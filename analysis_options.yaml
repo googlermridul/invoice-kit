@@ -1,0 +1,29 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+   exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/generated/**"
+   errors:
+      invalid_annotation_target: ignore
+      avoid_relative_lib_imports: ignore
+
+linter:
+   rules:
+      public_member_api_docs: false
+      lines_longer_than_80_chars: false
+      one_member_abstracts: false
+      avoid_classes_with_only_static_members: false
+      document_ignores: false
+      flutter_style_todos: false
+      avoid_redundant_argument_values: false
+      sort_pub_dependencies: false
+      use_setters_to_change_properties: false
+      prefer_relative_imports: false
+      avoid_final_parameters: false
+      # We use code generation, so some lints are noise.
+      prefer_const_constructors: false
+      prefer_const_declarations: false
+      prefer_const_literals_to_create_immutables: false
+      prefer_final_locals: false

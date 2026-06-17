@@ -1,0 +1,65 @@
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+**/generated/**.dart
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+*.iml
+.DS_Store
+.history
+.swiftpm/
+.atom/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.staging
+!.env.production
+
+# Android
+android/.gradle
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/key.properties
+android/app/google-services.json
+**/GeneratedPluginRegistrant.java
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Runner/Info.plist
+ios/Runner.xcworkspace/xcuserdata/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Symbolication
+app.*.symbols
+app.*.map.json
+
+# Misc
+*.log
+*.lock
+*.tmp

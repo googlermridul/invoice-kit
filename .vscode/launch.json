@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Development",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=APP_ENV=development",
+        "--flavor=development"
+      ]
+    },
+    {
+      "name": "Staging",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=APP_ENV=staging",
+        "--flavor=staging"
+      ]
+    },
+    {
+      "name": "Production",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=APP_ENV=production",
+        "--flavor=production"
+      ]
+    }
+  ]
+}
