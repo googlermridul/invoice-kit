@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/errors/failures.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
 
 /// Custom Dio-aware failure. Contains a [DioException] reference for debugging.
 class ApiException extends Failure {

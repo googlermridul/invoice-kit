@@ -1,16 +1,16 @@
-import 'package:flutter_boilerplate/core/errors/error_handler.dart';
-import 'package:flutter_boilerplate/core/errors/error_mapper.dart';
-import 'package:flutter_boilerplate/core/network/interceptors/auth_interceptor.dart';
-import 'package:flutter_boilerplate/core/storage/hive_storage_service.dart';
-import 'package:flutter_boilerplate/core/storage/local_storage_service.dart';
-import 'package:flutter_boilerplate/core/storage/secure_storage_service.dart';
-import 'package:flutter_boilerplate/features/authentication/data/datasources/auth_local_datasource.dart';
-import 'package:flutter_boilerplate/features/authentication/data/datasources/auth_remote_datasource.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/repositories/auth_repository.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/forgot_password_usecase.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/login_usecase.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/logout_usecase.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/register_usecase.dart';
+import 'package:invoice_kit/core/errors/error_handler.dart';
+import 'package:invoice_kit/core/errors/error_mapper.dart';
+import 'package:invoice_kit/core/network/interceptors/auth_interceptor.dart';
+import 'package:invoice_kit/core/storage/hive_storage_service.dart';
+import 'package:invoice_kit/core/storage/local_storage_service.dart';
+import 'package:invoice_kit/core/storage/secure_storage_service.dart';
+import 'package:invoice_kit/features/authentication/data/datasources/auth_local_datasource.dart';
+import 'package:invoice_kit/features/authentication/data/datasources/auth_remote_datasource.dart';
+import 'package:invoice_kit/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/forgot_password_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/login_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/logout_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/register_usecase.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLocalStorageService extends Mock implements LocalStorageService {}

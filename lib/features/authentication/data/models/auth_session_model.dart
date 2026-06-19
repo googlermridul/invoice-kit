@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/features/authentication/data/models/user_model.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/entities/user.dart';
+import 'package:invoice_kit/features/authentication/data/models/user_model.dart';
+import 'package:invoice_kit/features/authentication/domain/entities/user.dart';
 
 class AuthSessionModel extends AuthSession {
   const AuthSessionModel({

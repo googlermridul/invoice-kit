@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/features/authentication/domain/entities/user.dart';
+import 'package:invoice_kit/features/authentication/domain/entities/user.dart';
 
 /// JSON-friendly mirror of [User]. To use json_serializable codegen, add
 /// `@JsonSerializable()` and the `User.fromJson` factory.

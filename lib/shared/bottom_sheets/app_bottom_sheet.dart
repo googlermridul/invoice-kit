@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/extensions/context_extensions.dart';
-import 'package:flutter_boilerplate/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/theme/app_spacing.dart';
 
 class AppBottomSheet {
   const AppBottomSheet._();

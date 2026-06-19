@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:flutter_boilerplate/app/app_config.dart';
-import 'package:flutter_boilerplate/core/api/api_constants.dart';
-import 'package:flutter_boilerplate/core/network/interceptors/auth_interceptor.dart';
-import 'package:flutter_boilerplate/core/network/interceptors/logging_interceptor.dart';
-import 'package:flutter_boilerplate/core/network/interceptors/refresh_token_interceptor.dart';
+import 'package:invoice_kit/app/app_config.dart';
+import 'package:invoice_kit/core/api/api_constants.dart';
+import 'package:invoice_kit/core/network/interceptors/auth_interceptor.dart';
+import 'package:invoice_kit/core/network/interceptors/logging_interceptor.dart';
+import 'package:invoice_kit/core/network/interceptors/refresh_token_interceptor.dart';
 
 /// Configures and produces a single [Dio] instance for the app.
 class DioClient {

@@ -4,7 +4,7 @@
 library;
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_boilerplate/core/localization/app_locales.dart';
+import 'package:invoice_kit/core/localization/app_locales.dart';
 
 class AppLocalizations {
   const AppLocalizations(this.locale);

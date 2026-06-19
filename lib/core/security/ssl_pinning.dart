@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/app/app_config.dart' show AppConfig;
+import 'package:invoice_kit/app/app_config.dart' show AppConfig;
 
 /// Hooks for SSL pinning.
 ///

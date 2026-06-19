@@ -1,4 +1,4 @@
-package com.example.flutter_boilerplate
+package com.example.invoice_kit
 
 import io.flutter.embedding.android.FlutterActivity
 

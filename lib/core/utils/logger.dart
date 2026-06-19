@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_boilerplate/core/constants/app_constants.dart';
+import 'package:invoice_kit/core/constants/app_constants.dart';
 import 'package:logger/logger.dart';
 
 /// Environment-aware logger.

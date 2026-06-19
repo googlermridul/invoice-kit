@@ -1,11 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/entities/user.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/repositories/auth_repository.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/forgot_password_usecase.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/login_usecase.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/logout_usecase.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/usecases/register_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/entities/user.dart';
+import 'package:invoice_kit/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/forgot_password_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/login_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/logout_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/register_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

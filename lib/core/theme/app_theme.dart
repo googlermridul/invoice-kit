@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/theme/app_colors.dart';
-import 'package:flutter_boilerplate/core/theme/app_spacing.dart';
-import 'package:flutter_boilerplate/core/theme/app_text_theme.dart';
+import 'package:invoice_kit/core/theme/app_colors.dart';
+import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/theme/app_text_theme.dart';
 
 /// Centralised ThemeData factory.
 abstract class AppTheme {
@@ -59,8 +59,9 @@ abstract class AppTheme {
         titleTextStyle: TextStyle(
           color: onSurface,
           fontSize: 18,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           fontFamily: AppTextTheme.fontFamily,
+          letterSpacing: -0.2,
         ),
       ),
       cardTheme: CardThemeData(

@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/core/extensions/string_extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:invoice_kit/core/extensions/string_extensions.dart';
 
 void main() {
   group('StringX', () {

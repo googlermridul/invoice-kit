@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/errors/error_mapper.dart';
-import 'package:flutter_boilerplate/core/errors/failures.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:invoice_kit/core/errors/error_mapper.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
 
 void main() {
   group('DefaultErrorMapper', () {

@@ -4,14 +4,26 @@ import 'package:hive_flutter/hive_flutter.dart';
 class HiveStorageService {
   HiveStorageService._(this._boxes);
 
-  factory HiveStorageService.fromBoxes(Map<String, Box<dynamic>> boxes) =>
-      HiveStorageService._(boxes);
+  factory HiveStorageService.fromBoxes(Map<String, Box<dynamic>> boxes) => HiveStorageService._(boxes);
+
+  static HiveStorageService? _instance;
+
+  /// Access the most recently initialised instance.
+  static HiveStorageService get current {
+    final i = _instance;
+    if (i == null) {
+      throw StateError('HiveStorageService not initialised yet.');
+    }
+    return i;
+  }
 
   final Map<String, Box<dynamic>> _boxes;
 
   static Future<HiveStorageService> initialize({String subDir = 'hive'}) async {
     await Hive.initFlutter(subDir);
-    return HiveStorageService._({});
+    final svc = HiveStorageService._({});
+    _instance = svc;
+    return svc;
   }
 
   Future<Box<T>> openBox<T>(String name) async {

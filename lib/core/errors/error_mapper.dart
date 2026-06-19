@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_boilerplate/core/errors/failures.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
 
 /// Maps exceptions to domain-level [Failure]s. UI / blocs depend only on this.
 abstract class ErrorMapper {

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_boilerplate/core/extensions/context_extensions.dart';
-import 'package:flutter_boilerplate/core/localization/app_localizations.dart';
-import 'package:flutter_boilerplate/core/router/route_paths.dart';
-import 'package:flutter_boilerplate/core/theme/app_spacing.dart';
-import 'package:flutter_boilerplate/features/authentication/presentation/bloc/auth_bloc.dart';
-import 'package:flutter_boilerplate/features/authentication/presentation/widgets/auth_scaffold.dart';
-import 'package:flutter_boilerplate/shared/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invoice_kit/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/localization/app_localizations.dart';
+import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:invoice_kit/features/authentication/presentation/widgets/auth_scaffold.dart';
+import 'package:invoice_kit/shared/widgets/widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,12 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _submit() {
-    // if (_formKey.currentState!.validate()) {
-    // context.read<AuthBloc>().add(
-    //   AuthLoginRequested(email: _emailController.text.trim(), password: _passwordController.text),
-    // );
-    context.go(RoutePaths.home);
-    // }
+    if (_formKey.currentState!.validate()) {
+      context.read<AuthBloc>().add(
+        AuthLoginRequested(email: _emailController.text.trim(), password: _passwordController.text),
+      );
+    }
   }
 
   @override

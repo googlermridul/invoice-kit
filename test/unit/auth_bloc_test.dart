@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter_boilerplate/core/errors/failures.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/entities/user.dart';
-import 'package:flutter_boilerplate/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
+import 'package:invoice_kit/features/authentication/domain/entities/user.dart';
+import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../mocks/mocks.dart';

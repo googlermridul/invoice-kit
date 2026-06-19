@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/utils/logger.dart';
+import 'package:invoice_kit/core/utils/logger.dart';
 
 /// Logs request/response bodies in development, no-ops in release.
 class LoggingInterceptor extends Interceptor {

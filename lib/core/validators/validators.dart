@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/core/extensions/string_extensions.dart';
+import 'package:invoice_kit/core/extensions/string_extensions.dart';
 
 /// Lightweight field-level validators used by forms/blocs.
 class Validators {

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_boilerplate/core/storage/local_storage_service.dart';
+import 'package:invoice_kit/core/storage/local_storage_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 /// Reads `app_version`, `build_number`, etc. once at startup.

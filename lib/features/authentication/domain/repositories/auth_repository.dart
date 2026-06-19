@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/core/errors/failures.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/entities/user.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
+import 'package:invoice_kit/features/authentication/domain/entities/user.dart';
 
 /// Contract implemented by `data/repositories/auth_repository_impl.dart` and
 /// consumed by the BLoC layer. Returning [Failure] keeps the BLoC free of

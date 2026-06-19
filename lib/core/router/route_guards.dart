@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_boilerplate/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
 
 /// Marker used by [GoRouter] `redirect` to know which routes require auth.
 class RouteGuards {
@@ -18,7 +18,11 @@ class RouteGuards {
   static bool requiresAuth(String location) => !publicRoutes.contains(location);
 
   /// Hook used by [GoRouter.refreshListenable] when auth state changes.
-  static String? redirectAfterAuth(BuildContext context, GoRouterState state, AuthState auth) {
+  static String? redirectAfterAuth(
+    BuildContext context,
+    GoRouterState state,
+    AuthState auth,
+  ) {
     final loggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/register';
     if (auth.isAuthenticated) {
       return loggingIn ? '/home' : null;

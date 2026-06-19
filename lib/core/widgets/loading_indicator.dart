@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/theme/app_spacing.dart';
 
 /// Centred loading indicator with an optional label.
 class LoadingIndicator extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/theme/app_theme.dart';
-import 'package:flutter_boilerplate/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:invoice_kit/core/theme/app_theme.dart';
+import 'package:invoice_kit/features/onboarding/presentation/screens/onboarding_screen.dart';
 
 void main() {
   testWidgets('Onboarding screen renders three pages and a CTA', (tester) async {

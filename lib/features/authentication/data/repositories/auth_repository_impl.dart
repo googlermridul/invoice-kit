@@ -1,10 +1,10 @@
-import 'package:flutter_boilerplate/core/errors/error_handler.dart';
-import 'package:flutter_boilerplate/core/errors/failures.dart';
-import 'package:flutter_boilerplate/core/network/interceptors/auth_interceptor.dart';
-import 'package:flutter_boilerplate/features/authentication/data/datasources/auth_local_datasource.dart';
-import 'package:flutter_boilerplate/features/authentication/data/datasources/auth_remote_datasource.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/entities/user.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:invoice_kit/core/errors/error_handler.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
+import 'package:invoice_kit/core/network/interceptors/auth_interceptor.dart';
+import 'package:invoice_kit/features/authentication/data/datasources/auth_local_datasource.dart';
+import 'package:invoice_kit/features/authentication/data/datasources/auth_remote_datasource.dart';
+import 'package:invoice_kit/features/authentication/domain/entities/user.dart';
+import 'package:invoice_kit/features/authentication/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({

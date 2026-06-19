@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter_boilerplate/core/errors/error_mapper.dart';
-import 'package:flutter_boilerplate/core/errors/failures.dart';
+import 'package:invoice_kit/core/errors/error_mapper.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
 
 /// Centralised error handler. Use inside repositories/usecases:
 /// ```dart

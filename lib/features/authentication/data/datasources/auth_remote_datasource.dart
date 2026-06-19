@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/api/api_endpoints.dart';
-import 'package:flutter_boilerplate/core/api/api_response.dart';
-import 'package:flutter_boilerplate/features/authentication/data/models/auth_session_model.dart';
+import 'package:invoice_kit/core/api/api_endpoints.dart';
+import 'package:invoice_kit/core/api/api_response.dart';
+import 'package:invoice_kit/features/authentication/data/models/auth_session_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<AuthSessionModel> login({required String email, required String password});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/extensions/context_extensions.dart';
 
 class AppDialog {
   const AppDialog._();

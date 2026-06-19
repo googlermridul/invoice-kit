@@ -1,4 +1,4 @@
-import 'package:flutter_boilerplate/core/utils/logger.dart';
+import 'package:invoice_kit/core/utils/logger.dart';
 
 class CoreLogger {
   factory CoreLogger({bool enabled = true}) => CoreLogger._(AppLogger.create(enabled: enabled));

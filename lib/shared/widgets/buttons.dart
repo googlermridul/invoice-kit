@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/theme/app_spacing.dart';
 import 'package:gap/gap.dart';
+import 'package:invoice_kit/core/theme/app_spacing.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({

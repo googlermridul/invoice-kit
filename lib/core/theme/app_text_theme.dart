@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/theme/app_colors.dart';
+import 'package:invoice_kit/core/theme/app_colors.dart';
 
 class AppTextTheme {
   const AppTextTheme._();

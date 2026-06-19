@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/core/validators/validators.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:invoice_kit/core/validators/validators.dart';
 
 void main() {
   group('Validators', () {

@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/core/api/api_endpoints.dart';
-import 'package:flutter_boilerplate/core/api/api_response.dart';
-import 'package:flutter_boilerplate/core/network/interceptors/auth_interceptor.dart';
-import 'package:flutter_boilerplate/core/storage/secure_storage_service.dart';
+import 'package:invoice_kit/core/api/api_endpoints.dart';
+import 'package:invoice_kit/core/api/api_response.dart';
+import 'package:invoice_kit/core/network/interceptors/auth_interceptor.dart';
+import 'package:invoice_kit/core/storage/secure_storage_service.dart';
 
 /// Intercepts 401s, refreshes the access token once, then retries the request.
 class RefreshTokenInterceptor extends Interceptor {

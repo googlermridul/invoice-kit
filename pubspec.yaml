@@ -1,4 +1,4 @@
-name: flutter_boilerplate
+name: invoice_kit
 description: "Production-ready Flutter boilerplate — Clean Architecture, BLoC, GetIt, GoRouter."
 publish_to: "none"
 version: 1.0.0+1
@@ -64,6 +64,18 @@ dependencies:
    # Misc
    url_launcher: ^6.3.0
    path_provider: ^2.1.4
+
+   # PDF & Sharing (InvoiceKit)
+   pdf: ^3.11.1
+   printing: ^5.13.3
+   share_plus: ^13.0.0
+
+   # Charts (Reports)
+   fl_chart: ^1.2.0
+
+   # File picking / image
+   image_picker: ^1.1.2
+   file_picker: ^12.0.0-beta.7
 
 dev_dependencies:
    flutter_test:

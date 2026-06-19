@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_boilerplate/core/typography/font_weights.dart';
+import 'package:invoice_kit/core/typography/font_weights.dart';
 
 /// Pre-baked text styles. Use these for one-off widgets; otherwise prefer
 /// `Theme.of(context).textTheme`.

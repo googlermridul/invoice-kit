@@ -1,7 +1,7 @@
-import 'package:flutter_boilerplate/core/storage/hive_storage_service.dart';
-import 'package:flutter_boilerplate/core/storage/secure_storage_service.dart';
-import 'package:flutter_boilerplate/features/authentication/data/models/auth_session_model.dart';
-import 'package:flutter_boilerplate/features/authentication/data/models/user_model.dart';
+import 'package:invoice_kit/core/storage/hive_storage_service.dart';
+import 'package:invoice_kit/core/storage/secure_storage_service.dart';
+import 'package:invoice_kit/features/authentication/data/models/auth_session_model.dart';
+import 'package:invoice_kit/features/authentication/data/models/user_model.dart';
 
 abstract class AuthLocalDataSource {
   Future<void> cacheSession(AuthSessionModel session);

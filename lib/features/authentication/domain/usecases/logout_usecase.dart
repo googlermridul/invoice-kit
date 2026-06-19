@@ -1,5 +1,5 @@
-import 'package:flutter_boilerplate/core/errors/failures.dart';
-import 'package:flutter_boilerplate/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:invoice_kit/core/errors/failures.dart';
+import 'package:invoice_kit/features/authentication/domain/repositories/auth_repository.dart';
 
 class LogoutUseCase {
   LogoutUseCase(this._repo);

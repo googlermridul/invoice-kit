@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_boilerplate/app/app_config.dart';
-import 'package:flutter_boilerplate/core/api/api_constants.dart';
+import 'package:invoice_kit/app/app_config.dart';
+import 'package:invoice_kit/core/api/api_constants.dart';
 
 /// Adds `Authorization: Bearer <token>` to every outgoing request.
 class AuthInterceptor extends Interceptor {

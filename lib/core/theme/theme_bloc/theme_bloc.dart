@@ -1,20 +1,19 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter_boilerplate/core/constants/storage_keys.dart';
-import 'package:flutter_boilerplate/core/storage/local_storage_service.dart';
+import 'package:invoice_kit/core/constants/storage_keys.dart';
+import 'package:invoice_kit/core/storage/local_storage_service.dart';
 
 part 'theme_event.dart';
 part 'theme_state.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   ThemeBloc(this._localStorage)
-      : super(
-          ThemeState(
-            mode: _resolveMode(_localStorage.getString(StorageKeys.themeMode)),
-          ),
-        ) {
+    : super(
+        ThemeState(
+          mode: _resolveMode(_localStorage.getString(StorageKeys.themeMode)),
+        ),
+      ) {
     on<ThemeChanged>(_onChanged);
     on<ThemeToggled>(_onToggled);
   }
