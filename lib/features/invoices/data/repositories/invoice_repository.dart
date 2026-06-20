@@ -20,7 +20,8 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
 
   final HiveJsonStore<Invoice> _store;
 
-  static InvoiceRepository create(HiveStorageService storage) => InvoiceRepositoryImpl(
+  static InvoiceRepository create(HiveStorageService storage) =>
+      InvoiceRepositoryImpl(
         HiveJsonStore<Invoice>(
           storage: storage,
           boxName: HiveBoxes.invoices,

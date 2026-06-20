@@ -37,7 +37,10 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   final SubscriptionRepository subscriptionRepo;
   final EntitlementService entitlements;
 
-  Future<void> _onStarted(OnboardingStarted event, Emitter<OnboardingState> emit) async {
+  Future<void> _onStarted(
+    OnboardingStarted event,
+    Emitter<OnboardingState> emit,
+  ) async {
     emit(state.copyWith(status: OnboardingStatus.loading));
     final existingProfile = await businessRepo.load();
     final settings = await settingsRepo.load();
@@ -48,24 +51,37 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         businessName: existingProfile?.businessName ?? state.businessName,
         currency: existingProfile?.defaultCurrency ?? settings.currency,
         taxId: existingProfile?.taxId ?? state.taxId,
-        paymentTerms: existingProfile?.defaultPaymentTerms ?? state.paymentTerms,
+        paymentTerms:
+            existingProfile?.defaultPaymentTerms ?? state.paymentTerms,
       ),
     );
   }
 
-  void _onStepChanged(OnboardingStepChanged event, Emitter<OnboardingState> emit) {
+  void _onStepChanged(
+    OnboardingStepChanged event,
+    Emitter<OnboardingState> emit,
+  ) {
     emit(state.copyWith(step: event.step));
   }
 
-  void _onUserName(OnboardingUserNameChanged event, Emitter<OnboardingState> emit) {
+  void _onUserName(
+    OnboardingUserNameChanged event,
+    Emitter<OnboardingState> emit,
+  ) {
     emit(state.copyWith(userName: event.value));
   }
 
-  void _onBusinessName(OnboardingBusinessNameChanged event, Emitter<OnboardingState> emit) {
+  void _onBusinessName(
+    OnboardingBusinessNameChanged event,
+    Emitter<OnboardingState> emit,
+  ) {
     emit(state.copyWith(businessName: event.value));
   }
 
-  void _onCurrency(OnboardingCurrencyChanged event, Emitter<OnboardingState> emit) {
+  void _onCurrency(
+    OnboardingCurrencyChanged event,
+    Emitter<OnboardingState> emit,
+  ) {
     emit(state.copyWith(currency: event.value));
   }
 
@@ -73,7 +89,10 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     emit(state.copyWith(taxId: event.value));
   }
 
-  void _onTerms(OnboardingPaymentTermsChanged event, Emitter<OnboardingState> emit) {
+  void _onTerms(
+    OnboardingPaymentTermsChanged event,
+    Emitter<OnboardingState> emit,
+  ) {
     emit(state.copyWith(paymentTerms: event.value));
   }
 
@@ -81,11 +100,16 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     emit(state.copyWith(themeModeName: event.value));
   }
 
-  Future<void> _onCompleted(OnboardingCompleted event, Emitter<OnboardingState> emit) async {
+  Future<void> _onCompleted(
+    OnboardingCompleted event,
+    Emitter<OnboardingState> emit,
+  ) async {
     emit(state.copyWith(status: OnboardingStatus.saving));
 
     final profile = BusinessProfile(
-      businessName: state.businessName.trim().isEmpty ? 'My Business' : state.businessName.trim(),
+      businessName: state.businessName.trim().isEmpty
+          ? 'My Business'
+          : state.businessName.trim(),
       ownerName: state.userName.trim().isEmpty ? null : state.userName.trim(),
       defaultCurrency: state.currency,
       taxId: state.taxId.trim().isEmpty ? null : state.taxId.trim(),
@@ -105,7 +129,9 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     // Start the trial automatically when onboarding completes.
     final current = await subscriptionRepo.current();
     if (entitlements.canStartTrial(current)) {
-      await subscriptionRepo.save(entitlements.startTrial(current, DateTime.now()));
+      await subscriptionRepo.save(
+        entitlements.startTrial(current, DateTime.now()),
+      );
     }
 
     await localStorage.setBool(StorageKeys.onboardingCompleted, true);

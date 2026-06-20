@@ -27,14 +27,17 @@ class AppRouterGuard {
   final EntitlementService entitlements;
 
   String? redirect(BuildContext context, GoRouterState state) {
-    final completed = localStorage.getBool(StorageKeys.onboardingCompleted) ?? false;
+    final completed =
+        localStorage.getBool(StorageKeys.onboardingCompleted) ?? false;
     if (!completed) {
       // Allow only the splash and onboarding routes.
       final allowed = {
         RoutePaths.splash,
         RoutePaths.onboarding,
       };
-      return allowed.contains(state.matchedLocation) ? null : RoutePaths.onboarding;
+      return allowed.contains(state.matchedLocation)
+          ? null
+          : RoutePaths.onboarding;
     }
 
     final subState = subscriptionBloc.state;
@@ -44,7 +47,9 @@ class AppRouterGuard {
         RoutePaths.splash,
         RoutePaths.subscription,
       };
-      return allowed.contains(state.matchedLocation) ? null : RoutePaths.subscription;
+      return allowed.contains(state.matchedLocation)
+          ? null
+          : RoutePaths.subscription;
     }
 
     return null;

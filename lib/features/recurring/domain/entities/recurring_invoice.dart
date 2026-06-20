@@ -17,8 +17,8 @@ enum RecurringFrequency {
     RecurringFrequency.yearly => 'Yearly',
   };
 
-  static RecurringFrequency fromId(int id) =>
-      RecurringFrequency.values.firstWhere((f) => f.id == id, orElse: () => RecurringFrequency.monthly);
+  static RecurringFrequency fromId(int id) => RecurringFrequency.values
+      .firstWhere((f) => f.id == id, orElse: () => RecurringFrequency.monthly);
 }
 
 /// A template for invoices that should be generated on a recurring schedule.
@@ -38,20 +38,27 @@ class RecurringInvoice extends Equatable {
     this.active = true,
   });
 
-  factory RecurringInvoice.fromJson(Map<String, dynamic> json) => RecurringInvoice(
-    id: (json['id'] ?? '').toString(),
-    clientId: (json['clientId'] ?? '').toString(),
-    frequency: RecurringFrequency.fromId((json['frequency'] as num?)?.toInt() ?? 2),
-    startDate: DateTime.parse(json['startDate'] as String),
-    nextRunDate: DateTime.parse(json['nextRunDate'] as String),
-    endDate: json['endDate'] == null ? null : DateTime.parse(json['endDate'] as String),
-    currency: (json['currency'] ?? 'USD').toString(),
-    items: (json['items'] as List<dynamic>? ?? const []).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
-    notes: json['notes'] as String?,
-    terms: json['terms'] as String?,
-    taxRateOverride: (json['taxRateOverride'] as num?)?.toDouble(),
-    active: json['active'] as bool? ?? true,
-  );
+  factory RecurringInvoice.fromJson(Map<String, dynamic> json) =>
+      RecurringInvoice(
+        id: (json['id'] ?? '').toString(),
+        clientId: (json['clientId'] ?? '').toString(),
+        frequency: RecurringFrequency.fromId(
+          (json['frequency'] as num?)?.toInt() ?? 2,
+        ),
+        startDate: DateTime.parse(json['startDate'] as String),
+        nextRunDate: DateTime.parse(json['nextRunDate'] as String),
+        endDate: json['endDate'] == null
+            ? null
+            : DateTime.parse(json['endDate'] as String),
+        currency: (json['currency'] ?? 'USD').toString(),
+        items: (json['items'] as List<dynamic>? ?? const [])
+            .map((e) => Map<String, dynamic>.from(e as Map))
+            .toList(),
+        notes: json['notes'] as String?,
+        terms: json['terms'] as String?,
+        taxRateOverride: (json['taxRateOverride'] as num?)?.toDouble(),
+        active: json['active'] as bool? ?? true,
+      );
 
   final String id;
   final String clientId;

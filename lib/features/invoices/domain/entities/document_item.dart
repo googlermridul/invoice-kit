@@ -74,5 +74,12 @@ class DocumentItem extends Equatable {
   };
 
   @override
-  List<Object?> get props => [id, description, quantity, unitPrice, taxRate, discount];
+  List<Object?> get props => [
+    id,
+    description,
+    quantity,
+    unitPrice,
+    taxRate,
+    discount,
+  ];
 }

@@ -24,7 +24,13 @@ class BackupCubit extends Cubit<BackupState> {
     emit(state.copyWith(busy: true, error: null));
     try {
       final path = await repository.exportToFile();
-      emit(state.copyWith(busy: false, lastExportPath: path, message: 'Exported backup'));
+      emit(
+        state.copyWith(
+          busy: false,
+          lastExportPath: path,
+          message: 'Exported backup',
+        ),
+      );
       await load();
       return path;
     } catch (e) {
@@ -38,11 +44,23 @@ class BackupCubit extends Cubit<BackupState> {
   Future<BackupValidationResult> validate(String jsonString) =>
       repository.validate(jsonString);
 
-  Future<ImportSummary> importFromString(String jsonString, {bool overwrite = true}) async {
+  Future<ImportSummary> importFromString(
+    String jsonString, {
+    bool overwrite = true,
+  }) async {
     emit(state.copyWith(busy: true, error: null));
     try {
-      final summary = await repository.importFromString(jsonString, overwrite: overwrite);
-      emit(state.copyWith(busy: false, lastImport: summary, message: 'Imported backup'));
+      final summary = await repository.importFromString(
+        jsonString,
+        overwrite: overwrite,
+      );
+      emit(
+        state.copyWith(
+          busy: false,
+          lastImport: summary,
+          message: 'Imported backup',
+        ),
+      );
       return summary;
     } catch (e) {
       emit(state.copyWith(busy: false, error: e.toString()));

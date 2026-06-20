@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/localization/app_localizations.dart';
+import 'package:invoice_kit/core/router/app_routes.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:invoice_kit/features/authentication/presentation/widgets/auth_scaffold.dart';
@@ -31,7 +32,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-        AuthLoginRequested(email: _emailController.text.trim(), password: _passwordController.text),
+        AuthLoginRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
       );
     }
   }
@@ -70,7 +74,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscure: _obscure,
                   prefixIcon: Icons.lock_outline,
                   suffixIcon: IconButton(
-                    icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                      _obscure ? Icons.visibility_off : Icons.visibility,
+                    ),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                   textInputAction: TextInputAction.done,
@@ -80,18 +86,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () => context.go('/forgot-password'),
+                    onPressed: () =>
+                        GoRouter.of(context).push(AppRoutes.forgotPassword),
                     child: Text(l.authForgotPassword),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                PrimaryButton(label: l.authLogin, onPressed: _submit, loading: state.isSubmitting),
+                PrimaryButton(
+                  label: l.authLogin,
+                  onPressed: _submit,
+                  loading: state.isSubmitting,
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(l.authDontHaveAccount),
-                    TextButton(onPressed: () => context.go('/register'), child: Text(l.authSignUp)),
+                    TextButton(
+                      onPressed: () =>
+                          GoRouter.of(context).push(AppRoutes.register),
+                      child: Text(l.authSignUp),
+                    ),
                   ],
                 ),
               ],

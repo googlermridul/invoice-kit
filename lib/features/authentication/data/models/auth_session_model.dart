@@ -10,7 +10,8 @@ class AuthSessionModel extends AuthSession {
 
   factory AuthSessionModel.fromJson(Map<String, dynamic> json) {
     return AuthSessionModel(
-      accessToken: json['accessToken']?.toString() ?? json['token']?.toString() ?? '',
+      accessToken:
+          json['accessToken']?.toString() ?? json['token']?.toString() ?? '',
       refreshToken: json['refreshToken']?.toString() ?? '',
       user: UserModel.fromJson(
         json['user'] is Map<String, dynamic>

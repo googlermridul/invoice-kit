@@ -21,13 +21,12 @@ class QuotesState extends Equatable {
     String? defaultCurrency,
     String? error,
     bool clearError = false,
-  }) =>
-      QuotesState(
-        loading: loading ?? this.loading,
-        quotes: quotes ?? this.quotes,
-        defaultCurrency: defaultCurrency ?? this.defaultCurrency,
-        error: clearError ? null : (error ?? this.error),
-      );
+  }) => QuotesState(
+    loading: loading ?? this.loading,
+    quotes: quotes ?? this.quotes,
+    defaultCurrency: defaultCurrency ?? this.defaultCurrency,
+    error: clearError ? null : (error ?? this.error),
+  );
 
   @override
   List<Object?> get props => [loading, quotes, defaultCurrency, error];

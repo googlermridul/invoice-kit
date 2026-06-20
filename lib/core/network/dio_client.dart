@@ -37,7 +37,8 @@ class DioClient {
     // SSL pinning (no-op by default — see security/ssl_pinning.dart).
     if (config.enableSslPinning) {
       (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        final client = HttpClient()..badCertificateCallback = (_, _, _) => false;
+        final client = HttpClient()
+          ..badCertificateCallback = (_, _, _) => false;
         return client;
       };
     }

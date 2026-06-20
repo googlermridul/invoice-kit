@@ -15,7 +15,10 @@ class RefreshTokenInterceptor extends Interceptor {
   bool _refreshing = false;
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     if (err.response?.statusCode != 401 || _refreshing) {
       return handler.next(err);
     }
@@ -75,7 +78,10 @@ class SecureStorageTokenProvider implements TokenProvider {
   Future<String?> refreshToken() => _storage.read(_kRefresh);
 
   @override
-  Future<void> saveTokens({required String accessToken, required String refreshToken}) async {
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
     await _storage.write(_kAccess, accessToken);
     await _storage.write(_kRefresh, refreshToken);
   }

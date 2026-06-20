@@ -18,14 +18,15 @@ class ClientRepositoryImpl implements ClientRepository {
 
   final HiveJsonStore<Client> _store;
 
-  static ClientRepository create(HiveStorageService storage) => ClientRepositoryImpl(
-    HiveJsonStore<Client>(
-      storage: storage,
-      boxName: HiveBoxes.clients,
-      fromJson: Client.fromJson,
-      toJson: (c) => c.toJson(),
-    ),
-  );
+  static ClientRepository create(HiveStorageService storage) =>
+      ClientRepositoryImpl(
+        HiveJsonStore<Client>(
+          storage: storage,
+          boxName: HiveBoxes.clients,
+          fromJson: Client.fromJson,
+          toJson: (c) => c.toJson(),
+        ),
+      );
 
   @override
   Future<List<Client>> all() => _store.all();

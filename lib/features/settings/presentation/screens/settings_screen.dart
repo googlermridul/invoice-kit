@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/constants/invoice_constants.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/router/app_routes.dart';
 import 'package:invoice_kit/core/theme/theme.dart';
+import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/pdf_template.dart';
 import 'package:invoice_kit/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
@@ -13,126 +15,268 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+    return AppScaffold(
+      title: 'Settings',
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          AppSpacing.xxxl,
+        ),
         children: [
-          _Section('Account'),
-          BlocBuilder<SubscriptionBloc, SubscriptionState>(
-            builder: (context, state) {
-              return ListTile(
-                leading: const Icon(Icons.workspace_premium_outlined),
-                title: const Text('Subscription'),
-                subtitle: Text(
-                  state.isTrialing
-                      ? 'Trial · ${state.trialDaysRemaining} days left'
-                      : state.isActive
-                      ? 'Active · ${state.currentStatus.plan?.label ?? ''}'
-                      : 'Inactive',
+          const SectionHeader(
+            title: 'Account',
+            uppercase: true,
+            tone: SectionHeaderTone.neutral,
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                BlocBuilder<SubscriptionBloc, SubscriptionState>(
+                  builder: (context, state) {
+                    return ListTile(
+                      leading: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: context.tokens.brandSubtle,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.workspace_premium_outlined,
+                          color: context.colors.primary,
+                        ),
+                      ),
+                      title: const Text('Subscription'),
+                      subtitle: Text(
+                        state.isTrialing
+                            ? 'Trial · ${state.trialDaysRemaining} days left'
+                            : state.isActive
+                            ? 'Active · ${state.currentStatus.plan?.label ?? ''}'
+                            : 'Inactive',
+                        style: TextStyle(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () =>
+                          GoRouter.of(context).push(AppRoutes.subscription),
+                    );
+                  },
                 ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.go('/subscription'),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.storefront_outlined),
-            title: const Text('Business profile'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.go('/business-profile'),
-          ),
-          const Divider(),
-          _Section('Appearance'),
-          BlocBuilder<ThemeBloc, ThemeState>(
-            builder: (context, state) {
-              return Column(
-                children: [
-                  RadioListTile<ThemeMode>(
-                    title: const Text('Match system'),
-                    value: ThemeMode.system,
-                    groupValue: state.mode,
-                    onChanged: (m) {
-                      if (m != null) context.read<ThemeBloc>().add(ThemeChanged(m));
-                    },
+                const Divider(
+                  height: 1,
+                  indent: AppSpacing.md,
+                  endIndent: AppSpacing.md,
+                ),
+                ListTile(
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: context.tokens.brandSubtle,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.storefront_outlined,
+                      color: context.colors.primary,
+                    ),
                   ),
-                  RadioListTile<ThemeMode>(
-                    title: const Text('Light'),
-                    value: ThemeMode.light,
-                    groupValue: state.mode,
-                    onChanged: (m) {
-                      if (m != null) context.read<ThemeBloc>().add(ThemeChanged(m));
-                    },
-                  ),
-                  RadioListTile<ThemeMode>(
-                    title: const Text('Dark'),
-                    value: ThemeMode.dark,
-                    groupValue: state.mode,
-                    onChanged: (m) {
-                      if (m != null) context.read<ThemeBloc>().add(ThemeChanged(m));
-                    },
-                  ),
-                ],
-              );
-            },
+                  title: const Text('Business profile'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () =>
+                      GoRouter.of(context).push(AppRoutes.businessProfile),
+                ),
+              ],
+            ),
           ),
-          const Divider(),
-          _Section('Defaults'),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionHeader(
+            title: 'Appearance',
+            uppercase: true,
+            tone: SectionHeaderTone.neutral,
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: BlocBuilder<ThemeBloc, ThemeState>(
+              builder: (context, state) {
+                return Column(
+                  children: [
+                    _ThemeOption(
+                      label: 'Match system',
+                      value: ThemeMode.system,
+                      groupValue: state.mode,
+                    ),
+                    const Divider(
+                      height: 1,
+                      indent: AppSpacing.md,
+                      endIndent: AppSpacing.md,
+                    ),
+                    _ThemeOption(
+                      label: 'Light',
+                      value: ThemeMode.light,
+                      groupValue: state.mode,
+                    ),
+                    const Divider(
+                      height: 1,
+                      indent: AppSpacing.md,
+                      endIndent: AppSpacing.md,
+                    ),
+                    _ThemeOption(
+                      label: 'Dark',
+                      value: ThemeMode.dark,
+                      groupValue: state.mode,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionHeader(
+            title: 'Defaults',
+            uppercase: true,
+            tone: SectionHeaderTone.neutral,
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: AppSpacing.sm),
           BlocBuilder<SettingsCubit, SettingsState>(
             builder: (context, state) {
               final s = state.settings;
-              return Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.attach_money),
-                    title: const Text('Default currency'),
-                    subtitle: Text(s.currency),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _pickCurrency(context, s.currency),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.picture_as_pdf_outlined),
-                    title: const Text('Default PDF template'),
-                    subtitle: Text(PdfTemplateIds.displayName(s.selectedPdfTemplate)),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () => _pickTemplate(context, s.selectedPdfTemplate),
-                  ),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.notifications_outlined),
-                    title: const Text('Send payment reminders'),
-                    value: s.sendReminders,
-                    onChanged: (v) => context.read<SettingsCubit>().setSendReminders(v),
-                  ),
-                  SwitchListTile(
-                    secondary: const Icon(Icons.warning_amber_outlined),
-                    title: const Text('Auto-mark overdue'),
-                    value: s.markOverdueAuto,
-                    onChanged: (v) => context.read<SettingsCubit>().setMarkOverdueAuto(v),
-                  ),
-                ],
+              return AppCard(
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        Icons.attach_money,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      title: const Text('Default currency'),
+                      subtitle: Text(
+                        s.currency,
+                        style: TextStyle(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => _pickCurrency(context, s.currency),
+                    ),
+                    const Divider(
+                      height: 1,
+                      indent: AppSpacing.md,
+                      endIndent: AppSpacing.md,
+                    ),
+                    ListTile(
+                      leading: Icon(
+                        Icons.picture_as_pdf_outlined,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      title: const Text('Default PDF template'),
+                      subtitle: Text(
+                        PdfTemplateIds.displayName(s.selectedPdfTemplate),
+                        style: TextStyle(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () =>
+                          _pickTemplate(context, s.selectedPdfTemplate),
+                    ),
+                    const Divider(
+                      height: 1,
+                      indent: AppSpacing.md,
+                      endIndent: AppSpacing.md,
+                    ),
+                    SwitchListTile(
+                      secondary: Icon(
+                        Icons.notifications_outlined,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      title: const Text('Send payment reminders'),
+                      value: s.sendReminders,
+                      onChanged: (v) =>
+                          context.read<SettingsCubit>().setSendReminders(v),
+                    ),
+                    const Divider(
+                      height: 1,
+                      indent: AppSpacing.md,
+                      endIndent: AppSpacing.md,
+                    ),
+                    SwitchListTile(
+                      secondary: Icon(
+                        Icons.warning_amber_outlined,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      title: const Text('Auto-mark overdue'),
+                      value: s.markOverdueAuto,
+                      onChanged: (v) =>
+                          context.read<SettingsCubit>().setMarkOverdueAuto(v),
+                    ),
+                  ],
+                ),
               );
             },
           ),
-          const Divider(),
-          _Section('Data'),
-          ListTile(
-            leading: const Icon(Icons.cloud_sync_outlined),
-            title: const Text('Backup & restore'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.go('/backup'),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionHeader(
+            title: 'Data',
+            uppercase: true,
+            tone: SectionHeaderTone.neutral,
+            padding: EdgeInsets.zero,
           ),
-          ListTile(
-            leading: const Icon(Icons.swap_horiz),
-            title: const Text('FX rates'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.go('/fx'),
+          const SizedBox(height: AppSpacing.sm),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(
+                    Icons.cloud_sync_outlined,
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                  title: const Text('Backup & restore'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => GoRouter.of(context).push(AppRoutes.backup),
+                ),
+                const Divider(
+                  height: 1,
+                  indent: AppSpacing.md,
+                  endIndent: AppSpacing.md,
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.swap_horiz,
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                  title: const Text('FX rates'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => GoRouter.of(context).push(AppRoutes.fx),
+                ),
+              ],
+            ),
           ),
-          const Divider(),
-          _Section('About'),
-          const ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text('InvoiceKit'),
-            subtitle: Text('1.0.0'),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionHeader(
+            title: 'About',
+            uppercase: true,
+            tone: SectionHeaderTone.neutral,
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          const AppCard(
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(Icons.info_outline),
+              title: Text('InvoiceKit'),
+              subtitle: Text('1.0.0'),
+            ),
           ),
         ],
       ),
@@ -179,25 +323,27 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class _Section extends StatelessWidget {
-  const _Section(this.title);
-  final String title;
+class _ThemeOption extends StatelessWidget {
+  const _ThemeOption({
+    required this.label,
+    required this.value,
+    required this.groupValue,
+  });
+
+  final String label;
+  final ThemeMode value;
+  final ThemeMode groupValue;
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.xs,
-      ),
-      child: Text(
-        title.toUpperCase(),
-        style: context.textTheme.labelSmall?.copyWith(
-          color: context.colors.outline,
-          letterSpacing: 1.2,
-        ),
-      ),
+    return RadioListTile<ThemeMode>(
+      title: Text(label),
+      value: value,
+      // ignore: deprecated_member_use
+      groupValue: groupValue,
+      onChanged: (m) {
+        if (m != null) context.read<ThemeBloc>().add(ThemeChanged(m));
+      },
     );
   }
 }

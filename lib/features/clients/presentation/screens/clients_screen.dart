@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/router/route_paths.dart';
+import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/widgets/app_scaffold.dart';
+import 'package:invoice_kit/core/widgets/empty_state.dart';
+import 'package:invoice_kit/core/widgets/search_field.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
+import 'package:invoice_kit/shared/widgets/client_row.dart';
 
 class ClientsScreen extends StatefulWidget {
   const ClientsScreen({super.key});
@@ -30,40 +36,29 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Clients'),
-      ),
+    return AppScaffold(
+      title: 'Clients',
+      leading: const SizedBox.shrink(),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/clients/new'),
+        onPressed: () => GoRouter.of(context).push(RoutePaths.clientNew),
         icon: const Icon(Icons.person_add_alt_1),
         label: const Text('New client'),
       ),
+      padding: EdgeInsets.zero,
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
-            child: TextField(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.sm,
+            ),
+            child: SearchField(
               controller: _searchCtrl,
-              decoration: InputDecoration(
-                hintText: 'Search by name, email, company',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchCtrl.text.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          _searchCtrl.clear();
-                          context.read<ClientsCubit>().load();
-                          setState(() {});
-                        },
-                      ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onChanged: (v) {
-                context.read<ClientsCubit>().search(v);
-                setState(() {});
-              },
+              hint: 'Search by name, email, company',
+              onChanged: (v) => context.read<ClientsCubit>().search(v),
+              onClear: () => context.read<ClientsCubit>().load(),
             ),
           ),
           Expanded(
@@ -73,31 +68,43 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (state.clients.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.people_outline, size: 64, color: context.colors.outline),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(state.query.isEmpty ? 'No clients yet' : 'No clients match "${state.query}"'),
-                        const SizedBox(height: AppSpacing.sm),
-                        TextButton(
-                          onPressed: () => context.go('/clients/new'),
-                          child: const Text('Add your first client'),
-                        ),
-                      ],
-                    ),
+                  return EmptyState(
+                    icon: Icons.people_outline,
+                    title: state.query.isEmpty
+                        ? 'No clients yet'
+                        : 'No clients match "${state.query}"',
+                    subtitle: state.query.isEmpty
+                        ? 'Add your first client to start invoicing.'
+                        : 'Try a different name or company.',
+                    actionLabel: state.query.isEmpty ? 'Add client' : null,
+                    onAction: state.query.isEmpty
+                        ? () => GoRouter.of(context).push(RoutePaths.clientNew)
+                        : null,
                   );
                 }
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  itemCount: state.clients.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1, indent: 72),
-                  itemBuilder: (_, i) => _ClientRow(
-                    client: state.clients[i],
-                    invoiceCount: state.invoiceCountByClient[state.clients[i].id] ?? 0,
-                    quoteCount: state.quoteCountByClient[state.clients[i].id] ?? 0,
+                return ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    AppSpacing.xxxl,
                   ),
+                  itemCount: state.clients.length,
+                  itemBuilder: (_, i) {
+                    final c = state.clients[i];
+                    final invoices = state.invoiceCountByClient[c.id] ?? 0;
+                    final quotes = state.quoteCountByClient[c.id] ?? 0;
+                    return ClientRow(
+                      name: c.name,
+                      subtitle: _clientSubtitle(c),
+                      trailing: (invoices > 0 || quotes > 0)
+                          ? _CountBadges(invoices: invoices, quotes: quotes)
+                          : null,
+                      onTap: () => GoRouter.of(context).push(
+                        RoutePaths.clientDetailPath(c.id),
+                      ),
+                    );
+                  },
                 );
               },
             ),
@@ -106,63 +113,58 @@ class _ClientsScreenState extends State<ClientsScreen> {
       ),
     );
   }
+
+  String? _clientSubtitle(Client c) {
+    final parts = [
+      if ((c.company ?? '').isNotEmpty) c.company!,
+      if ((c.email ?? '').isNotEmpty) c.email!,
+    ];
+    return parts.isEmpty ? null : parts.join(' · ');
+  }
 }
 
-class _ClientRow extends StatelessWidget {
-  const _ClientRow({
-    required this.client,
-    required this.invoiceCount,
-    required this.quoteCount,
-  });
-
-  final Client client;
-  final int invoiceCount;
-  final int quoteCount;
+class _CountBadges extends StatelessWidget {
+  const _CountBadges({required this.invoices, required this.quotes});
+  final int invoices;
+  final int quotes;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-      leading: CircleAvatar(
-        backgroundColor: context.colors.primary.withValues(alpha: 0.12),
-        child: Text(
-          client.name.isEmpty ? '?' : client.name[0].toUpperCase(),
-          style: TextStyle(color: context.colors.primary, fontWeight: FontWeight.w700),
-        ),
-      ),
-      title: Text(client.name),
-      subtitle: Text(
-        [
-          if ((client.company ?? '').isNotEmpty) client.company!,
-          if ((client.email ?? '').isNotEmpty) client.email!,
-        ].join(' · '),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      trailing: Wrap(
-        spacing: 4,
-        children: [
-          if (invoiceCount > 0) _countChip(context, Icons.receipt_long_outlined, invoiceCount),
-          if (quoteCount > 0) _countChip(context, Icons.description_outlined, quoteCount),
-        ],
-      ),
-      onTap: () => context.go('/clients/${client.id}'),
+    return Wrap(
+      spacing: 4,
+      children: [
+        if (invoices > 0)
+          _Badge(icon: Icons.receipt_long_outlined, n: invoices),
+        if (quotes > 0) _Badge(icon: Icons.description_outlined, n: quotes),
+      ],
     );
   }
+}
 
-  Widget _countChip(BuildContext context, IconData icon, int n) {
+class _Badge extends StatelessWidget {
+  const _Badge({required this.icon, required this.n});
+  final IconData icon;
+  final int n;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: context.colors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: context.colors.primary),
           const SizedBox(width: 4),
-          Text('$n', style: context.textTheme.labelSmall?.copyWith(color: context.colors.primary)),
+          Text(
+            '$n',
+            style: context.textTheme.labelSmall?.copyWith(
+              color: context.colors.primary,
+            ),
+          ),
         ],
       ),
     );

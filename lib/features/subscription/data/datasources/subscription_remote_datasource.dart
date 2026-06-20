@@ -22,7 +22,9 @@ class SubscriptionRemoteDataSourceImpl implements SubscriptionRemoteDataSource {
   @override
   Future<SubscriptionStatus> fetchStatus() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>('/subscription/status');
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/subscription/status',
+      );
       final body = response.data;
       if (body != null && body.containsKey('state')) {
         return SubscriptionStatus.fromJson(body);
@@ -54,7 +56,10 @@ class SubscriptionRemoteDataSourceImpl implements SubscriptionRemoteDataSource {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.settings,
-        data: {'action': 'restore', 'originalTransactionId': originalTransactionId},
+        data: {
+          'action': 'restore',
+          'originalTransactionId': originalTransactionId,
+        },
       );
       return response.data ?? const {};
     } on Object catch (_) {

@@ -30,7 +30,7 @@ class RoutePaths {
   static const String backup = '/backup';
   static const String settings = '/settings';
   static const String home = '/home';
-  static const String notFound = '/404';
+  static const String dashboardHomeAlias = 'home';
 
   static String clientDetailPath(String id) => '/clients/$id';
   static String clientEditPath(String id) => '/clients/$id/edit';

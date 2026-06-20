@@ -32,7 +32,9 @@ class Invoice extends Document {
     terms: json['terms'] as String?,
     taxRateOverride: (json['taxRateOverride'] as num?)?.toDouble(),
     status: InvoiceStatus.fromId((json['status'] as num?)?.toInt() ?? 0),
-    paidDate: json['paidDate'] == null ? null : DateTime.parse(json['paidDate'] as String),
+    paidDate: json['paidDate'] == null
+        ? null
+        : DateTime.parse(json['paidDate'] as String),
     recurringId: json['recurringId'] as String?,
   );
 

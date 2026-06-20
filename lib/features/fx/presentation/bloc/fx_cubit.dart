@@ -19,7 +19,9 @@ class FxCubit extends Cubit<FxState> {
     final lastUpdated = rates.isEmpty
         ? null
         : rates.map((r) => r.updatedAt).reduce((a, b) => a.isAfter(b) ? a : b);
-    emit(state.copyWith(loading: false, rates: rates, lastUpdated: lastUpdated));
+    emit(
+      state.copyWith(loading: false, rates: rates, lastUpdated: lastUpdated),
+    );
   }
 
   Future<void> refresh({String base = 'USD'}) async {
@@ -28,13 +30,26 @@ class FxCubit extends Cubit<FxState> {
       final rates = await repository.refresh(base: base);
       final lastUpdated = rates.isEmpty
           ? null
-          : rates.map((r) => r.updatedAt).reduce((a, b) => a.isAfter(b) ? a : b);
-      emit(state.copyWith(refreshing: false, rates: rates, lastUpdated: lastUpdated, base: base));
+          : rates
+                .map((r) => r.updatedAt)
+                .reduce((a, b) => a.isAfter(b) ? a : b);
+      emit(
+        state.copyWith(
+          refreshing: false,
+          rates: rates,
+          lastUpdated: lastUpdated,
+          base: base,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(refreshing: false, error: e.toString()));
     }
   }
 
-  double convert({required double amount, required String from, required String to}) =>
+  double convert({
+    required double amount,
+    required String from,
+    required String to,
+  }) =>
       converter.convert(amount: amount, from: from, to: to, rates: state.rates);
 }

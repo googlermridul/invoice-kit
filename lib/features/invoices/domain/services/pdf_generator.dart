@@ -58,7 +58,8 @@ class PdfGenerator {
       currency: quote.currency,
       items: quote.items,
       notes: quote.notes ?? business.defaultNotes,
-      terms: quote.terms ?? 'This quote is valid for 30 days from the issue date.',
+      terms:
+          quote.terms ?? 'This quote is valid for 30 days from the issue date.',
       paymentInstructions: null,
       bankDetails: null,
       taxId: business.taxId,
@@ -118,7 +119,8 @@ class PdfGenerator {
           pw.SizedBox(height: 12),
           _section('Terms', a.terms!),
         ],
-        if ((a.paymentInstructions ?? '').isNotEmpty || (a.bankDetails ?? '').isNotEmpty) ...[
+        if ((a.paymentInstructions ?? '').isNotEmpty ||
+            (a.bankDetails ?? '').isNotEmpty) ...[
           pw.SizedBox(height: 12),
           _section('Payment', _paymentText(a)),
         ],
@@ -214,7 +216,8 @@ class PdfGenerator {
           pw.SizedBox(height: 24),
           _section('Notes', a.notes!),
         ],
-        if ((a.paymentInstructions ?? '').isNotEmpty || (a.bankDetails ?? '').isNotEmpty) ...[
+        if ((a.paymentInstructions ?? '').isNotEmpty ||
+            (a.bankDetails ?? '').isNotEmpty) ...[
           pw.SizedBox(height: 12),
           _section('Payment', _paymentText(a)),
         ],
@@ -264,10 +267,20 @@ class PdfGenerator {
               business.businessName,
               style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
             ),
-            if (business.ownerName != null) pw.Text(business.ownerName!, style: const pw.TextStyle(fontSize: 11)),
-            if (business.address != null) pw.Text(business.address!, style: const pw.TextStyle(fontSize: 10)),
-            if (business.email != null) pw.Text(business.email!, style: const pw.TextStyle(fontSize: 10)),
-            if (business.phone != null) pw.Text(business.phone!, style: const pw.TextStyle(fontSize: 10)),
+            if (business.ownerName != null)
+              pw.Text(
+                business.ownerName!,
+                style: const pw.TextStyle(fontSize: 11),
+              ),
+            if (business.address != null)
+              pw.Text(
+                business.address!,
+                style: const pw.TextStyle(fontSize: 10),
+              ),
+            if (business.email != null)
+              pw.Text(business.email!, style: const pw.TextStyle(fontSize: 10)),
+            if (business.phone != null)
+              pw.Text(business.phone!, style: const pw.TextStyle(fontSize: 10)),
           ],
         ),
         pw.Column(
@@ -282,7 +295,10 @@ class PdfGenerator {
               ),
             ),
             pw.SizedBox(height: 4),
-            pw.Text('Number: ${a.number}', style: const pw.TextStyle(fontSize: 11)),
+            pw.Text(
+              'Number: ${a.number}',
+              style: const pw.TextStyle(fontSize: 11),
+            ),
           ],
         ),
       ],
@@ -301,9 +317,15 @@ class PdfGenerator {
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
-            pw.Text(a.title, style: const pw.TextStyle(fontSize: 11, letterSpacing: 4)),
+            pw.Text(
+              a.title,
+              style: const pw.TextStyle(fontSize: 11, letterSpacing: 4),
+            ),
             pw.SizedBox(height: 4),
-            pw.Text(a.number, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              a.number,
+              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+            ),
           ],
         ),
       ],
@@ -334,9 +356,21 @@ class PdfGenerator {
               ),
               pw.SizedBox(height: 2),
               if (a.business.email != null)
-                pw.Text(a.business.email!, style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey300)),
+                pw.Text(
+                  a.business.email!,
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    color: PdfColors.grey300,
+                  ),
+                ),
               if (a.business.phone != null)
-                pw.Text(a.business.phone!, style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey300)),
+                pw.Text(
+                  a.business.phone!,
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    color: PdfColors.grey300,
+                  ),
+                ),
             ],
           ),
           pw.Column(
@@ -344,9 +378,19 @@ class PdfGenerator {
             children: [
               pw.Text(
                 a.title,
-                style: pw.TextStyle(fontSize: 22, color: PdfColors.white, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(
+                  fontSize: 22,
+                  color: PdfColors.white,
+                  fontWeight: pw.FontWeight.bold,
+                ),
               ),
-              pw.Text(a.number, style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey300)),
+              pw.Text(
+                a.number,
+                style: const pw.TextStyle(
+                  fontSize: 11,
+                  color: PdfColors.grey300,
+                ),
+              ),
             ],
           ),
         ],
@@ -360,7 +404,11 @@ class PdfGenerator {
       children: [
         pw.Text(
           a.business.businessName.toUpperCase(),
-          style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, letterSpacing: 3),
+          style: pw.TextStyle(
+            fontSize: 24,
+            fontWeight: pw.FontWeight.bold,
+            letterSpacing: 3,
+          ),
         ),
         pw.SizedBox(height: 8),
         pw.Container(height: 1, color: PdfColors.brown700, width: 80),
@@ -373,16 +421,36 @@ class PdfGenerator {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 if (a.business.ownerName != null)
-                  pw.Text(a.business.ownerName!, style: const pw.TextStyle(fontSize: 11)),
-                if (a.business.address != null) pw.Text(a.business.address!, style: const pw.TextStyle(fontSize: 10)),
-                if (a.business.email != null) pw.Text(a.business.email!, style: const pw.TextStyle(fontSize: 10)),
+                  pw.Text(
+                    a.business.ownerName!,
+                    style: const pw.TextStyle(fontSize: 11),
+                  ),
+                if (a.business.address != null)
+                  pw.Text(
+                    a.business.address!,
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
+                if (a.business.email != null)
+                  pw.Text(
+                    a.business.email!,
+                    style: const pw.TextStyle(fontSize: 10),
+                  ),
               ],
             ),
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.end,
               children: [
-                pw.Text(a.title, style: const pw.TextStyle(fontSize: 14, letterSpacing: 4)),
-                pw.Text(a.number, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  a.title,
+                  style: const pw.TextStyle(fontSize: 14, letterSpacing: 4),
+                ),
+                pw.Text(
+                  a.number,
+                  style: pw.TextStyle(
+                    fontSize: 14,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ],
@@ -411,7 +479,13 @@ class PdfGenerator {
                 ),
               ),
               if (a.business.email != null)
-                pw.Text(a.business.email!, style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey300)),
+                pw.Text(
+                  a.business.email!,
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    color: PdfColors.grey300,
+                  ),
+                ),
             ],
           ),
           pw.Column(
@@ -419,9 +493,19 @@ class PdfGenerator {
             children: [
               pw.Text(
                 a.title,
-                style: pw.TextStyle(fontSize: 22, color: PdfColors.amber, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(
+                  fontSize: 22,
+                  color: PdfColors.amber,
+                  fontWeight: pw.FontWeight.bold,
+                ),
               ),
-              pw.Text(a.number, style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey300)),
+              pw.Text(
+                a.number,
+                style: const pw.TextStyle(
+                  fontSize: 11,
+                  color: PdfColors.grey300,
+                ),
+              ),
             ],
           ),
         ],
@@ -441,9 +525,21 @@ class PdfGenerator {
               a.business.businessName,
               style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
             ),
-            if (a.business.ownerName != null) pw.Text(a.business.ownerName!, style: const pw.TextStyle(fontSize: 11)),
-            if (a.business.phone != null) pw.Text(a.business.phone!, style: const pw.TextStyle(fontSize: 10)),
-            if (a.business.email != null) pw.Text(a.business.email!, style: const pw.TextStyle(fontSize: 10)),
+            if (a.business.ownerName != null)
+              pw.Text(
+                a.business.ownerName!,
+                style: const pw.TextStyle(fontSize: 11),
+              ),
+            if (a.business.phone != null)
+              pw.Text(
+                a.business.phone!,
+                style: const pw.TextStyle(fontSize: 10),
+              ),
+            if (a.business.email != null)
+              pw.Text(
+                a.business.email!,
+                style: const pw.TextStyle(fontSize: 10),
+              ),
           ],
         ),
         pw.Container(
@@ -456,9 +552,16 @@ class PdfGenerator {
             children: [
               pw.Text(
                 a.title,
-                style: pw.TextStyle(fontSize: 12, color: PdfColors.white, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  color: PdfColors.white,
+                  fontWeight: pw.FontWeight.bold,
+                ),
               ),
-              pw.Text(a.number, style: const pw.TextStyle(fontSize: 10, color: PdfColors.white)),
+              pw.Text(
+                a.number,
+                style: const pw.TextStyle(fontSize: 10, color: PdfColors.white),
+              ),
             ],
           ),
         ),
@@ -479,14 +582,40 @@ class PdfGenerator {
             children: [
               pw.Text(
                 'Bill To',
-                style: pw.TextStyle(fontSize: 9, color: dateColor, letterSpacing: 1.5),
+                style: pw.TextStyle(
+                  fontSize: 9,
+                  color: dateColor,
+                  letterSpacing: 1.5,
+                ),
               ),
               pw.SizedBox(height: 4),
-              pw.Text(a.client.name, style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
-              if (a.client.company != null) pw.Text(a.client.company!, style: const pw.TextStyle(fontSize: 10)),
-              if (a.client.address != null) pw.Text(a.client.address!, style: const pw.TextStyle(fontSize: 10)),
-              if (a.client.email != null) pw.Text(a.client.email!, style: const pw.TextStyle(fontSize: 10)),
-              if (a.client.phone != null) pw.Text(a.client.phone!, style: const pw.TextStyle(fontSize: 10)),
+              pw.Text(
+                a.client.name,
+                style: pw.TextStyle(
+                  fontSize: 12,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              if (a.client.company != null)
+                pw.Text(
+                  a.client.company!,
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+              if (a.client.address != null)
+                pw.Text(
+                  a.client.address!,
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+              if (a.client.email != null)
+                pw.Text(
+                  a.client.email!,
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
+              if (a.client.phone != null)
+                pw.Text(
+                  a.client.phone!,
+                  style: const pw.TextStyle(fontSize: 10),
+                ),
             ],
           ),
         ),
@@ -506,9 +635,15 @@ class PdfGenerator {
     return pw.Row(
       mainAxisSize: pw.MainAxisSize.min,
       children: [
-        pw.Text(label, style: pw.TextStyle(fontSize: 9, color: accent, letterSpacing: 1.5)),
+        pw.Text(
+          label,
+          style: pw.TextStyle(fontSize: 9, color: accent, letterSpacing: 1.5),
+        ),
         pw.SizedBox(width: 8),
-        pw.Text(value, style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold)),
+        pw.Text(
+          value,
+          style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold),
+        ),
       ],
     );
   }
@@ -534,7 +669,8 @@ class PdfGenerator {
     bottom: pw.BorderSide(color: PdfColors.brown700, width: 1),
   );
 
-  pw.TableBorder boldTable() => pw.TableBorder.all(color: PdfColors.black, width: 0.5);
+  pw.TableBorder boldTable() =>
+      pw.TableBorder.all(color: PdfColors.black, width: 0.5);
 
   pw.TableBorder serviceTable() => const pw.TableBorder(
     horizontalInside: pw.BorderSide(color: PdfColors.grey400, width: 0.5),
@@ -566,15 +702,27 @@ class PdfGenerator {
             ),
             pw.Padding(
               padding: const pw.EdgeInsets.all(6),
-              child: pw.Text('QTY', style: headStyle(), textAlign: pw.TextAlign.right),
+              child: pw.Text(
+                'QTY',
+                style: headStyle(),
+                textAlign: pw.TextAlign.right,
+              ),
             ),
             pw.Padding(
               padding: const pw.EdgeInsets.all(6),
-              child: pw.Text('UNIT PRICE', style: headStyle(), textAlign: pw.TextAlign.right),
+              child: pw.Text(
+                'UNIT PRICE',
+                style: headStyle(),
+                textAlign: pw.TextAlign.right,
+              ),
             ),
             pw.Padding(
               padding: const pw.EdgeInsets.all(6),
-              child: pw.Text('AMOUNT', style: headStyle(), textAlign: pw.TextAlign.right),
+              child: pw.Text(
+                'AMOUNT',
+                style: headStyle(),
+                textAlign: pw.TextAlign.right,
+              ),
             ),
           ],
         ),
@@ -586,11 +734,17 @@ class PdfGenerator {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(item.description, style: const pw.TextStyle(fontSize: 11)),
+                    pw.Text(
+                      item.description,
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
                     if (item.taxRate > 0)
                       pw.Text(
                         'Tax ${item.taxRate.toStringAsFixed(0)}%',
-                        style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+                        style: const pw.TextStyle(
+                          fontSize: 8,
+                          color: PdfColors.grey600,
+                        ),
                       ),
                   ],
                 ),
@@ -626,7 +780,8 @@ class PdfGenerator {
     );
   }
 
-  String _qty(double q) => q == q.roundToDouble() ? q.toInt().toString() : q.toString();
+  String _qty(double q) =>
+      q == q.roundToDouble() ? q.toInt().toString() : q.toString();
 
   // ── Totals ───────────────────────────────────────────────────────────────
 
@@ -640,14 +795,28 @@ class PdfGenerator {
           padding: const pw.EdgeInsets.symmetric(vertical: 8),
           decoration: pw.BoxDecoration(
             border: pw.Border(
-              top: pw.BorderSide(color: accent ?? PdfColors.blueGrey900, width: 1),
+              top: pw.BorderSide(
+                color: accent ?? PdfColors.blueGrey900,
+                width: 1,
+              ),
             ),
           ),
           child: pw.Column(
             children: [
-              _row('Subtotal', Formatters.currency(totals.subtotal, code: a.currency)),
-              if (totals.discount > 0) _row('Discount', '- ${Formatters.currency(totals.discount, code: a.currency)}'),
-              if (totals.lineTax > 0) _row('Tax', Formatters.currency(totals.lineTax, code: a.currency)),
+              _row(
+                'Subtotal',
+                Formatters.currency(totals.subtotal, code: a.currency),
+              ),
+              if (totals.discount > 0)
+                _row(
+                  'Discount',
+                  '- ${Formatters.currency(totals.discount, code: a.currency)}',
+                ),
+              if (totals.lineTax > 0)
+                _row(
+                  'Tax',
+                  Formatters.currency(totals.lineTax, code: a.currency),
+                ),
               if (totals.globalTax > 0)
                 _row(
                   'Tax (${a.taxRateOverride!.toStringAsFixed(0)}%)',
@@ -669,7 +838,12 @@ class PdfGenerator {
     );
   }
 
-  pw.Widget _row(String label, String value, {bool isBold = false, PdfColor? color}) {
+  pw.Widget _row(
+    String label,
+    String value, {
+    bool isBold = false,
+    PdfColor? color,
+  }) {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 2),
       child: pw.Row(
@@ -704,7 +878,11 @@ class PdfGenerator {
       children: [
         pw.Text(
           title.toUpperCase(),
-          style: pw.TextStyle(fontSize: 9, color: accent ?? PdfColors.blueGrey700, letterSpacing: 1.5),
+          style: pw.TextStyle(
+            fontSize: 9,
+            color: accent ?? PdfColors.blueGrey700,
+            letterSpacing: 1.5,
+          ),
         ),
         pw.SizedBox(height: 4),
         pw.Text(body, style: const pw.TextStyle(fontSize: 10, lineSpacing: 2)),
@@ -714,7 +892,9 @@ class PdfGenerator {
 
   String _paymentText(_LayoutArgs a) {
     final parts = <String>[];
-    if ((a.paymentInstructions ?? '').isNotEmpty) parts.add(a.paymentInstructions!);
+    if ((a.paymentInstructions ?? '').isNotEmpty) {
+      parts.add(a.paymentInstructions!);
+    }
     if ((a.bankDetails ?? '').isNotEmpty) parts.add(a.bankDetails!);
     return parts.join('\n');
   }

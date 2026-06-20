@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/localization/app_localizations.dart';
+import 'package:invoice_kit/core/router/app_routes.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:invoice_kit/features/authentication/presentation/widgets/auth_scaffold.dart';
@@ -44,8 +45,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         listener: (context, state) {
           if (state.message != null) {
             context.showSnackBar(state.message!);
-            if (!state.isSubmitting && (state.message?.contains('sent') ?? false)) {
-              context.go('/login');
+            if (!state.isSubmitting &&
+                (state.message?.contains('sent') ?? false)) {
+              // Root-replacement: leave the auth flow entirely and go to login.
+              context.go(AppRoutes.login);
             }
           }
         },
@@ -71,7 +74,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   loading: state.isSubmitting,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                TextButton(onPressed: () => context.go('/login'), child: Text(l.commonBack)),
+                TextButton(
+                  onPressed: () => GoRouter.of(context).pop(),
+                  child: Text(l.commonBack),
+                ),
               ],
             ),
           );

@@ -16,7 +16,9 @@ abstract class AuthRepository {
     String? name,
   });
 
-  Future<({Failure? failure, User? user})> forgotPassword({required String email});
+  Future<({Failure? failure, User? user})> forgotPassword({
+    required String email,
+  });
 
   Future<({Failure? failure, bool success})> logout();
 

@@ -53,8 +53,14 @@ class RecurringCubit extends Cubit<RecurringState> {
 
       if (newInvoices.isNotEmpty) {
         final lastRun = newInvoices.last.issueDate;
-        final advanced = RecurringInvoiceGenerator.advance(lastRun, schedule.frequency);
-        final capped = (schedule.endDate != null && advanced.isAfter(schedule.endDate!)) ? schedule.endDate : advanced;
+        final advanced = RecurringInvoiceGenerator.advance(
+          lastRun,
+          schedule.frequency,
+        );
+        final capped =
+            (schedule.endDate != null && advanced.isAfter(schedule.endDate!))
+            ? schedule.endDate
+            : advanced;
         final updatedSchedule = schedule.copyWith(nextRunDate: capped);
         await recurringRepo.save(updatedSchedule);
       }
@@ -64,7 +70,9 @@ class RecurringCubit extends Cubit<RecurringState> {
   }
 
   Future<void> upsert(RecurringInvoice schedule) async {
-    final existing = schedule.id.isEmpty ? schedule.copyWith(id: IdGenerator.create('rec')) : schedule;
+    final existing = schedule.id.isEmpty
+        ? schedule.copyWith(id: IdGenerator.create('rec'))
+        : schedule;
     await recurringRepo.save(existing);
     await load();
   }

@@ -26,7 +26,9 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   }
 
   Future<void> _onToggled(ThemeToggled event, Emitter<ThemeState> emit) async {
-    final next = state.mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    final next = state.mode == ThemeMode.dark
+        ? ThemeMode.light
+        : ThemeMode.dark;
     await _localStorage.setString(StorageKeys.themeMode, next.name);
     emit(state.copyWith(mode: next));
   }

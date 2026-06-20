@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+/// Spacing scale tokens.
 class AppSpacing {
   const AppSpacing._();
 
@@ -8,54 +7,37 @@ class AppSpacing {
   static const double sm = 8;
   static const double md = 12;
   static const double lg = 16;
-  static const double xl = 24;
-  static const double xxl = 32;
-  static const double xxxl = 48;
-  static const double huge = 64;
+  static const double xl = 20;
+  static const double xxl = 24;
+  static const double xxxl = 32;
+  static const double huge = 48;
+  static const double gigantic = 64;
 
-  // Common
+  // Common semantic aliases
   static const double page = lg;
-  static const double pageHorizontal = xl;
+  static const double pageHorizontal = lg;
   static const double pageVertical = lg;
   static const double cardPadding = lg;
   static const double inputPadding = md;
+  static const double sectionGap = xxl;
+  static const double rowGap = md;
 }
 
-class AppRadius {
-  const AppRadius._();
+/// Common sizing tokens.
+class AppSize {
+  const AppSize._();
 
-  static const double xs = 4;
-  static const double sm = 8;
-  static const double md = 12;
-  static const double lg = 16;
-  static const double xl = 24;
-  static const double pill = 999;
-}
-
-class AppShadows {
-  const AppShadows._();
-
-  static const List<BoxShadow> sm = [
-    BoxShadow(
-      color: Color(0x0F000000),
-      blurRadius: 4,
-      offset: Offset(0, 1),
-    ),
-  ];
-
-  static const List<BoxShadow> md = [
-    BoxShadow(
-      color: Color(0x14000000),
-      blurRadius: 8,
-      offset: Offset(0, 2),
-    ),
-  ];
-
-  static const List<BoxShadow> lg = [
-    BoxShadow(
-      color: Color(0x1F000000),
-      blurRadius: 16,
-      offset: Offset(0, 4),
-    ),
-  ];
+  static const double buttonHeight = 52;
+  static const double buttonHeightSm = 40;
+  static const double inputHeight = 52;
+  static const double appBarHeight = 56;
+  static const double iconXs = 14;
+  static const double iconSm = 16;
+  static const double iconMd = 20;
+  static const double iconLg = 24;
+  static const double iconXl = 32;
+  static const double avatarSm = 32;
+  static const double avatarMd = 40;
+  static const double avatarLg = 56;
+  static const double avatarXl = 72;
 }

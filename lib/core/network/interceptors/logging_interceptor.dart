@@ -17,7 +17,10 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
     if (enabled) {
       logger.i(
         '← ${response.statusCode} ${response.requestOptions.method} ${response.requestOptions.uri}',

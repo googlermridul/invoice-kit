@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus, QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus, QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/quotes/data/repositories/quote_repository.dart';
@@ -25,7 +26,13 @@ class QuotesCubit extends Cubit<QuotesState> {
     final all = await quoteRepo.all();
     final profile = await businessRepo.load();
     final sorted = [...all]..sort((a, b) => b.issueDate.compareTo(a.issueDate));
-    emit(state.copyWith(loading: false, quotes: sorted, defaultCurrency: profile?.defaultCurrency));
+    emit(
+      state.copyWith(
+        loading: false,
+        quotes: sorted,
+        defaultCurrency: profile?.defaultCurrency,
+      ),
+    );
   }
 
   Future<void> remove(String id) async {
@@ -38,11 +45,15 @@ class QuotesCubit extends Cubit<QuotesState> {
     final nextNumber = profile?.nextQuoteNumber ?? 1;
     final copy = quote.copyWith(
       id: IdGenerator.create('quo'),
-      number: newNumber ?? '${profile?.quotePrefix ?? 'QUO-'}${nextNumber.toString().padLeft(5, '0')}',
+      number:
+          newNumber ??
+          '${profile?.quotePrefix ?? 'QUO-'}${nextNumber.toString().padLeft(5, '0')}',
       status: QuoteStatus.draft,
       issueDate: DateTime.now(),
       validUntil: DateTime.now().add(const Duration(days: 30)),
-      items: quote.items.map((it) => it.copyWith(description: it.description)).toList(),
+      items: quote.items
+          .map((it) => it.copyWith(description: it.description))
+          .toList(),
     );
     return copy;
   }
@@ -58,9 +69,13 @@ class QuotesCubit extends Cubit<QuotesState> {
     await load();
   }
 
-  Future<Quote> createDraft({required String clientId, String currency = 'USD'}) async {
+  Future<Quote> createDraft({
+    required String clientId,
+    String currency = 'USD',
+  }) async {
     final profile = await businessRepo.load();
-    final number = '${profile?.quotePrefix ?? 'QUO-'}${(profile?.nextQuoteNumber ?? 1).toString().padLeft(5, '0')}';
+    final number =
+        '${profile?.quotePrefix ?? 'QUO-'}${(profile?.nextQuoteNumber ?? 1).toString().padLeft(5, '0')}';
     final now = DateTime.now();
     return Quote(
       id: IdGenerator.create('quo'),
@@ -78,7 +93,8 @@ class QuotesCubit extends Cubit<QuotesState> {
   Future<Invoice> convertToInvoice(Quote quote) async {
     final profile = await businessRepo.load();
     final nextNumber = profile?.nextInvoiceNumber ?? 1;
-    final number = '${profile?.invoicePrefix ?? 'INV-'}${nextNumber.toString().padLeft(5, '0')}';
+    final number =
+        '${profile?.invoicePrefix ?? 'INV-'}${nextNumber.toString().padLeft(5, '0')}';
     final now = DateTime.now();
     return Invoice(
       id: IdGenerator.create('inv'),

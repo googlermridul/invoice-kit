@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/theme/app_tokens.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
-import 'package:invoice_kit/core/widgets/empty_state.dart';
+import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/backup/presentation/bloc/backup_cubit.dart';
-import 'package:invoice_kit/shared/widgets/widgets.dart';
+import 'package:invoice_kit/shared/widgets/app_text_field.dart';
+import 'package:invoice_kit/shared/widgets/buttons.dart';
 import 'package:share_plus/share_plus.dart';
 
 class BackupScreen extends StatefulWidget {
@@ -31,39 +33,78 @@ class _BackupScreenState extends State<BackupScreen> {
     super.dispose();
   }
 
+  Future<void> _confirmWipe() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text('Delete all local data?'),
+        content: const Text(
+          'This removes every client, invoice, quote, recurring schedule and your business profile. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.pop(dialogCtx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      await context.read<BackupCubit>().wipeAll();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Backup & restore')),
+    return AppScaffold(
+      title: 'Backup & restore',
       body: BlocConsumer<BackupCubit, BackupState>(
         listenWhen: (a, b) => a.message != b.message || a.error != b.error,
         listener: (context, state) {
           if (state.message != null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message!)));
+            context.showSnackBar(state.message!);
           }
           if (state.error != null) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.error!)));
+            context.showErrorSnack(state.error!);
           }
         },
         builder: (context, state) {
           return ListView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.md,
+              AppSpacing.lg,
+              AppSpacing.xxxl,
+            ),
             children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: context.colors.primary.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: context.colors.primary.withValues(alpha: 0.18)),
-                ),
+              const SectionHeader(
+                title: 'Export',
+                uppercase: true,
+                tone: SectionHeaderTone.primary,
+                padding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              AppCard(
+                variant: AppCardVariant.tinted,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Export backup', style: context.textTheme.titleMedium),
-                    const SizedBox(height: 4),
+                    Text(
+                      'Export backup',
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Saves all your data (business profile, clients, invoices, quotes, recurring) to a JSON file.',
-                      style: context.textTheme.bodySmall,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     PrimaryButton(
@@ -79,7 +120,10 @@ class _BackupScreenState extends State<BackupScreen> {
                               await SharePlus.instance.share(
                                 ShareParams(
                                   files: [
-                                    XFile.fromData(bytes, name: path.split('/').last),
+                                    XFile.fromData(
+                                      bytes,
+                                      name: path.split('/').last,
+                                    ),
                                   ],
                                   text: 'InvoiceKit backup',
                                 ),
@@ -89,32 +133,36 @@ class _BackupScreenState extends State<BackupScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: context.colors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: context.colors.outlineVariant),
-                ),
+              const SizedBox(height: AppSpacing.xl),
+              const SectionHeader(
+                title: 'Import',
+                uppercase: true,
+                tone: SectionHeaderTone.primary,
+                padding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Import backup', style: context.textTheme.titleMedium),
-                    const SizedBox(height: 4),
+                    Text(
+                      'Import backup',
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Paste a previously exported InvoiceKit JSON below. Imports will overwrite existing data.',
-                      style: context.textTheme.bodySmall,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    TextField(
+                    AppTextField(
                       controller: _pasteCtrl,
-                      minLines: 4,
-                      maxLines: 10,
-                      decoration: const InputDecoration(
-                        hintText: '{ "schemaVersion": 1, … }',
-                        border: OutlineInputBorder(),
-                      ),
+                      hint: '{ "schemaVersion": 1, … }',
+                      maxLines: 8,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Wrap(
@@ -122,10 +170,12 @@ class _BackupScreenState extends State<BackupScreen> {
                       runSpacing: AppSpacing.sm,
                       children: [
                         SecondaryButton(
-                          label: 'Paste',
+                          label: 'Paste from clipboard',
                           icon: Icons.paste,
                           onPressed: () async {
-                            final data = await Clipboard.getData(Clipboard.kTextPlain);
+                            final data = await Clipboard.getData(
+                              Clipboard.kTextPlain,
+                            );
                             _pasteCtrl.text = data?.text ?? '';
                           },
                         ),
@@ -139,18 +189,14 @@ class _BackupScreenState extends State<BackupScreen> {
                                   try {
                                     final summary = await context.read<BackupCubit>().importFromString(_pasteCtrl.text);
                                     if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Imported ${summary.clients} clients, ${summary.invoices} invoices',
-                                          ),
-                                        ),
+                                      context.showSnackBar(
+                                        'Imported ${summary.clients} clients, ${summary.invoices} invoices',
                                       );
                                     }
                                   } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(e.toString())),
-                                    );
+                                    if (mounted) {
+                                      context.showErrorSnack(e.toString());
+                                    }
                                   }
                                 },
                         ),
@@ -159,13 +205,14 @@ class _BackupScreenState extends State<BackupScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              const Divider(),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.xl),
               Row(
                 children: [
-                  Expanded(
-                    child: Text('Recent exports', style: context.textTheme.titleMedium),
+                  const Expanded(
+                    child: SectionHeader(
+                      title: 'Recent exports',
+                      padding: EdgeInsets.zero,
+                    ),
                   ),
                   if (state.history.isNotEmpty)
                     TextButton(
@@ -176,43 +223,82 @@ class _BackupScreenState extends State<BackupScreen> {
                     ),
                 ],
               ),
+              const SizedBox(height: AppSpacing.sm),
               if (state.history.isEmpty)
-                const EmptyState(icon: Icons.history, title: 'No exports yet')
-              else
-                ...state.history.map(
-                  (e) => ListTile(
-                    leading: const Icon(Icons.history),
-                    title: Text(e.path?.split('/').last ?? e.label ?? 'Backup'),
-                    subtitle: Text(
-                      '${Formatters.date(e.createdAt)} · ${(e.sizeBytes / 1024).toStringAsFixed(1)} kB',
+                const AppCard(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    child: EmptyState(
+                      icon: Icons.history,
+                      title: 'No exports yet',
                     ),
                   ),
-                ),
-              const SizedBox(height: AppSpacing.lg),
-              OutlinedButton.icon(
-                onPressed: () async {
-                  final ok = await showDialog<bool>(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Delete all local data?'),
-                      content: const Text(
-                        'This removes every client, invoice, quote, recurring schedule and your business profile. This cannot be undone.',
-                      ),
-                      actions: [
-                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                        FilledButton.tonal(
-                          onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Delete'),
+                )
+              else
+                AppCard(
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < state.history.length; i++) ...[
+                        if (i > 0) const Divider(height: 1),
+                        ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: context.tokens.brandSubtle,
+                            child: Icon(
+                              Icons.history,
+                              color: context.colors.primary,
+                            ),
+                          ),
+                          title: Text(
+                            state.history[i].path?.split('/').last ?? state.history[i].label ?? 'Backup',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${Formatters.date(state.history[i].createdAt)} · '
+                            '${(state.history[i].sizeBytes / 1024).toStringAsFixed(1)} kB',
+                            style: TextStyle(
+                              color: context.colors.onSurfaceVariant,
+                            ),
+                          ),
                         ),
                       ],
+                    ],
+                  ),
+                ),
+              const SizedBox(height: AppSpacing.xl),
+              AppCard(
+                variant: AppCardVariant.filled,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Danger zone',
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.error,
+                      ),
                     ),
-                  );
-                  if (ok == true) {
-                    await context.read<BackupCubit>().wipeAll();
-                  }
-                },
-                icon: const Icon(Icons.delete_forever_outlined),
-                label: const Text('Wipe all local data'),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      'Remove all local data on this device. Export a backup first if you might want to restore later.',
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: context.colors.error,
+                        side: BorderSide(color: context.colors.error),
+                      ),
+                      onPressed: _confirmWipe,
+                      icon: const Icon(Icons.delete_forever_outlined),
+                      label: const Text('Wipe all local data'),
+                    ),
+                  ],
+                ),
               ),
             ],
           );

@@ -41,13 +41,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final isAuth = await _repo.isAuthenticated();
     if (isAuth) {
       final user = await _repo.currentUser();
-      emit(state.copyWith(status: AuthStatus.authenticated, user: user, clearUser: user == null));
+      emit(
+        state.copyWith(
+          status: AuthStatus.authenticated,
+          user: user,
+          clearUser: user == null,
+        ),
+      );
     } else {
       emit(state.copyWith(status: AuthStatus.unauthenticated));
     }
   }
 
-  Future<void> _onLogin(AuthLoginRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogin(
+    AuthLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(state.copyWith(isSubmitting: true, clearMessage: true));
     final result = await _login(email: event.email, password: event.password);
     if (result.failure != null) {
@@ -70,9 +79,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _onRegister(AuthRegisterRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onRegister(
+    AuthRegisterRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(state.copyWith(isSubmitting: true, clearMessage: true));
-    final result = await _register(email: event.email, password: event.password, name: event.name);
+    final result = await _register(
+      email: event.email,
+      password: event.password,
+      name: event.name,
+    );
     if (result.failure != null) {
       emit(
         state.copyWith(
@@ -93,7 +109,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _onForgot(AuthForgotPasswordRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onForgot(
+    AuthForgotPasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(state.copyWith(isSubmitting: true, clearMessage: true));
     final result = await _forgot(email: event.email);
     if (result.failure != null) {
@@ -115,7 +134,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _onLogout(AuthLogoutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogout(
+    AuthLogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(state.copyWith(isSubmitting: true));
     await _logout();
     emit(const AuthState(status: AuthStatus.unauthenticated));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 
@@ -19,7 +20,12 @@ class AppTextField extends StatelessWidget {
     this.onSubmitted,
     this.maxLines = 1,
     this.initialValue,
-  }) : assert(controller != null || initialValue != null, 'Provide either controller or initialValue');
+    this.dense = false,
+    this.inputFormatters,
+  }) : assert(
+         controller != null || initialValue != null,
+         'Provide either controller or initialValue',
+       );
 
   final TextEditingController? controller;
   final String? label;
@@ -34,15 +40,25 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<String>? onSubmitted;
   final int maxLines;
   final String? initialValue;
+  final bool dense;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
-    final controller = this.controller ?? TextEditingController(text: initialValue);
+    final controller =
+        this.controller ?? TextEditingController(text: initialValue);
+    final tt = context.textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          Text(label!, style: context.textTheme.labelMedium),
+          Text(
+            label!,
+            style: tt.labelMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: context.colors.onSurface,
+            ),
+          ),
           const SizedBox(height: AppSpacing.xs),
         ],
         TextField(
@@ -53,11 +69,20 @@ class AppTextField extends StatelessWidget {
           onChanged: onChanged,
           onSubmitted: onSubmitted,
           maxLines: obscure ? 1 : maxLines,
+          inputFormatters: inputFormatters,
+          style: tt.bodyLarge,
           decoration: InputDecoration(
             hintText: hint,
             errorText: error,
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+            prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
             suffixIcon: suffixIcon,
+            isDense: dense,
+            contentPadding: dense
+                ? const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm + 2,
+                  )
+                : null,
           ),
         ),
       ],
@@ -75,7 +100,12 @@ class AppDividerWithLabel extends StatelessWidget {
         const Expanded(child: Divider()),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Text(label, style: context.textTheme.bodySmall),
+          child: Text(
+            label,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
         ),
         const Expanded(child: Divider()),
       ],

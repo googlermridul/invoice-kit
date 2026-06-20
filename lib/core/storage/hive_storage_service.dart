@@ -4,7 +4,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 class HiveStorageService {
   HiveStorageService._(this._boxes);
 
-  factory HiveStorageService.fromBoxes(Map<String, Box<dynamic>> boxes) => HiveStorageService._(boxes);
+  factory HiveStorageService.fromBoxes(Map<String, Box<dynamic>> boxes) =>
+      HiveStorageService._(boxes);
 
   static HiveStorageService? _instance;
 

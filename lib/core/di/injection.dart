@@ -15,6 +15,7 @@ import 'package:invoice_kit/core/security/device_integrity_service.dart';
 import 'package:invoice_kit/core/storage/hive_storage_service.dart';
 import 'package:invoice_kit/core/storage/local_storage_service.dart';
 import 'package:invoice_kit/core/storage/secure_storage_service.dart';
+import 'package:invoice_kit/core/theme/theme_bloc/theme_bloc.dart';
 import 'package:invoice_kit/features/authentication/data/datasources/auth_local_datasource.dart';
 import 'package:invoice_kit/features/authentication/data/datasources/auth_remote_datasource.dart';
 import 'package:invoice_kit/features/authentication/data/repositories/auth_repository_impl.dart';
@@ -44,6 +45,7 @@ import 'package:invoice_kit/features/recurring/data/repositories/recurring_repos
 import 'package:invoice_kit/features/recurring/presentation/bloc/recurring_cubit.dart';
 import 'package:invoice_kit/features/settings/data/repositories/settings_repository.dart';
 import 'package:invoice_kit/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:invoice_kit/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:invoice_kit/features/subscription/data/datasources/subscription_remote_datasource.dart';
 import 'package:invoice_kit/features/subscription/data/repositories/subscription_repository.dart';
 import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart';
@@ -64,9 +66,13 @@ Future<void> configureDependencies({
     ..registerSingleton<AppConfig>(config)
     ..registerSingleton<LocalStorageService>(localStorage)
     ..registerSingleton<SecureStorageService>(SecureStorageService())
-    ..registerSingleton<HiveStorageService>(await HiveStorageService.initialize())
+    ..registerSingleton<HiveStorageService>(
+      await HiveStorageService.initialize(),
+    )
     ..registerSingleton<CoreLogger>(CoreLogger(enabled: config.enableLogging))
-    ..registerSingleton<ConnectivityService>(ConnectivityService()..initialize())
+    ..registerSingleton<ConnectivityService>(
+      ConnectivityService()..initialize(),
+    )
     ..registerSingleton<PermissionsService>(const PermissionsService())
     ..registerSingleton<DeviceIntegrityService>(const DeviceIntegrityService())
     ..registerSingleton<HttpApiClient>(HttpApiClient())
@@ -74,7 +80,9 @@ Future<void> configureDependencies({
     ..registerSingleton<ErrorHandler>(ErrorHandler(sl<ErrorMapper>()))
     ..registerSingleton<PdfGenerator>(const PdfGenerator())
     ..registerSingleton<EntitlementService>(const EntitlementService())
-    ..registerSingleton<SharedPreferences>(await SharedPreferences.getInstance());
+    ..registerSingleton<SharedPreferences>(
+      await SharedPreferences.getInstance(),
+    );
 
   // ── Dio stack ─────────────────────────────────────────────────────────
   final tokenProvider = SecureStorageTokenProvider(sl<SecureStorageService>());
@@ -90,7 +98,10 @@ Future<void> configureDependencies({
       ),
     )
     ..registerSingleton<LoggingInterceptor>(
-      LoggingInterceptor(logger: sl<CoreLogger>().raw, enabled: config.enableLogging),
+      LoggingInterceptor(
+        logger: sl<CoreLogger>().raw,
+        enabled: config.enableLogging,
+      ),
     )
     ..registerSingleton<DioClient>(
       DioClient.create(
@@ -102,9 +113,14 @@ Future<void> configureDependencies({
     )
     ..registerSingleton<Dio>(sl<DioClient>().dio)
     // ── Authentication feature ─────────────────────────────────────────────
-    ..registerSingleton<AuthRemoteDataSource>(AuthRemoteDataSourceImpl(sl<Dio>()))
+    ..registerSingleton<AuthRemoteDataSource>(
+      AuthRemoteDataSourceImpl(sl<Dio>()),
+    )
     ..registerSingleton<AuthLocalDataSource>(
-      AuthLocalDataSourceImpl(sl<SecureStorageService>(), sl<HiveStorageService>()),
+      AuthLocalDataSourceImpl(
+        sl<SecureStorageService>(),
+        sl<HiveStorageService>(),
+      ),
     )
     ..registerSingleton<AuthRepository>(
       AuthRepositoryImpl(
@@ -117,7 +133,9 @@ Future<void> configureDependencies({
     ..registerSingleton<LoginUseCase>(LoginUseCase(sl<AuthRepository>()))
     ..registerSingleton<RegisterUseCase>(RegisterUseCase(sl<AuthRepository>()))
     ..registerSingleton<LogoutUseCase>(LogoutUseCase(sl<AuthRepository>()))
-    ..registerSingleton<ForgotPasswordUseCase>(ForgotPasswordUseCase(sl<AuthRepository>()))
+    ..registerSingleton<ForgotPasswordUseCase>(
+      ForgotPasswordUseCase(sl<AuthRepository>()),
+    )
     // ── InvoiceKit features ────────────────────────────────────────────────
     ..registerSingleton<BusinessProfileRepository>(
       BusinessProfileRepositoryImpl.create(sl<HiveStorageService>()),
@@ -229,5 +247,14 @@ Future<void> configureDependencies({
     )
     ..registerFactory<BackupCubit>(
       () => BackupCubit(repository: sl<BackupRepository>()),
+    )
+    ..registerFactory<SplashBloc>(
+      () => SplashBloc(
+        localStorage: sl<LocalStorageService>(),
+        subscriptionRepository: sl<SubscriptionRepository>(),
+      ),
+    )
+    ..registerLazySingleton<ThemeBloc>(
+      () => ThemeBloc(sl<LocalStorageService>()),
     );
 }

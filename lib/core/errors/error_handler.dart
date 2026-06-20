@@ -20,7 +20,8 @@ class ErrorHandler {
     }
   }
 
-  Failure map(Object error, [StackTrace? stackTrace]) => _mapper.map(error, stackTrace);
+  Failure map(Object error, [StackTrace? stackTrace]) =>
+      _mapper.map(error, stackTrace);
 }
 
 /// Functional `Result<T>` wrapper, used by repositories to avoid throwing.

@@ -42,7 +42,11 @@ class Validators {
     return null;
   }
 
-  static String? minLength(String? value, int length, {String fieldName = 'This field'}) {
+  static String? minLength(
+    String? value,
+    int length, {
+    String fieldName = 'This field',
+  }) {
     if (value.isNullOrEmpty) return '$fieldName is required';
     if (value!.length < length) {
       return '$fieldName must be at least $length characters';

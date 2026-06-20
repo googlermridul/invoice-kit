@@ -77,7 +77,10 @@ class ReportsCalculator {
   }
 
   /// Returns monthly totals for the last [months] months, oldest first.
-  List<RevenueTrendPoint> monthlyTrend(List<Invoice> invoices, {int months = 6}) {
+  List<RevenueTrendPoint> monthlyTrend(
+    List<Invoice> invoices, {
+    int months = 6,
+  }) {
     final now = DateTime.now();
     final result = <RevenueTrendPoint>[];
 
@@ -107,13 +110,21 @@ class ReportsCalculator {
   }) {
     final totals = <String, double>{};
     for (final inv in invoices) {
-      if (inv.status == InvoiceStatus.cancelled || inv.status == InvoiceStatus.draft) continue;
-      totals.update(inv.clientId, (v) => v + inv.total, ifAbsent: () => inv.total);
+      if (inv.status == InvoiceStatus.cancelled || inv.status == InvoiceStatus.draft) {
+        continue;
+      }
+      totals.update(
+        inv.clientId,
+        (v) => v + inv.total,
+        ifAbsent: () => inv.total,
+      );
     }
     final sorted =
         totals.entries
             .where((e) => clientsById[e.key] != null)
-            .map((e) => ClientRevenue(client: clientsById[e.key]!, total: e.value))
+            .map(
+              (e) => ClientRevenue(client: clientsById[e.key]!, total: e.value),
+            )
             .toList()
           ..sort((a, b) => b.total.compareTo(a.total));
     return sorted.take(limit).toList();
@@ -123,7 +134,9 @@ class ReportsCalculator {
   double totalTaxCollected(List<Invoice> invoices) {
     var total = 0.0;
     for (final inv in invoices) {
-      if (inv.status == InvoiceStatus.cancelled || inv.status == InvoiceStatus.draft) continue;
+      if (inv.status == InvoiceStatus.cancelled || inv.status == InvoiceStatus.draft) {
+        continue;
+      }
       total += inv.itemTaxTotal + inv.globalTax;
     }
     return total;

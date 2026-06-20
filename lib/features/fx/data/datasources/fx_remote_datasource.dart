@@ -18,15 +18,18 @@ class FxRemoteDataSourceImpl implements FxRemoteDataSource {
         queryParameters: {'base': base},
       );
       final data = response.data ?? const {};
-      final list = (data['rates'] as List<dynamic>? ?? const []).whereType<Map<dynamic, dynamic>>().map((e) {
-        final m = Map<String, dynamic>.from(e);
-        return FxRate.fromJson({
-          'base': m['base'] ?? base,
-          'quote': m['quote'] ?? '',
-          'rate': m['rate'] ?? 1,
-          'updatedAt': m['updatedAt'] ?? DateTime.now().toIso8601String(),
-        });
-      }).toList();
+      final list = (data['rates'] as List<dynamic>? ?? const [])
+          .whereType<Map<dynamic, dynamic>>()
+          .map((e) {
+            final m = Map<String, dynamic>.from(e);
+            return FxRate.fromJson({
+              'base': m['base'] ?? base,
+              'quote': m['quote'] ?? '',
+              'rate': m['rate'] ?? 1,
+              'updatedAt': m['updatedAt'] ?? DateTime.now().toIso8601String(),
+            });
+          })
+          .toList();
       if (list.isNotEmpty) return list;
     } on DioException {
       // fall through to dummy

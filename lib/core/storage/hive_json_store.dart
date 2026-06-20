@@ -3,7 +3,12 @@ import 'package:invoice_kit/core/storage/hive_storage_service.dart';
 
 /// Generic typed helper for storing JSON-encoded values in a Hive box.
 class HiveJsonStore<T> {
-  HiveJsonStore({required this.storage, required this.boxName, required this.fromJson, required this.toJson});
+  HiveJsonStore({
+    required this.storage,
+    required this.boxName,
+    required this.fromJson,
+    required this.toJson,
+  });
 
   final HiveStorageService storage;
   final String boxName;

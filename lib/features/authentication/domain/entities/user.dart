@@ -24,15 +24,14 @@ class User extends Equatable {
     String? avatarUrl,
     String? phone,
     bool? emailVerified,
-  }) =>
-      User(
-        id: id,
-        email: email,
-        name: name ?? this.name,
-        avatarUrl: avatarUrl ?? this.avatarUrl,
-        phone: phone ?? this.phone,
-        emailVerified: emailVerified ?? this.emailVerified,
-      );
+  }) => User(
+    id: id,
+    email: email,
+    name: name ?? this.name,
+    avatarUrl: avatarUrl ?? this.avatarUrl,
+    phone: phone ?? this.phone,
+    emailVerified: emailVerified ?? this.emailVerified,
+  );
 
   @override
   List<Object?> get props => [id, email, name, avatarUrl, phone, emailVerified];

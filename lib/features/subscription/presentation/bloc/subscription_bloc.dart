@@ -22,7 +22,10 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
   final SubscriptionRepository repository;
   final EntitlementService entitlements;
 
-  Future<void> _onStarted(SubscriptionStarted event, Emitter<SubscriptionState> emit) async {
+  Future<void> _onStarted(
+    SubscriptionStarted event,
+    Emitter<SubscriptionState> emit,
+  ) async {
     emit(state.copyWith(status: SubscriptionStatusX.loading));
     final current = await repository.current();
     emit(
@@ -30,12 +33,18 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
         status: SubscriptionStatusX.ready,
         subscriptionStatus: current,
         hasAccess: entitlements.hasAccess(current, DateTime.now()),
-        trialDaysRemaining: entitlements.trialDaysRemaining(current, DateTime.now()),
+        trialDaysRemaining: entitlements.trialDaysRemaining(
+          current,
+          DateTime.now(),
+        ),
       ),
     );
   }
 
-  Future<void> _onRefresh(SubscriptionRefreshed event, Emitter<SubscriptionState> emit) async {
+  Future<void> _onRefresh(
+    SubscriptionRefreshed event,
+    Emitter<SubscriptionState> emit,
+  ) async {
     emit(state.copyWith(status: SubscriptionStatusX.refreshing));
     try {
       final remote = await repository.refresh();
@@ -44,15 +53,26 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
           status: SubscriptionStatusX.ready,
           subscriptionStatus: remote,
           hasAccess: entitlements.hasAccess(remote, DateTime.now()),
-          trialDaysRemaining: entitlements.trialDaysRemaining(remote, DateTime.now()),
+          trialDaysRemaining: entitlements.trialDaysRemaining(
+            remote,
+            DateTime.now(),
+          ),
         ),
       );
     } on Object catch (e) {
-      emit(state.copyWith(status: SubscriptionStatusX.ready, message: e.toString()));
+      emit(
+        state.copyWith(
+          status: SubscriptionStatusX.ready,
+          message: e.toString(),
+        ),
+      );
     }
   }
 
-  Future<void> _onPurchased(SubscriptionPlanPurchased event, Emitter<SubscriptionState> emit) async {
+  Future<void> _onPurchased(
+    SubscriptionPlanPurchased event,
+    Emitter<SubscriptionState> emit,
+  ) async {
     emit(state.copyWith(status: SubscriptionStatusX.purchasing));
     final current = await repository.current();
     final updated = entitlements.activate(
@@ -71,7 +91,10 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     );
   }
 
-  Future<void> _onRestored(SubscriptionRestored event, Emitter<SubscriptionState> emit) async {
+  Future<void> _onRestored(
+    SubscriptionRestored event,
+    Emitter<SubscriptionState> emit,
+  ) async {
     emit(state.copyWith(status: SubscriptionStatusX.restoring));
     try {
       await repository.refresh();
@@ -81,15 +104,25 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
           status: SubscriptionStatusX.ready,
           subscriptionStatus: current,
           hasAccess: entitlements.hasAccess(current, DateTime.now()),
-          message: current.isActive ? 'Subscription restored' : 'No subscription to restore',
+          message: current.isActive
+              ? 'Subscription restored'
+              : 'No subscription to restore',
         ),
       );
     } on Object catch (e) {
-      emit(state.copyWith(status: SubscriptionStatusX.ready, message: e.toString()));
+      emit(
+        state.copyWith(
+          status: SubscriptionStatusX.ready,
+          message: e.toString(),
+        ),
+      );
     }
   }
 
-  Future<void> _onExpired(SubscriptionExpired event, Emitter<SubscriptionState> emit) async {
+  Future<void> _onExpired(
+    SubscriptionExpired event,
+    Emitter<SubscriptionState> emit,
+  ) async {
     final current = await repository.current();
     final updated = entitlements.expire(current);
     await repository.save(updated);

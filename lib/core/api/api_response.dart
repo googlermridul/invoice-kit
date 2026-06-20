@@ -4,7 +4,10 @@ import 'package:equatable/equatable.dart';
 class ApiResponse<T> extends Equatable {
   const ApiResponse({required this.data, this.message, this.meta});
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(dynamic raw) decoder) {
+  factory ApiResponse.fromJson(
+    Map<String, dynamic> json,
+    T Function(dynamic raw) decoder,
+  ) {
     return ApiResponse<T>(
       data: decoder(json['data']),
       message: json['message'] as String?,
@@ -23,7 +26,11 @@ class ApiResponse<T> extends Equatable {
 }
 
 class ApiMeta extends Equatable {
-  const ApiMeta({required this.page, required this.perPage, required this.total});
+  const ApiMeta({
+    required this.page,
+    required this.perPage,
+    required this.total,
+  });
 
   factory ApiMeta.fromJson(Map<String, dynamic> json) => ApiMeta(
     page: (json['page'] as num?)?.toInt() ?? 1,

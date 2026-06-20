@@ -29,7 +29,10 @@ class DocumentListTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
           child: Row(
             children: [
               Expanded(
@@ -38,7 +41,12 @@ class DocumentListTile extends StatelessWidget {
                   children: [
                     Text(title, style: context.textTheme.titleMedium),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: context.textTheme.bodySmall?.copyWith(color: context.colors.outline)),
+                    Text(
+                      subtitle,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: context.colors.outline,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -48,7 +56,9 @@ class DocumentListTile extends StatelessWidget {
                 children: [
                   Text(
                     Formatters.currency(amount, code: currency),
-                    style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   trailing,

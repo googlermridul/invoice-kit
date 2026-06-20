@@ -18,7 +18,10 @@ class AppDialog {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(cancelText)),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(cancelText),
+          ),
           FilledButton(
             style: destructive
                 ? FilledButton.styleFrom(backgroundColor: context.colors.error)
@@ -43,7 +46,12 @@ class AppDialog {
       builder: (ctx) => AlertDialog(
         title: Text(title),
         content: Text(message),
-        actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(okText))],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(okText),
+          ),
+        ],
       ),
     );
   }

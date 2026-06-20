@@ -13,7 +13,9 @@ class FxRate extends Equatable {
     base: (json['base'] ?? '').toString(),
     quote: (json['quote'] ?? '').toString(),
     rate: (json['rate'] as num?)?.toDouble() ?? 1,
-    updatedAt: json['updatedAt'] == null ? DateTime.now() : DateTime.parse(json['updatedAt'] as String),
+    updatedAt: json['updatedAt'] == null
+        ? DateTime.now()
+        : DateTime.parse(json['updatedAt'] as String),
   );
 
   final String base;

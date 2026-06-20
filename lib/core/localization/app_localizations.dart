@@ -14,7 +14,8 @@ class AppLocalizations {
       const AppLocalizations(AppLocales.fallback);
   final Locale locale;
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// Trivial in-memory strings; replace once `flutter gen-l10n` runs.
   String _s(String key) => key;
@@ -55,7 +56,8 @@ class AppLocalizations {
   String get settingsAbout => _s('settings_about');
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -63,7 +65,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
       AppLocales.supported.any((l) => l.languageCode == locale.languageCode);
 
   @override
-  Future<AppLocalizations> load(Locale locale) async => AppLocalizations(locale);
+  Future<AppLocalizations> load(Locale locale) async =>
+      AppLocalizations(locale);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;

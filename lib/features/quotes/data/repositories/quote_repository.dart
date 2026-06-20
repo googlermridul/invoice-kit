@@ -20,7 +20,8 @@ class QuoteRepositoryImpl implements QuoteRepository {
 
   final HiveJsonStore<Quote> _store;
 
-  static QuoteRepository create(HiveStorageService storage) => QuoteRepositoryImpl(
+  static QuoteRepository create(HiveStorageService storage) =>
+      QuoteRepositoryImpl(
         HiveJsonStore<Quote>(
           storage: storage,
           boxName: HiveBoxes.quotes,

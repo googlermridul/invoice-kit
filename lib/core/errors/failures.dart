@@ -2,7 +2,11 @@ import 'package:equatable/equatable.dart';
 
 /// Base Failure contract — every domain-layer failure extends this.
 abstract class Failure extends Equatable {
-  const Failure({this.message = 'Unexpected error', this.code, this.stackTrace});
+  const Failure({
+    this.message = 'Unexpected error',
+    this.code,
+    this.stackTrace,
+  });
 
   final String message;
   final String? code;
@@ -14,7 +18,10 @@ abstract class Failure extends Equatable {
 
 /// No internet connectivity.
 class NetworkFailure extends Failure {
-  const NetworkFailure({super.message = 'No internet connection.', super.code = 'NETWORK_FAILURE'});
+  const NetworkFailure({
+    super.message = 'No internet connection.',
+    super.code = 'NETWORK_FAILURE',
+  });
 }
 
 /// Server returned 5xx or any unrecoverable backend error.
@@ -54,7 +61,10 @@ class ValidationFailure extends Failure {
 
 /// Cached / local storage failure.
 class CacheFailure extends Failure {
-  const CacheFailure({super.message = 'Local cache failure.', super.code = 'CACHE_FAILURE'});
+  const CacheFailure({
+    super.message = 'Local cache failure.',
+    super.code = 'CACHE_FAILURE',
+  });
 }
 
 /// Unknown / uncategorised failure.

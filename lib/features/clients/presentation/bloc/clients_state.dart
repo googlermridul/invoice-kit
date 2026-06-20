@@ -32,5 +32,11 @@ class ClientsState extends Equatable {
   );
 
   @override
-  List<Object?> get props => [loading, query, clients, invoiceCountByClient, quoteCountByClient];
+  List<Object?> get props => [
+    loading,
+    query,
+    clients,
+    invoiceCountByClient,
+    quoteCountByClient,
+  ];
 }

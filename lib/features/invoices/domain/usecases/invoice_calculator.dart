@@ -8,13 +8,16 @@ class InvoiceCalculator {
   const InvoiceCalculator._();
 
   /// Pre-tax sum of all line subtotals.
-  static double subtotal(Iterable<DocumentItem> items) => items.fold(0, (sum, item) => sum + item.lineSubtotal);
+  static double subtotal(Iterable<DocumentItem> items) =>
+      items.fold(0, (sum, item) => sum + item.lineSubtotal);
 
   /// Sum of line-level tax amounts.
-  static double lineTaxTotal(Iterable<DocumentItem> items) => items.fold(0, (sum, item) => sum + item.taxAmount);
+  static double lineTaxTotal(Iterable<DocumentItem> items) =>
+      items.fold(0, (sum, item) => sum + item.taxAmount);
 
   /// Sum of all line discounts.
-  static double discountTotal(Iterable<DocumentItem> items) => items.fold(0, (sum, item) => sum + item.discount);
+  static double discountTotal(Iterable<DocumentItem> items) =>
+      items.fold(0, (sum, item) => sum + item.discount);
 
   /// Document-level tax (e.g. an extra global surcharge). Applied to
   /// `subtotal + lineTaxTotal`.

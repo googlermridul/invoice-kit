@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/widgets/app_scaffold.dart';
+import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/shared/helpers/id_generator.dart';
@@ -33,7 +35,10 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
     cubit.stream.first.then((state) {
       final existing = widget.clientId == null
           ? null
-          : state.clients.where((c) => c.id == widget.clientId).cast<Client?>().firstOrNull;
+          : state.clients
+                .where((c) => c.id == widget.clientId)
+                .cast<Client?>()
+                .firstOrNull;
       if (existing != null) {
         _name.text = existing.name;
         _email.text = existing.email ?? '';
@@ -73,10 +78,18 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
     );
     await cubit.upsert(client);
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(widget.clientId == null ? 'Client added' : 'Client updated')));
-      context.go('/clients/$id');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.clientId == null ? 'Client added' : 'Client updated',
+          ),
+        ),
+      );
+      if (widget.clientId == null) {
+        GoRouter.of(context).pushReplacement('/clients/$id');
+      } else {
+        GoRouter.of(context).pop();
+      }
     }
   }
 
@@ -88,25 +101,34 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final isNew = widget.clientId == null;
-    return Scaffold(
-      appBar: AppBar(title: Text(isNew ? 'New client' : 'Edit client')),
+    return AppScaffold(
+      title: isNew ? 'New client' : 'Edit client',
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            AppSpacing.xxxl,
+          ),
           children: [
+            const SectionHeader(
+              title: 'Personal',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
+            ),
             AppTextField(
               controller: _name,
               label: 'Full name *',
               hint: 'Jane Doe',
             ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _company,
-              label: 'Company',
-              hint: 'Acme Inc.',
+            const SizedBox(height: AppSpacing.lg),
+            const SectionHeader(
+              title: 'Contact',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
             ),
-            const SizedBox(height: AppSpacing.md),
             AppTextField(
               controller: _email,
               label: 'Email',
@@ -120,6 +142,17 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
               hint: '+1 555 123 4567',
               keyboardType: TextInputType.phone,
             ),
+            const SizedBox(height: AppSpacing.lg),
+            const SectionHeader(
+              title: 'Business',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
+            ),
+            AppTextField(
+              controller: _company,
+              label: 'Company',
+              hint: 'Acme Inc.',
+            ),
             const SizedBox(height: AppSpacing.md),
             AppTextField(
               controller: _address,
@@ -127,15 +160,24 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
               hint: '123 Main St, City',
               maxLines: 3,
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.lg),
+            const SectionHeader(
+              title: 'Notes',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
+            ),
             AppTextField(
               controller: _notes,
-              label: 'Notes',
-              hint: 'Internal notes…',
+              label: 'Internal notes',
+              hint: 'Anything worth remembering…',
               maxLines: 3,
             ),
-            const SizedBox(height: AppSpacing.lg),
-            PrimaryButton(label: isNew ? 'Add client' : 'Save changes', onPressed: _save),
+            const SizedBox(height: AppSpacing.xl),
+            PrimaryButton(
+              label: isNew ? 'Add client' : 'Save changes',
+              icon: Icons.check,
+              onPressed: _save,
+            ),
           ],
         ),
       ),

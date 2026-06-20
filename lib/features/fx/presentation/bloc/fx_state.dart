@@ -28,16 +28,22 @@ class FxState extends Equatable {
     String? error,
     bool clearError = false,
     bool clearLastUpdated = false,
-  }) =>
-      FxState(
-        loading: loading ?? this.loading,
-        refreshing: refreshing ?? this.refreshing,
-        rates: rates ?? this.rates,
-        base: base ?? this.base,
-        lastUpdated: clearLastUpdated ? null : (lastUpdated ?? this.lastUpdated),
-        error: clearError ? null : (error ?? this.error),
-      );
+  }) => FxState(
+    loading: loading ?? this.loading,
+    refreshing: refreshing ?? this.refreshing,
+    rates: rates ?? this.rates,
+    base: base ?? this.base,
+    lastUpdated: clearLastUpdated ? null : (lastUpdated ?? this.lastUpdated),
+    error: clearError ? null : (error ?? this.error),
+  );
 
   @override
-  List<Object?> get props => [loading, refreshing, rates, base, lastUpdated, error];
+  List<Object?> get props => [
+    loading,
+    refreshing,
+    rates,
+    base,
+    lastUpdated,
+    error,
+  ];
 }

@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/router/route_paths.dart';
+import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/theme/app_tokens.dart';
+import 'package:invoice_kit/core/widgets/app_card.dart';
+import 'package:invoice_kit/core/widgets/app_scaffold.dart';
+import 'package:invoice_kit/core/widgets/kv_row.dart';
+import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
@@ -24,39 +31,53 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Client'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () => context.go('/clients/${widget.clientId}/edit'),
+    return AppScaffold(
+      title: 'Client',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit_outlined),
+          tooltip: 'Edit',
+          onPressed: () => GoRouter.of(context).push(
+            RoutePaths.clientEditPath(widget.clientId),
           ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: _confirmDelete,
-          ),
-        ],
-      ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete_outline),
+          tooltip: 'Delete',
+          onPressed: _confirmDelete,
+        ),
+      ],
       body: BlocBuilder<ClientsCubit, ClientsState>(
         builder: (context, state) {
-          final client = state.clients.where((c) => c.id == widget.clientId).cast<Client?>().firstOrNull;
+          final client = state.clients
+              .where((c) => c.id == widget.clientId)
+              .cast<Client?>()
+              .firstOrNull;
           if (client == null) {
             return const Center(child: CircularProgressIndicator());
           }
           final c = client;
           return ListView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.xxxl,
+            ),
             children: [
               Center(
-                child: CircleAvatar(
-                  radius: 36,
-                  backgroundColor: context.colors.primary.withValues(alpha: 0.12),
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: context.tokens.brandSubtle,
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
+                  ),
                   child: Text(
                     c.name.isEmpty ? '?' : c.name[0].toUpperCase(),
-                    style: TextStyle(
+                    style: context.textTheme.displaySmall?.copyWith(
                       color: context.colors.primary,
-                      fontSize: 28,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -64,37 +85,51 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
               Center(
-                child: Text(c.name, style: context.textTheme.headlineSmall),
+                child: Text(
+                  c.name,
+                  style: context.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              _kv('Email', c.email),
-              _kv('Phone', c.phone),
-              _kv('Company', c.company),
-              _kv('Address', c.address),
+              AppCard(
+                child: Column(
+                  children: [
+                    KvRow(label: 'Email', value: c.email ?? '—'),
+                    KvRow(label: 'Phone', value: c.phone ?? '—'),
+                    KvRow(label: 'Company', value: c.company ?? '—'),
+                    KvRow(label: 'Address', value: c.address ?? '—'),
+                  ],
+                ),
+              ),
               if ((c.notes ?? '').isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.md),
-                Text('Notes', style: context.textTheme.labelMedium?.copyWith(color: context.colors.outline)),
-                const SizedBox(height: AppSpacing.xs),
-                Text(c.notes!),
+                const SizedBox(height: AppSpacing.lg),
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SectionHeader(
+                        title: 'Notes',
+                        padding: EdgeInsets.zero,
+                        uppercase: true,
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(c.notes!),
+                    ],
+                  ),
+                ),
               ],
               const SizedBox(height: AppSpacing.lg),
-              const Divider(),
-              const SizedBox(height: AppSpacing.md),
-              Text('Invoices', style: context.textTheme.titleMedium),
-              const SizedBox(height: AppSpacing.sm),
-              _ClientInvoices(clientId: widget.clientId),
-              const SizedBox(height: AppSpacing.lg),
-              Text('Quotes', style: context.textTheme.titleMedium),
-              const SizedBox(height: AppSpacing.sm),
-              _ClientQuotes(clientId: widget.clientId),
-              const SizedBox(height: AppSpacing.xl),
               Row(
                 children: [
                   Expanded(
                     child: PrimaryButton(
                       label: 'New invoice',
                       icon: Icons.receipt_long_outlined,
-                      onPressed: () => context.go('/invoices/new?clientId=${widget.clientId}'),
+                      onPressed: () => GoRouter.of(
+                        context,
+                      ).push('/invoices/new?clientId=${widget.clientId}'),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -102,31 +137,18 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
                     child: SecondaryButton(
                       label: 'New quote',
                       icon: Icons.description_outlined,
-                      onPressed: () => context.go('/quotes/new?clientId=${widget.clientId}'),
+                      onPressed: () => GoRouter.of(
+                        context,
+                      ).push('/quotes/new?clientId=${widget.clientId}'),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: AppSpacing.lg),
+              _RelatedSummary(clientId: widget.clientId),
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _kv(String k, String? v) {
-    if (v == null || v.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 84,
-            child: Text(k, style: TextStyle(color: context.colors.outline)),
-          ),
-          Expanded(child: Text(v)),
-        ],
       ),
     );
   }
@@ -137,9 +159,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Delete client?'),
-        content: const Text('Existing invoices and quotes will keep their reference.'),
+        content: const Text(
+          'Existing invoices and quotes will keep their reference.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton.tonal(
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Delete'),
@@ -149,41 +176,71 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
     );
     if (ok == true) {
       await cubit.remove(widget.clientId);
-      if (mounted) context.go('/clients');
+      if (mounted) GoRouter.of(context).pop();
     }
   }
 }
 
-class _ClientInvoices extends StatelessWidget {
-  const _ClientInvoices({required this.clientId});
+class _RelatedSummary extends StatelessWidget {
+  const _RelatedSummary({required this.clientId});
   final String clientId;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ClientsCubit, ClientsState>(
       builder: (context, state) {
-        final all = state.invoiceCountByClient[clientId] ?? 0;
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Text('$all invoice${all == 1 ? '' : 's'} on file'),
-        );
-      },
-    );
-  }
-}
-
-class _ClientQuotes extends StatelessWidget {
-  const _ClientQuotes({required this.clientId});
-  final String clientId;
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<ClientsCubit, ClientsState>(
-      builder: (context, state) {
-        final all = state.quoteCountByClient[clientId] ?? 0;
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Text('$all quote${all == 1 ? '' : 's'} on file'),
+        final invoices = state.invoiceCountByClient[clientId] ?? 0;
+        final quotes = state.quoteCountByClient[clientId] ?? 0;
+        return Row(
+          children: [
+            Expanded(
+              child: AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'INVOICES',
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '$invoices',
+                      style: context.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'QUOTES',
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: context.colors.onSurfaceVariant,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '$quotes',
+                      style: context.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       },
     );

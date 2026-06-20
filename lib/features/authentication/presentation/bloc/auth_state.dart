@@ -21,7 +21,8 @@ class AuthState extends Equatable {
   final String? message;
   final bool isSubmitting;
 
-  bool get isAuthenticated => status == AuthStatus.authenticated && user != null;
+  bool get isAuthenticated =>
+      status == AuthStatus.authenticated && user != null;
 
   AuthState copyWith({
     AuthStatus? status,
@@ -30,13 +31,12 @@ class AuthState extends Equatable {
     bool? isSubmitting,
     bool clearUser = false,
     bool clearMessage = false,
-  }) =>
-      AuthState(
-        status: status ?? this.status,
-        user: clearUser ? null : (user ?? this.user),
-        message: clearMessage ? null : (message ?? this.message),
-        isSubmitting: isSubmitting ?? this.isSubmitting,
-      );
+  }) => AuthState(
+    status: status ?? this.status,
+    user: clearUser ? null : (user ?? this.user),
+    message: clearMessage ? null : (message ?? this.message),
+    isSubmitting: isSubmitting ?? this.isSubmitting,
+  );
 
   @override
   List<Object?> get props => [status, user, message, isSubmitting];

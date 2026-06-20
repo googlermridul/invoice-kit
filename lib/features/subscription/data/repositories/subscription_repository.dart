@@ -19,7 +19,8 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
     required this._remote,
     required this._storage,
     StreamController<SubscriptionStatus>? controller,
-  }) : _controller = controller ?? StreamController<SubscriptionStatus>.broadcast();
+  }) : _controller =
+           controller ?? StreamController<SubscriptionStatus>.broadcast();
 
   static const _box = 'subscription_box';
   static const _key = 'status';

@@ -18,9 +18,11 @@ class AppConfig {
       environment: dotenv.maybeGet('APP_ENV') ?? 'development',
       appName: dotenv.maybeGet('APP_NAME') ?? 'Flutter Boilerplate',
       apiBaseUrl: dotenv.maybeGet('APP_BASE_URL') ?? 'https://dummyjson.com',
-      apiTimeoutSeconds: int.tryParse(dotenv.maybeGet('API_TIMEOUT_SECONDS') ?? '') ?? 30,
+      apiTimeoutSeconds:
+          int.tryParse(dotenv.maybeGet('API_TIMEOUT_SECONDS') ?? '') ?? 30,
       enableLogging: (dotenv.maybeGet('ENABLE_LOGGING') ?? 'true') == 'true',
-      enableSslPinning: (dotenv.maybeGet('ENABLE_SSL_PINNING') ?? 'false') == 'true',
+      enableSslPinning:
+          (dotenv.maybeGet('ENABLE_SSL_PINNING') ?? 'false') == 'true',
       locale: dotenv.maybeGet('LOCALE') ?? 'en',
     );
   }

@@ -7,7 +7,8 @@ part 'business_profile_event.dart';
 part 'business_profile_state.dart';
 
 class BusinessProfileCubit extends Cubit<BusinessProfileState> {
-  BusinessProfileCubit({required this.repo}) : super(BusinessProfileState.initial());
+  BusinessProfileCubit({required this.repo})
+    : super(BusinessProfileState.initial());
 
   final BusinessProfileRepository repo;
 

@@ -47,7 +47,9 @@ class BackupPayload {
   static BackupPayload fromJson(Map<String, dynamic> json) => BackupPayload(
     businessProfile: json['businessProfile'] == null
         ? null
-        : BusinessProfile.fromJson(Map<String, dynamic>.from(json['businessProfile'] as Map)),
+        : BusinessProfile.fromJson(
+            Map<String, dynamic>.from(json['businessProfile'] as Map),
+          ),
     clients: (json['clients'] as List<dynamic>? ?? const [])
         .map((e) => Client.fromJson(Map<String, dynamic>.from(e as Map)))
         .toList(),
@@ -58,11 +60,15 @@ class BackupPayload {
         .map((e) => Quote.fromJson(Map<String, dynamic>.from(e as Map)))
         .toList(),
     recurring: (json['recurring'] as List<dynamic>? ?? const [])
-        .map((e) => RecurringInvoice.fromJson(Map<String, dynamic>.from(e as Map)))
+        .map(
+          (e) => RecurringInvoice.fromJson(Map<String, dynamic>.from(e as Map)),
+        )
         .toList(),
     subscriptionStatus: json['subscriptionStatus'] == null
         ? SubscriptionStatus.initial()
-        : SubscriptionStatus.fromJson(Map<String, dynamic>.from(json['subscriptionStatus'] as Map)),
+        : SubscriptionStatus.fromJson(
+            Map<String, dynamic>.from(json['subscriptionStatus'] as Map),
+          ),
   );
 }
 
@@ -177,7 +183,10 @@ class BackupRepositoryImpl implements BackupRepository {
     try {
       final raw = jsonDecode(jsonString);
       if (raw is! Map<String, dynamic>) {
-        return const BackupValidationResult(valid: false, errors: ['Backup root must be a JSON object.']);
+        return const BackupValidationResult(
+          valid: false,
+          errors: ['Backup root must be a JSON object.'],
+        );
       }
       return BackupValidator.validate(raw);
     } catch (e) {
@@ -217,7 +226,9 @@ class BackupRepositoryImpl implements BackupRepository {
     await _recurringStore.putAll(payload.recurring, (r) => r.id);
 
     if (payload.businessProfile != null) {
-      final businessBox = await _storage.openBox<dynamic>('business_profile_box');
+      final businessBox = await _storage.openBox<dynamic>(
+        'business_profile_box',
+      );
       await businessBox.put('me', payload.businessProfile!.toJson());
     }
 
@@ -246,7 +257,11 @@ class BackupRepositoryImpl implements BackupRepository {
     if (raw == null) return const [];
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list.map((e) => ExportRecord.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+      return list
+          .map(
+            (e) => ExportRecord.fromJson(Map<String, dynamic>.from(e as Map)),
+          )
+          .toList();
     } catch (_) {
       return const [];
     }

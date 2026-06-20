@@ -24,42 +24,56 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
     _subscriptionBloc = sl<SubscriptionBloc>()..add(const SubscriptionStarted());
-    _router = AppRouter(guard: AppRouterGuard(subscriptionBloc: _subscriptionBloc));
+    _router = AppRouter(
+      guard: AppRouterGuard(subscriptionBloc: _subscriptionBloc),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, themeState) {
-        return MaterialApp.router(
-          title: 'InvoiceKit',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light,
-          darkTheme: AppTheme.dark,
-          themeMode: themeState.mode,
-          routerConfig: _router.router,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: AppLocales.supported,
-          localeResolutionCallback: (deviceLocale, supported) {
-            if (deviceLocale == null) return AppLocales.fallback;
-            return AppLocales.supported.firstWhere(
-              (l) => l.languageCode == deviceLocale.languageCode,
-              orElse: () => AppLocales.fallback,
-            );
-          },
-          builder: (context, child) {
-            return MediaQuery(
-              data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
-              child: child ?? const SizedBox.shrink(),
-            );
-          },
-        );
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ThemeBloc>(create: (_) => sl<ThemeBloc>()),
+        BlocProvider<SubscriptionBloc>.value(value: _subscriptionBloc),
+      ],
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp.router(
+            title: 'InvoiceKit',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: themeState.mode,
+            routerConfig: _router.router,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: AppLocales.supported,
+            localeResolutionCallback: (deviceLocale, supported) {
+              if (deviceLocale == null) return AppLocales.fallback;
+              return AppLocales.supported.firstWhere(
+                (l) => l.languageCode == deviceLocale.languageCode,
+                orElse: () => AppLocales.fallback,
+              );
+            },
+            builder: (context, child) {
+              final media = MediaQuery.of(context);
+              return MediaQuery(
+                data: media.copyWith(
+                  textScaler: media.textScaler.clamp(
+                    minScaleFactor: 1,
+                    maxScaleFactor: 1.25,
+                  ),
+                ),
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

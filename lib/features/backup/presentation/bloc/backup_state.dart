@@ -31,17 +31,24 @@ class BackupState extends Equatable {
     String? error,
     bool clearMessage = false,
     bool clearError = false,
-  }) =>
-      BackupState(
-        loading: loading ?? this.loading,
-        busy: busy ?? this.busy,
-        history: history ?? this.history,
-        lastExportPath: lastExportPath ?? this.lastExportPath,
-        lastImport: lastImport ?? this.lastImport,
-        message: clearMessage ? null : (message ?? this.message),
-        error: clearError ? null : (error ?? this.error),
-      );
+  }) => BackupState(
+    loading: loading ?? this.loading,
+    busy: busy ?? this.busy,
+    history: history ?? this.history,
+    lastExportPath: lastExportPath ?? this.lastExportPath,
+    lastImport: lastImport ?? this.lastImport,
+    message: clearMessage ? null : (message ?? this.message),
+    error: clearError ? null : (error ?? this.error),
+  );
 
   @override
-  List<Object?> get props => [loading, busy, history, lastExportPath, lastImport, message, error];
+  List<Object?> get props => [
+    loading,
+    busy,
+    history,
+    lastExportPath,
+    lastImport,
+    message,
+    error,
+  ];
 }

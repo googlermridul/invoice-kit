@@ -7,8 +7,7 @@ class PermissionsService {
   Future<PermissionStatus> request(Permission permission) =>
       permission.request();
 
-  Future<PermissionStatus> status(Permission permission) =>
-      permission.status;
+  Future<PermissionStatus> status(Permission permission) => permission.status;
 
   Future<bool> isGranted(Permission permission) async =>
       (await permission.status).isGranted;

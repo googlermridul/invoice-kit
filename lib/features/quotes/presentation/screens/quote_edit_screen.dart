@@ -5,9 +5,14 @@ import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
+import 'package:invoice_kit/core/widgets/app_card.dart';
+import 'package:invoice_kit/core/widgets/app_scaffold.dart';
+import 'package:invoice_kit/core/widgets/kv_row.dart';
+import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/quotes/data/repositories/quote_repository.dart';
@@ -26,8 +31,8 @@ class QuoteEditScreen extends StatefulWidget {
 
 class _QuoteEditScreenState extends State<QuoteEditScreen> {
   Quote? _quote;
-  // BusinessProfile? _profile;
   bool _loaded = false;
+  final _notesCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -35,16 +40,23 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     _bootstrap();
   }
 
+  @override
+  void dispose() {
+    _notesCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _bootstrap() async {
-    // final profile = await sl<BusinessProfileRepository>().load();
     final cubit = context.read<QuotesCubit>();
     final clientsCubit = context.read<ClientsCubit>();
     await clientsCubit.load();
     await cubit.load();
     if (widget.quoteId != null) {
       _quote = await sl<QuoteRepository>().byId(widget.quoteId!);
+      if (_quote != null) _notesCtrl.text = _quote!.notes ?? '';
+    } else {
+      _notesCtrl.text = '';
     }
-    // _profile = profile;
     if (mounted) setState(() => _loaded = true);
   }
 
@@ -61,16 +73,24 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       final profile = await sl<BusinessProfileRepository>().load();
       if (profile != null) {
         await sl<BusinessProfileRepository>().save(
-          profile.copyWith(
-            nextQuoteNumber: profile.nextQuoteNumber + 1,
-          ),
+          profile.copyWith(nextQuoteNumber: profile.nextQuoteNumber + 1),
         );
       }
     }
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Quote saved')));
-      context.go('/quotes/${_quote!.id}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Quote saved')),
+      );
+      if (widget.quoteId == null) {
+        GoRouter.of(context).pushReplacement('/quotes/${_quote!.id}');
+      } else {
+        GoRouter.of(context).pop();
+      }
     }
+  }
+
+  void _updateItems(List<DocumentItem> items) {
+    setState(() => _quote = _quote!.copyWith(items: items));
   }
 
   @override
@@ -79,176 +99,167 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     final totals = InvoiceCalculator.forDocument(_quote!);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.quoteId == null ? 'New quote' : 'Edit quote'),
-        actions: [
-          IconButton(icon: const Icon(Icons.save_outlined), onPressed: _save),
-        ],
-      ),
+    return AppScaffold(
+      title: widget.quoteId == null ? 'New quote' : 'Edit quote',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.save_outlined),
+          tooltip: 'Save',
+          onPressed: _save,
+        ),
+      ],
       body: BlocBuilder<ClientsCubit, ClientsState>(
         builder: (context, cstate) {
+          final selectedName = cstate.clients
+              .where((c) => c.id == _quote!.clientId)
+              .map((c) => c.name)
+              .firstOrNull;
           return ListView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.sm,
+              AppSpacing.lg,
+              AppSpacing.xxxl,
+            ),
             children: [
-              InkWell(
-                onTap: () async {
-                  final id = await showModalBottomSheet<String>(
-                    context: context,
-                    builder: (_) => ListView(
-                      shrinkWrap: true,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text('Pick a client', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                        ),
-                        ...cstate.clients.map(
-                          (c) => ListTile(
-                            title: Text(c.name),
-                            subtitle: Text(c.company ?? c.email ?? ''),
-                            onTap: () => Navigator.pop(context, c.id),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (id != null) {
-                    setState(() => _quote = _quote!.copyWith(clientId: id));
-                  }
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: context.colors.outlineVariant),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.person_outline),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Quote for', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                            Text(
-                              cstate.clients.where((c) => c.id == _quote!.clientId).map((c) => c.name).firstOrNull ??
-                                  'Tap to choose',
-                              style: context.textTheme.titleMedium,
-                            ),
-                          ],
-                        ),
+              const SectionHeader(
+                title: 'Client',
+                uppercase: true,
+                tone: SectionHeaderTone.primary,
+              ),
+              ClientPickerRow(
+                label: 'Quote for',
+                selectedName: selectedName,
+                options: cstate.clients
+                    .map(
+                      (c) => (
+                        id: c.id,
+                        name: c.name,
+                        subtitle: c.company ?? c.email,
                       ),
-                      const Icon(Icons.chevron_right),
-                    ],
-                  ),
+                    )
+                    .toList(),
+                onSelected: (id) => setState(
+                  () => _quote = _quote!.copyWith(clientId: id),
                 ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              _DateRow(
+              const SizedBox(height: AppSpacing.lg),
+              const SectionHeader(
+                title: 'Dates',
+                uppercase: true,
+                tone: SectionHeaderTone.primary,
+              ),
+              DateRow(
                 label: 'Issue date',
                 value: _quote!.issueDate,
-                onPicked: (d) => setState(() => _quote = _quote!.copyWith(issueDate: d)),
+                onPicked: (d) => setState(
+                  () => _quote = _quote!.copyWith(issueDate: d),
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              _DateRow(
+              DateRow(
                 label: 'Valid until',
-                value: _quote!.validUntil ?? DateTime.now().add(const Duration(days: 30)),
-                onPicked: (d) => setState(() => _quote = _quote!.copyWith(validUntil: d)),
+                value:
+                    _quote!.validUntil ??
+                    DateTime.now().add(const Duration(days: 30)),
+                onPicked: (d) => setState(
+                  () => _quote = _quote!.copyWith(validUntil: d),
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Text('Line items', style: context.textTheme.titleMedium),
-              const SizedBox(height: AppSpacing.sm),
+              const SectionHeader(
+                title: 'Line items',
+                uppercase: true,
+                tone: SectionHeaderTone.primary,
+              ),
               ..._quote!.items.asMap().entries.map((entry) {
-                final idx = entry.key;
+                final index = entry.key;
                 final item = entry.value;
-                return _ItemEditor(
+                return LineItemEditor(
                   item: item,
                   onChanged: (updated) {
                     final list = [..._quote!.items];
-                    list[idx] = updated;
-                    setState(() => _quote = _quote!.copyWith(items: list));
+                    list[index] = updated;
+                    _updateItems(list);
                   },
                   onRemove: _quote!.items.length > 1
-                      ? () => setState(
-                          () => _quote = _quote!.copyWith(
-                            items: [..._quote!.items]..removeAt(idx),
-                          ),
+                      ? () => _updateItems(
+                          [..._quote!.items]..removeAt(index),
                         )
                       : null,
                 );
               }),
-              TextButton.icon(
-                onPressed: () {
-                  setState(
-                    () => _quote = _quote!.copyWith(
-                      items: [
-                        ..._quote!.items,
-                        DocumentItem.empty(IdGenerator.create('item')),
-                      ],
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Add line item'),
+              const SizedBox(height: AppSpacing.sm),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () {
+                    _updateItems([
+                      ..._quote!.items,
+                      DocumentItem.empty(IdGenerator.create('item')),
+                    ]);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add line item'),
+                ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: context.colors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: context.colors.outlineVariant),
-                ),
+              AppCard(
                 child: Column(
                   children: [
-                    _row(context, 'Subtotal', totals.subtotal, _quote!.currency),
-                    if (totals.lineTax > 0) _row(context, 'Line tax', totals.lineTax, _quote!.currency),
-                    if (totals.globalTax > 0) _row(context, 'Global tax', totals.globalTax, _quote!.currency),
-                    const Divider(),
-                    _row(context, 'Total', totals.total, _quote!.currency, bold: true),
+                    KvRow(
+                      label: 'Subtotal',
+                      value: Formatters.currency(
+                        totals.subtotal,
+                        code: _quote!.currency,
+                      ),
+                    ),
+                    if (totals.lineTax > 0)
+                      KvRow(
+                        label: 'Line tax',
+                        value: Formatters.currency(
+                          totals.lineTax,
+                          code: _quote!.currency,
+                        ),
+                      ),
+                    if (totals.globalTax > 0)
+                      KvRow(
+                        label: 'Global tax',
+                        value: Formatters.currency(
+                          totals.globalTax,
+                          code: _quote!.currency,
+                        ),
+                      ),
+                    const SizedBox(height: AppSpacing.xs),
+                    KvRow(
+                      label: 'Total',
+                      value: Formatters.currency(
+                        totals.total,
+                        code: _quote!.currency,
+                      ),
+                      bold: true,
+                      valueColor: context.colors.primary,
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
               AppTextField(
-                controller: TextEditingController(text: _quote!.notes ?? ''),
+                controller: _notesCtrl,
                 label: 'Notes',
                 hint: 'Terms, scope, assumptions…',
                 maxLines: 3,
                 onChanged: (v) => _quote = _quote!.copyWith(notes: v),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              PrimaryButton(label: 'Save quote', onPressed: _save),
               const SizedBox(height: AppSpacing.xl),
+              PrimaryButton(
+                label: 'Save quote',
+                icon: Icons.check,
+                onPressed: _save,
+              ),
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _row(BuildContext context, String label, double value, String currency, {bool bold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: bold
-                  ? context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)
-                  : context.textTheme.bodyMedium,
-            ),
-          ),
-          Text(
-            Formatters.currency(value, code: currency),
-            style: bold
-                ? context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)
-                : context.textTheme.bodyMedium,
-          ),
-        ],
       ),
     );
   }
@@ -256,142 +267,4 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
 
 extension _FirstOrNull<E> on Iterable<E> {
   E? get firstOrNull => isEmpty ? null : first;
-}
-
-class _DateRow extends StatelessWidget {
-  const _DateRow({required this.label, required this.value, required this.onPicked});
-  final String label;
-  final DateTime value;
-  final ValueChanged<DateTime> onPicked;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        final d = await showDatePicker(
-          context: context,
-          initialDate: value,
-          firstDate: DateTime(2010),
-          lastDate: DateTime(2100),
-        );
-        if (d != null) onPicked(d);
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: context.colors.outlineVariant),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.event_outlined),
-            const SizedBox(width: AppSpacing.md),
-            Text(label),
-            const Spacer(),
-            Text(Formatters.date(value), style: const TextStyle(fontWeight: FontWeight.w600)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ItemEditor extends StatefulWidget {
-  const _ItemEditor({
-    required this.item,
-    required this.onChanged,
-    this.onRemove,
-  });
-
-  final DocumentItem item;
-  final ValueChanged<DocumentItem> onChanged;
-  final VoidCallback? onRemove;
-
-  @override
-  State<_ItemEditor> createState() => _ItemEditorState();
-}
-
-class _ItemEditorState extends State<_ItemEditor> {
-  late final _descCtrl = TextEditingController(text: widget.item.description);
-  late final _qtyCtrl = TextEditingController(text: _formatQty(widget.item.quantity));
-  late final _priceCtrl = TextEditingController(
-    text: widget.item.unitPrice == 0 ? '' : widget.item.unitPrice.toStringAsFixed(2),
-  );
-
-  String _formatQty(double q) => q == q.roundToDouble() ? q.toInt().toString() : q.toString();
-
-  @override
-  void dispose() {
-    _descCtrl.dispose();
-    _qtyCtrl.dispose();
-    _priceCtrl.dispose();
-    super.dispose();
-  }
-
-  void _emit() {
-    widget.onChanged(
-      widget.item.copyWith(
-        description: _descCtrl.text,
-        quantity: double.tryParse(_qtyCtrl.text) ?? 1,
-        unitPrice: double.tryParse(_priceCtrl.text) ?? 0,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: context.colors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.colors.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppTextField(
-            controller: _descCtrl,
-            label: 'Description',
-            hint: 'Service or product',
-            onChanged: (_) => _emit(),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Expanded(
-                child: AppTextField(
-                  controller: _qtyCtrl,
-                  label: 'Qty',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (_) => _emit(),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                flex: 2,
-                child: AppTextField(
-                  controller: _priceCtrl,
-                  label: 'Unit price',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (_) => _emit(),
-                ),
-              ),
-            ],
-          ),
-          if (widget.onRemove != null)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: widget.onRemove,
-                icon: const Icon(Icons.delete_outline, size: 18),
-                label: const Text('Remove'),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
 }

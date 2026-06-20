@@ -14,7 +14,10 @@ class BackupValidator {
     final errors = <String>[];
 
     if (json == null) {
-      return const BackupValidationResult(valid: false, errors: ['Empty backup file.']);
+      return const BackupValidationResult(
+        valid: false,
+        errors: ['Empty backup file.'],
+      );
     }
 
     final version = json['schemaVersion'];
@@ -37,7 +40,13 @@ class BackupValidator {
     }
 
     // Soft checks — present but maybe empty.
-    for (final key in const ['businessProfile', 'clients', 'invoices', 'quotes', 'recurring']) {
+    for (final key in const [
+      'businessProfile',
+      'clients',
+      'invoices',
+      'quotes',
+      'recurring',
+    ]) {
       if (!payload.containsKey(key)) {
         errors.add('Missing $key section.');
       }

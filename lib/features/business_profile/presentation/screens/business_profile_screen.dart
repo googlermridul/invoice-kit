@@ -4,11 +4,13 @@ import 'package:invoice_kit/core/constants/invoice_constants.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
 import 'package:invoice_kit/features/business_profile/presentation/bloc/business_profile_cubit.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/pdf_template.dart';
-import 'package:invoice_kit/shared/widgets/widgets.dart';
+import 'package:invoice_kit/shared/widgets/app_text_field.dart';
+import 'package:invoice_kit/shared/widgets/buttons.dart';
 
 class BusinessProfileScreen extends StatefulWidget {
   const BusinessProfileScreen({super.key});
@@ -43,7 +45,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     cubit.stream.first.then((s) {
       final p = s.profile;
       if (p != null) _hydrate(p);
-      setState(() => _loaded = true);
+      if (mounted) setState(() => _loaded = true);
     });
   }
 
@@ -109,11 +111,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     );
     await cubit.save(updated);
     await sl<BusinessProfileRepository>().save(updated);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile saved')),
-      );
-    }
+    if (mounted) context.showSnackBar('Profile saved');
   }
 
   String? _nullIfEmpty(String v) => v.trim().isEmpty ? null : v.trim();
@@ -123,136 +121,206 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     if (!_loaded) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    return Scaffold(
-      appBar: AppBar(title: const Text('Business profile')),
+    return AppScaffold(
+      title: 'Business profile',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.save_outlined),
+          tooltip: 'Save',
+          onPressed: _save,
+        ),
+      ],
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.xxxl,
+          ),
           children: [
-            _section('Business'),
-            AppTextField(
-              controller: _businessName,
-              label: 'Business name',
-              hint: 'Acme Studio',
+            const SectionHeader(
+              title: 'Business',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
+              padding: EdgeInsets.zero,
             ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _ownerName,
-              label: 'Owner / contact name',
-              hint: 'Jane Doe',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _email,
-              label: 'Email',
-              hint: 'billing@acme.com',
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _phone,
-              label: 'Phone',
-              hint: '+1 555 123 4567',
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _address,
-              label: 'Address',
-              hint: '123 Main St, City',
-              maxLines: 3,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _website,
-              label: 'Website',
-              hint: 'https://acme.com',
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _section('Invoicing'),
-            DropdownButtonFormField<String>(
-              initialValue: _currency,
-              decoration: const InputDecoration(
-                labelText: 'Default currency',
-                border: OutlineInputBorder(),
+            const SizedBox(height: AppSpacing.sm),
+            AppCard(
+              child: Column(
+                children: [
+                  AppTextField(
+                    controller: _businessName,
+                    label: 'Business name',
+                    hint: 'Acme Studio',
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _ownerName,
+                    label: 'Owner / contact name',
+                    hint: 'Jane Doe',
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _email,
+                    label: 'Email',
+                    hint: 'billing@acme.com',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _phone,
+                    label: 'Phone',
+                    hint: '+1 555 123 4567',
+                    keyboardType: TextInputType.phone,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _address,
+                    label: 'Address',
+                    hint: '123 Main St, City',
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _website,
+                    label: 'Website',
+                    hint: 'https://acme.com',
+                  ),
+                ],
               ),
-              items: CurrencyCodes.common
-                  .map(
-                    (c) => DropdownMenuItem(
-                      value: c,
-                      child: Text('${CurrencyCodes.symbolOf(c)}  $c'),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            const SectionHeader(
+              title: 'Invoicing',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
+              padding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AppCard(
+              child: Column(
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: _currency,
+                    decoration: const InputDecoration(
+                      labelText: 'Default currency',
+                      border: OutlineInputBorder(),
                     ),
-                  )
-                  .toList(),
-              onChanged: (v) => setState(() => _currency = v ?? 'USD'),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _invoicePrefix,
-              label: 'Invoice number prefix',
-              hint: 'INV-',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _quotePrefix,
-              label: 'Quote number prefix',
-              hint: 'QUO-',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _taxId,
-              label: 'Tax ID / VAT',
-              hint: '123456789',
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _defaultTerms,
-              label: 'Default payment terms',
-              hint: 'Payment due within 14 days.',
-              maxLines: 3,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _section('Payment details'),
-            AppTextField(
-              controller: _bankDetails,
-              label: 'Bank details',
-              hint: 'Bank name · Account · Routing',
-              maxLines: 4,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            AppTextField(
-              controller: _paymentInstructions,
-              label: 'Payment instructions',
-              hint: 'Pay via bank transfer to the account above.',
-              maxLines: 4,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _section('PDF template'),
-            ...PdfTemplateIds.all.map(
-              (id) => RadioListTile<String>(
-                value: id,
-                groupValue: _pdfTemplate,
-                onChanged: (v) => setState(() => _pdfTemplate = v ?? id),
-                title: Text(PdfTemplateIds.displayName(id)),
-                subtitle: Text(PdfTemplateIds.description(id)),
+                    items: CurrencyCodes.common
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c,
+                            child: Text('${CurrencyCodes.symbolOf(c)}  $c'),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (v) => setState(() => _currency = v ?? 'USD'),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _invoicePrefix,
+                    label: 'Invoice number prefix',
+                    hint: 'INV-',
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _quotePrefix,
+                    label: 'Quote number prefix',
+                    hint: 'QUO-',
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _taxId,
+                    label: 'Tax ID / VAT',
+                    hint: '123456789',
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _defaultTerms,
+                    label: 'Default payment terms',
+                    hint: 'Payment due within 14 days.',
+                    maxLines: 3,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            PrimaryButton(label: 'Save profile', icon: Icons.save_outlined, onPressed: _save),
-            const SizedBox(height: AppSpacing.xxl),
+            const SizedBox(height: AppSpacing.xl),
+            const SectionHeader(
+              title: 'Payment details',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
+              padding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AppCard(
+              child: Column(
+                children: [
+                  AppTextField(
+                    controller: _bankDetails,
+                    label: 'Bank details',
+                    hint: 'Bank name · Account · Routing',
+                    maxLines: 4,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  AppTextField(
+                    controller: _paymentInstructions,
+                    label: 'Payment instructions',
+                    hint: 'Pay via bank transfer to the account above.',
+                    maxLines: 4,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            const SectionHeader(
+              title: 'PDF template',
+              uppercase: true,
+              tone: SectionHeaderTone.primary,
+              padding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            AppCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  for (var i = 0; i < PdfTemplateIds.all.length; i++) ...[
+                    if (i > 0)
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
+                      ),
+                    RadioListTile<String>(
+                      value: PdfTemplateIds.all[i],
+                      // ignore: deprecated_member_use
+                      groupValue: _pdfTemplate,
+                      onChanged: (v) => setState(
+                        () => _pdfTemplate = v ?? PdfTemplateIds.all[i],
+                      ),
+                      title: Text(
+                        PdfTemplateIds.displayName(PdfTemplateIds.all[i]),
+                      ),
+                      subtitle: Text(
+                        PdfTemplateIds.description(PdfTemplateIds.all[i]),
+                        style: TextStyle(
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            PrimaryButton(
+              label: 'Save profile',
+              icon: Icons.save_outlined,
+              onPressed: _save,
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _section(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm, top: AppSpacing.sm),
-      child: Text(
-        title.toUpperCase(),
-        style: context.textTheme.labelMedium?.copyWith(color: context.colors.primary, letterSpacing: 1),
       ),
     );
   }

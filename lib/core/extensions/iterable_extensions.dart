@@ -14,6 +14,7 @@ extension IterableX<T> on Iterable<T> {
     return map;
   }
 
-  Map<K, T> associateBy<K>(K Function(T) key) =>
-      {for (final e in this) key(e): e};
+  Map<K, T> associateBy<K>(K Function(T) key) => {
+    for (final e in this) key(e): e,
+  };
 }

@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
-import 'package:invoice_kit/core/theme/app_colors.dart';
+import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
+import 'package:invoice_kit/core/widgets/app_card.dart';
+import 'package:invoice_kit/core/widgets/app_scaffold.dart';
+import 'package:invoice_kit/core/widgets/kv_row.dart';
+import 'package:invoice_kit/core/widgets/meta_tile.dart';
+import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/invoices/domain/services/pdf_generator.dart';
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/invoices/presentation/bloc/invoices_cubit.dart';
-import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
 import 'package:printing/printing.dart';
 
@@ -37,56 +43,71 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Invoice'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () => context.go('/invoices/${widget.invoiceId}/edit'),
-          ),
-          PopupMenuButton<String>(
-            onSelected: (v) async {
-              final cubit = context.read<InvoicesCubit>();
-              final inv = _invoice(context);
-              if (inv == null) return;
-              switch (v) {
-                case 'duplicate':
-                  final copy = await cubit.duplicate(inv);
-                  await cubit.saveDuplicate(copy);
-                  if (mounted) context.go('/invoices/${copy.id}');
-                case 'paid':
-                  await cubit.setStatus(inv, InvoiceStatus.paid);
-                case 'sent':
-                  await cubit.setStatus(inv, InvoiceStatus.sent);
-                case 'cancel':
-                  await cubit.setStatus(inv, InvoiceStatus.cancelled);
-                case 'delete':
-                  await cubit.remove(inv.id);
-                  if (mounted) context.go('/invoices');
-                case 'pdf':
-                  await _openPdf(context, inv);
-              }
-            },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'pdf', child: Text('Preview / share PDF')),
-              PopupMenuItem(value: 'sent', child: Text('Mark as sent')),
-              PopupMenuItem(value: 'paid', child: Text('Mark as paid')),
-              PopupMenuItem(value: 'cancel', child: Text('Mark as cancelled')),
-              PopupMenuItem(value: 'duplicate', child: Text('Duplicate')),
-              PopupMenuDivider(),
-              PopupMenuItem(value: 'delete', child: Text('Delete')),
-            ],
-          ),
-        ],
-      ),
+    return AppScaffold(
+      title: 'Invoice',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit_outlined),
+          tooltip: 'Edit',
+          onPressed: () => GoRouter.of(
+            context,
+          ).push(RoutePaths.invoiceEditPath(widget.invoiceId)),
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert),
+          onSelected: (v) async {
+            final cubit = context.read<InvoicesCubit>();
+            final inv = _invoice(context);
+            if (inv == null) return;
+            switch (v) {
+              case 'duplicate':
+                final copy = await cubit.duplicate(inv);
+                await cubit.saveDuplicate(copy);
+                if (mounted) {
+                  GoRouter.of(context).pop();
+                  GoRouter.of(context).push(
+                    RoutePaths.invoiceDetailPath(copy.id),
+                  );
+                }
+              case 'paid':
+                await cubit.setStatus(inv, InvoiceStatus.paid);
+              case 'sent':
+                await cubit.setStatus(inv, InvoiceStatus.sent);
+              case 'cancel':
+                await cubit.setStatus(inv, InvoiceStatus.cancelled);
+              case 'delete':
+                await cubit.remove(inv.id);
+                if (mounted) GoRouter.of(context).pop();
+              case 'pdf':
+                await _openPdf(context, inv);
+            }
+          },
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'pdf', child: Text('Preview / share PDF')),
+            PopupMenuItem(value: 'sent', child: Text('Mark as sent')),
+            PopupMenuItem(value: 'paid', child: Text('Mark as paid')),
+            PopupMenuItem(value: 'cancel', child: Text('Mark as cancelled')),
+            PopupMenuItem(value: 'duplicate', child: Text('Duplicate')),
+            PopupMenuDivider(),
+            PopupMenuItem(value: 'delete', child: Text('Delete')),
+          ],
+        ),
+      ],
       body: BlocBuilder<InvoicesCubit, InvoicesState>(
         builder: (context, state) {
-          final inv = state.invoices.where((i) => i.id == widget.invoiceId).cast<Invoice?>().firstOrNull;
-          if (inv == null) return const Center(child: CircularProgressIndicator());
+          final inv = state.invoices
+              .where((i) => i.id == widget.invoiceId)
+              .cast<Invoice?>()
+              .firstOrNull;
+          if (inv == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
           return BlocBuilder<ClientsCubit, ClientsState>(
             builder: (context, cstate) {
-              final client = cstate.clients.where((c) => c.id == inv.clientId).cast<Client?>().firstOrNull;
+              final client = cstate.clients
+                  .where((c) => c.id == inv.clientId)
+                  .cast<Client?>()
+                  .firstOrNull;
               return _InvoiceBody(invoice: inv, client: client);
             },
           );
@@ -97,12 +118,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   Invoice? _invoice(BuildContext context) {
     final s = context.read<InvoicesCubit>().state;
-    return s.invoices.where((i) => i.id == widget.invoiceId).cast<Invoice?>().firstOrNull;
+    return s.invoices
+        .where((i) => i.id == widget.invoiceId)
+        .cast<Invoice?>()
+        .firstOrNull;
   }
 
   Future<void> _openPdf(BuildContext context, Invoice invoice) async {
     final generator = sl<PdfGenerator>();
-    final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
+    final profile =
+        await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
     final client = context
         .read<ClientsCubit>()
         .state
@@ -118,11 +143,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     await Printing.layoutPdf(onLayout: (_) async => bytes);
   }
 
-  Client _emptyClient(String id) => Client(
-    id: id,
-    name: 'Unknown client',
-    createdAt: DateTime.now(),
-  );
+  Client _emptyClient(String id) =>
+      Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
 
   BusinessProfile _emptyProfile() => const BusinessProfile(businessName: '');
 }
@@ -140,7 +162,12 @@ class _InvoiceBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final totals = InvoiceCalculator.forDocument(invoice);
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.xxxl,
+      ),
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,67 +175,140 @@ class _InvoiceBody extends StatelessWidget {
             Expanded(
               child: Text(
                 invoice.number,
-                style: context.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
+                style: context.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.4,
+                ),
               ),
             ),
             InvoiceStatusBadge(invoice.status),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           'Billed to ${client?.name ?? "Unknown client"}',
-          style: context.textTheme.bodyMedium?.copyWith(color: context.colors.outline),
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.lg),
         Row(
           children: [
-            _MetaTile(context, 'Issued', Formatters.date(invoice.issueDate)),
-            const SizedBox(width: AppSpacing.md),
-            _MetaTile(context, 'Due', Formatters.date(invoice.dueDate)),
+            Expanded(
+              child: MetaTile(
+                label: 'Issued',
+                value: Formatters.date(invoice.issueDate),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: MetaTile(
+                label: 'Due',
+                value: Formatters.date(invoice.dueDate),
+              ),
+            ),
             if (invoice.paidDate != null) ...[
-              const SizedBox(width: AppSpacing.md),
-              _MetaTile(context, 'Paid', Formatters.date(invoice.paidDate!)),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: MetaTile(
+                  label: 'Paid',
+                  value: Formatters.date(invoice.paidDate!),
+                ),
+              ),
             ],
           ],
         ),
-        const SizedBox(height: AppSpacing.lg),
-        Container(
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: context.colors.outlineVariant),
-          ),
+        const SizedBox(height: AppSpacing.xl),
+        AppCard(
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
               ...invoice.items.map((it) => _itemRow(context, it)),
               const Divider(height: 1),
-              _kv(context, 'Subtotal', totals.subtotal, invoice.currency),
-              if (totals.lineTax > 0) _kv(context, 'Line tax', totals.lineTax, invoice.currency),
-              if (totals.globalTax > 0) _kv(context, 'Global tax', totals.globalTax, invoice.currency),
-              _kv(context, 'Total', totals.total, invoice.currency, bold: true),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  children: [
+                    KvRow(
+                      label: 'Subtotal',
+                      value: Formatters.currency(
+                        totals.subtotal,
+                        code: invoice.currency,
+                      ),
+                    ),
+                    if (totals.lineTax > 0)
+                      KvRow(
+                        label: 'Line tax',
+                        value: Formatters.currency(
+                          totals.lineTax,
+                          code: invoice.currency,
+                        ),
+                      ),
+                    if (totals.globalTax > 0)
+                      KvRow(
+                        label: 'Global tax',
+                        value: Formatters.currency(
+                          totals.globalTax,
+                          code: invoice.currency,
+                        ),
+                      ),
+                    const SizedBox(height: AppSpacing.xs),
+                    KvRow(
+                      label: 'Total',
+                      value: Formatters.currency(
+                        totals.total,
+                        code: invoice.currency,
+                      ),
+                      bold: true,
+                      valueColor: context.colors.primary,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
         if ((invoice.notes ?? '').isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
-          Text('Notes', style: context.textTheme.labelMedium),
-          const SizedBox(height: 4),
-          Text(invoice.notes!),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionHeader(
+                  title: 'Notes',
+                  uppercase: true,
+                  padding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(invoice.notes!),
+              ],
+            ),
+          ),
         ],
         if ((invoice.terms ?? '').isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
-          Text('Terms', style: context.textTheme.labelMedium),
-          const SizedBox(height: 4),
-          Text(invoice.terms!),
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionHeader(
+                  title: 'Terms',
+                  uppercase: true,
+                  padding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(invoice.terms!),
+              ],
+            ),
+          ),
         ],
-        const SizedBox(height: AppSpacing.xxl),
       ],
     );
   }
 
   Widget _itemRow(BuildContext context, DocumentItem item) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -216,58 +316,30 @@ class _InvoiceBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.description.isEmpty ? '—' : item.description),
+                Text(
+                  item.description.isEmpty ? '—' : item.description,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 2),
                 Text(
                   '${Formatters.number(item.quantity)} × ${Formatters.currency(item.unitPrice)}'
                   '${item.taxRate > 0 ? '  · ${item.taxRate.toStringAsFixed(0)}% tax' : ''}',
-                  style: TextStyle(color: context.colors.outline, fontSize: 12),
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
           ),
-          Text(Formatters.currency(item.lineTotal)),
-        ],
-      ),
-    );
-  }
-
-  Widget _kv(BuildContext context, String label, double value, String currency, {bool bold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(label, style: bold ? context.textTheme.titleMedium : context.textTheme.bodyMedium),
-          ),
           Text(
-            Formatters.currency(value, code: currency),
-            style: bold
-                ? context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: AppColors.primary)
-                : context.textTheme.bodyMedium,
+            Formatters.currency(item.lineTotal),
+            style: context.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _MetaTile(BuildContext context, String label, String value) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: context.colors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: context.colors.outlineVariant),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: context.textTheme.labelSmall?.copyWith(color: context.colors.outline)),
-            const SizedBox(height: 4),
-            Text(value, style: context.textTheme.titleMedium),
-          ],
-        ),
       ),
     );
   }

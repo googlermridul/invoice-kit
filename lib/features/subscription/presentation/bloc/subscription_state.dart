@@ -1,6 +1,13 @@
 part of 'subscription_bloc.dart';
 
-enum SubscriptionStatusX { initial, loading, ready, refreshing, purchasing, restoring }
+enum SubscriptionStatusX {
+  initial,
+  loading,
+  ready,
+  refreshing,
+  purchasing,
+  restoring,
+}
 
 class SubscriptionState extends Equatable {
   const SubscriptionState({
@@ -19,7 +26,8 @@ class SubscriptionState extends Equatable {
   final int trialDaysRemaining;
   final String? message;
 
-  SubscriptionStatus get currentStatus => _status ?? SubscriptionStatus.initial();
+  SubscriptionStatus get currentStatus =>
+      _status ?? SubscriptionStatus.initial();
 
   bool get isTrialing => currentStatus.isTrialing;
   bool get isActive => currentStatus.isActive;
@@ -43,5 +51,11 @@ class SubscriptionState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, _status, hasAccess, trialDaysRemaining, message];
+  List<Object?> get props => [
+    status,
+    _status,
+    hasAccess,
+    trialDaysRemaining,
+    message,
+  ];
 }

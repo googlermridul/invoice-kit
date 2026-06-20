@@ -7,7 +7,10 @@ sealed class ApiResult<T> {
     required R Function(String message, int? code) onFailure,
   }) => switch (this) {
     ApiSuccess<T>(:final data) => onSuccess(data),
-    ApiFailureResult<T>(:final message, :final code) => onFailure(message, code),
+    ApiFailureResult<T>(:final message, :final code) => onFailure(
+      message,
+      code,
+    ),
   };
 }
 

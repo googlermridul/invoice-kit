@@ -1,5 +1,6 @@
 import 'package:invoice_kit/core/constants/invoice_constants.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/recurring/domain/entities/recurring_invoice.dart';
@@ -31,7 +32,9 @@ class RecurringInvoiceGenerator {
     var counter = invoiceCounter;
 
     var safety = 0;
-    while (!next.isAfter(endBound) && !next.isAfter(now) && safety < maxCatchup) {
+    while (!next.isAfter(endBound) &&
+        !next.isAfter(now) &&
+        safety < maxCatchup) {
       final items = schedule.items
           .map((json) => DocumentItem.fromJson(json).copyWith())
           .toList();

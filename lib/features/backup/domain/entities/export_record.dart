@@ -15,7 +15,11 @@ class ExportRecord extends Equatable {
     id: (json['id'] ?? '').toString(),
     createdAt: DateTime.parse(json['createdAt'] as String),
     sizeBytes: (json['sizeBytes'] as num?)?.toInt() ?? 0,
-    itemCounts: (json['itemCounts'] as Map?)?.map((k, v) => MapEntry(k.toString(), (v as num).toInt())) ?? const {},
+    itemCounts:
+        (json['itemCounts'] as Map?)?.map(
+          (k, v) => MapEntry(k.toString(), (v as num).toInt()),
+        ) ??
+        const {},
     path: json['path'] as String?,
     label: json['label'] as String?,
   );
@@ -37,5 +41,12 @@ class ExportRecord extends Equatable {
   };
 
   @override
-  List<Object?> get props => [id, createdAt, sizeBytes, itemCounts, path, label];
+  List<Object?> get props => [
+    id,
+    createdAt,
+    sizeBytes,
+    itemCounts,
+    path,
+    label,
+  ];
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
+import 'package:invoice_kit/core/theme/app_tokens.dart';
 
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -20,26 +22,45 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tt = context.textTheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 64, color: context.colors.outline),
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: context.tokens.brandSubtle,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
+              ),
+              child: Icon(
+                icon,
+                size: 36,
+                color: context.colors.primary,
+              ),
+            ),
             const SizedBox(height: AppSpacing.lg),
-            Text(title, style: context.textTheme.titleMedium),
+            Text(title, style: tt.titleLarge),
             if (subtitle != null) ...[
               const SizedBox(height: AppSpacing.xs),
               Text(
                 subtitle!,
                 textAlign: TextAlign.center,
-                style: context.textTheme.bodySmall?.copyWith(color: context.colors.outline),
+                style: tt.bodyMedium?.copyWith(
+                  color: context.colors.onSurfaceVariant,
+                ),
               ),
             ],
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-              ElevatedButton(onPressed: onAction, child: Text(actionLabel!)),
+              const SizedBox(height: AppSpacing.xl),
+              ElevatedButton.icon(
+                onPressed: onAction,
+                icon: const Icon(Icons.add, size: 18),
+                label: Text(actionLabel!),
+              ),
             ],
           ],
         ),

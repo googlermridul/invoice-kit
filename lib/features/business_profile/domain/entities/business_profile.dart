@@ -22,26 +22,30 @@ class BusinessProfile extends Equatable {
     this.selectedPdfTemplate = 'classic',
   });
 
-  factory BusinessProfile.fromJson(Map<String, dynamic> json) => BusinessProfile(
-    businessName: (json['businessName'] ?? 'My Business').toString(),
-    ownerName: json['ownerName'] as String?,
-    email: json['email'] as String?,
-    phone: json['phone'] as String?,
-    address: json['address'] as String?,
-    website: json['website'] as String?,
-    taxId: json['taxId'] as String?,
-    logoPath: json['logoPath'] as String?,
-    defaultCurrency: (json['defaultCurrency'] ?? 'USD').toString(),
-    invoicePrefix: (json['invoicePrefix'] ?? 'INV-').toString(),
-    quotePrefix: (json['quotePrefix'] ?? 'QUO-').toString(),
-    nextInvoiceNumber: (json['nextInvoiceNumber'] as num?)?.toInt() ?? 1,
-    nextQuoteNumber: (json['nextQuoteNumber'] as num?)?.toInt() ?? 1,
-    defaultPaymentTerms: (json['defaultPaymentTerms'] ?? 'Payment due within 14 days.').toString(),
-    defaultNotes: json['defaultNotes'] as String?,
-    bankDetails: json['bankDetails'] as String?,
-    paymentInstructions: json['paymentInstructions'] as String?,
-    selectedPdfTemplate: (json['selectedPdfTemplate'] ?? 'classic').toString(),
-  );
+  factory BusinessProfile.fromJson(Map<String, dynamic> json) =>
+      BusinessProfile(
+        businessName: (json['businessName'] ?? 'My Business').toString(),
+        ownerName: json['ownerName'] as String?,
+        email: json['email'] as String?,
+        phone: json['phone'] as String?,
+        address: json['address'] as String?,
+        website: json['website'] as String?,
+        taxId: json['taxId'] as String?,
+        logoPath: json['logoPath'] as String?,
+        defaultCurrency: (json['defaultCurrency'] ?? 'USD').toString(),
+        invoicePrefix: (json['invoicePrefix'] ?? 'INV-').toString(),
+        quotePrefix: (json['quotePrefix'] ?? 'QUO-').toString(),
+        nextInvoiceNumber: (json['nextInvoiceNumber'] as num?)?.toInt() ?? 1,
+        nextQuoteNumber: (json['nextQuoteNumber'] as num?)?.toInt() ?? 1,
+        defaultPaymentTerms:
+            (json['defaultPaymentTerms'] ?? 'Payment due within 14 days.')
+                .toString(),
+        defaultNotes: json['defaultNotes'] as String?,
+        bankDetails: json['bankDetails'] as String?,
+        paymentInstructions: json['paymentInstructions'] as String?,
+        selectedPdfTemplate: (json['selectedPdfTemplate'] ?? 'classic')
+            .toString(),
+      );
 
   final String businessName;
   final String? ownerName;

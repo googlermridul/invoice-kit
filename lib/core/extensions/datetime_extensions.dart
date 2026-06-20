@@ -3,7 +3,8 @@ extension DateTimeX on DateTime {
   bool isSameDay(DateTime other) =>
       year == other.year && month == other.month && day == other.day;
   bool get isToday => isSameDay(DateTime.now());
-  bool get isYesterday => isSameDay(DateTime.now().subtract(const Duration(days: 1)));
+  bool get isYesterday =>
+      isSameDay(DateTime.now().subtract(const Duration(days: 1)));
   bool get isTomorrow => isSameDay(DateTime.now().add(const Duration(days: 1)));
 
   String timeAgo() {

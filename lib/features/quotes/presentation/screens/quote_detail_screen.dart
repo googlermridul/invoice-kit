@@ -3,12 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
+import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
+import 'package:invoice_kit/core/widgets/app_card.dart';
+import 'package:invoice_kit/core/widgets/app_scaffold.dart';
+import 'package:invoice_kit/core/widgets/kv_row.dart';
+import 'package:invoice_kit/core/widgets/meta_tile.dart';
+import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/features/invoices/data/repositories/invoice_repository.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/quotes/domain/entities/quote.dart';
 import 'package:invoice_kit/features/quotes/presentation/bloc/quotes_cubit.dart';
@@ -32,53 +39,65 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quote'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () => context.go('/quotes/${widget.quoteId}/edit'),
+    return AppScaffold(
+      title: 'Quote',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit_outlined),
+          tooltip: 'Edit',
+          onPressed: () => GoRouter.of(context).push(
+            RoutePaths.quoteEditPath(widget.quoteId),
           ),
-          PopupMenuButton<String>(
-            onSelected: (v) async {
-              final cubit = context.read<QuotesCubit>();
-              final q = _quote(context);
-              if (q == null) return;
-              switch (v) {
-                case 'accept':
-                  await cubit.setStatus(q, QuoteStatus.accepted);
-                case 'decline':
-                  await cubit.setStatus(q, QuoteStatus.declined);
-                case 'send':
-                  await cubit.setStatus(q, QuoteStatus.sent);
-                case 'convert':
-                  final inv = await cubit.convertToInvoice(q);
-                  await sl<InvoiceRepository>().save(inv);
-                  if (mounted) context.go('/invoices/${inv.id}');
-                case 'delete':
-                  await cubit.remove(q.id);
-                  if (mounted) context.go('/quotes');
-              }
-            },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'send', child: Text('Mark as sent')),
-              PopupMenuItem(value: 'accept', child: Text('Mark as accepted')),
-              PopupMenuItem(value: 'decline', child: Text('Mark as declined')),
-              PopupMenuItem(value: 'convert', child: Text('Convert to invoice')),
-              PopupMenuDivider(),
-              PopupMenuItem(value: 'delete', child: Text('Delete')),
-            ],
-          ),
-        ],
-      ),
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert),
+          onSelected: (v) async {
+            final cubit = context.read<QuotesCubit>();
+            final q = _quote(context);
+            if (q == null) return;
+            switch (v) {
+              case 'accept':
+                await cubit.setStatus(q, QuoteStatus.accepted);
+              case 'decline':
+                await cubit.setStatus(q, QuoteStatus.declined);
+              case 'send':
+                await cubit.setStatus(q, QuoteStatus.sent);
+              case 'convert':
+                final inv = await cubit.convertToInvoice(q);
+                await sl<InvoiceRepository>().save(inv);
+                if (mounted) {
+                  GoRouter.of(context).pushReplacement('/invoices/${inv.id}');
+                }
+              case 'delete':
+                await cubit.remove(q.id);
+                if (mounted) GoRouter.of(context).pop();
+            }
+          },
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'send', child: Text('Mark as sent')),
+            PopupMenuItem(value: 'accept', child: Text('Mark as accepted')),
+            PopupMenuItem(value: 'decline', child: Text('Mark as declined')),
+            PopupMenuItem(value: 'convert', child: Text('Convert to invoice')),
+            PopupMenuDivider(),
+            PopupMenuItem(value: 'delete', child: Text('Delete')),
+          ],
+        ),
+      ],
       body: BlocBuilder<QuotesCubit, QuotesState>(
         builder: (context, state) {
-          final q = state.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
-          if (q == null) return const Center(child: CircularProgressIndicator());
+          final q = state.quotes
+              .where((x) => x.id == widget.quoteId)
+              .cast<Quote?>()
+              .firstOrNull;
+          if (q == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
           return BlocBuilder<ClientsCubit, ClientsState>(
             builder: (context, cstate) {
-              final client = cstate.clients.where((c) => c.id == q.clientId).cast<Client?>().firstOrNull;
+              final client = cstate.clients
+                  .where((c) => c.id == q.clientId)
+                  .cast<Client?>()
+                  .firstOrNull;
               return _Body(quote: q, client: client);
             },
           );
@@ -89,7 +108,10 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
 
   Quote? _quote(BuildContext context) {
     final s = context.read<QuotesCubit>().state;
-    return s.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
+    return s.quotes
+        .where((x) => x.id == widget.quoteId)
+        .cast<Quote?>()
+        .firstOrNull;
   }
 }
 
@@ -106,37 +128,58 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final totals = InvoiceCalculator.forDocument(quote);
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.xxxl,
+      ),
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Text(quote.number, style: context.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700)),
+              child: Text(
+                quote.number,
+                style: context.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.4,
+                ),
+              ),
             ),
             QuoteStatusBadge(quote.status),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           'Quoted for ${client?.name ?? "Unknown client"}',
-          style: context.textTheme.bodyMedium?.copyWith(color: context.colors.outline),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Row(
-          children: [
-            _meta(context, 'Issued', Formatters.date(quote.issueDate)),
-            const SizedBox(width: AppSpacing.md),
-            if (quote.validUntil != null) _meta(context, 'Valid until', Formatters.date(quote.validUntil!)),
-          ],
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        Container(
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: context.colors.outlineVariant),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: MetaTile(
+                label: 'Issued',
+                value: Formatters.date(quote.issueDate),
+              ),
+            ),
+            if (quote.validUntil != null) ...[
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: MetaTile(
+                  label: 'Valid until',
+                  value: Formatters.date(quote.validUntil!),
+                ),
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        AppCard(
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
               ...quote.items.map(
@@ -149,73 +192,94 @@ class _Body extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(it.description.isEmpty ? '—' : it.description),
+                            Text(
+                              it.description.isEmpty ? '—' : it.description,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             const SizedBox(height: 2),
                             Text(
                               '${Formatters.number(it.quantity)} × ${Formatters.currency(it.unitPrice)}',
-                              style: TextStyle(color: context.colors.outline, fontSize: 12),
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: context.colors.onSurfaceVariant,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      Text(Formatters.currency(it.lineTotal)),
+                      Text(
+                        Formatters.currency(it.lineTotal),
+                        style: context.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
               const Divider(height: 1),
-              _kv(context, 'Subtotal', totals.subtotal, quote.currency),
-              if (totals.lineTax > 0) _kv(context, 'Line tax', totals.lineTax, quote.currency),
-              if (totals.globalTax > 0) _kv(context, 'Global tax', totals.globalTax, quote.currency),
-              _kv(context, 'Total', totals.total, quote.currency, bold: true),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  children: [
+                    KvRow(
+                      label: 'Subtotal',
+                      value: Formatters.currency(
+                        totals.subtotal,
+                        code: quote.currency,
+                      ),
+                    ),
+                    if (totals.lineTax > 0)
+                      KvRow(
+                        label: 'Line tax',
+                        value: Formatters.currency(
+                          totals.lineTax,
+                          code: quote.currency,
+                        ),
+                      ),
+                    if (totals.globalTax > 0)
+                      KvRow(
+                        label: 'Global tax',
+                        value: Formatters.currency(
+                          totals.globalTax,
+                          code: quote.currency,
+                        ),
+                      ),
+                    const SizedBox(height: AppSpacing.xs),
+                    KvRow(
+                      label: 'Total',
+                      value: Formatters.currency(
+                        totals.total,
+                        code: quote.currency,
+                      ),
+                      bold: true,
+                      valueColor: context.colors.primary,
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
         if ((quote.notes ?? '').isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
-          Text('Notes', style: context.textTheme.labelMedium),
-          const SizedBox(height: 4),
-          Text(quote.notes!),
-        ],
-      ],
-    );
-  }
-
-  Widget _kv(BuildContext context, String label, double value, String currency, {bool bold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-      child: Row(
-        children: [
-          Expanded(child: Text(label, style: bold ? context.textTheme.titleMedium : context.textTheme.bodyMedium)),
-          Text(
-            Formatters.currency(value, code: currency),
-            style: bold
-                ? context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)
-                : context.textTheme.bodyMedium,
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SectionHeader(
+                  title: 'Notes',
+                  uppercase: true,
+                  padding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(quote.notes!),
+              ],
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _meta(BuildContext context, String label, String value) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: context.colors.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: context.colors.outlineVariant),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: context.textTheme.labelSmall?.copyWith(color: context.colors.outline)),
-            const SizedBox(height: 4),
-            Text(value, style: context.textTheme.titleMedium),
-          ],
-        ),
-      ),
+      ],
     );
   }
 }

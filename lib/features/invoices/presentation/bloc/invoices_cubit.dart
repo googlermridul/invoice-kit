@@ -2,7 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/invoices/data/repositories/invoice_repository.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
@@ -32,12 +33,20 @@ class InvoicesCubit extends Cubit<InvoicesState> {
       return i;
     }).toList();
     for (final inv in updated.where((i) => i.status == InvoiceStatus.overdue)) {
-      if (all.firstWhere((a) => a.id == inv.id).status != InvoiceStatus.overdue) {
+      if (all.firstWhere((a) => a.id == inv.id).status !=
+          InvoiceStatus.overdue) {
         await invoiceRepo.save(inv);
       }
     }
-    final sorted = [...updated]..sort((a, b) => b.issueDate.compareTo(a.issueDate));
-    emit(state.copyWith(loading: false, invoices: sorted, defaultCurrency: profile?.defaultCurrency));
+    final sorted = [...updated]
+      ..sort((a, b) => b.issueDate.compareTo(a.issueDate));
+    emit(
+      state.copyWith(
+        loading: false,
+        invoices: sorted,
+        defaultCurrency: profile?.defaultCurrency,
+      ),
+    );
   }
 
   Future<void> remove(String id) async {
@@ -50,12 +59,16 @@ class InvoicesCubit extends Cubit<InvoicesState> {
     final nextNumber = profile?.nextInvoiceNumber ?? 1;
     final copy = invoice.copyWith(
       id: IdGenerator.create('inv'),
-      number: newNumber ?? '${profile?.invoicePrefix ?? 'INV-'}${nextNumber.toString().padLeft(5, '0')}',
+      number:
+          newNumber ??
+          '${profile?.invoicePrefix ?? 'INV-'}${nextNumber.toString().padLeft(5, '0')}',
       status: InvoiceStatus.draft,
       issueDate: DateTime.now(),
       dueDate: DateTime.now().add(const Duration(days: 14)),
       paidDate: null,
-      items: invoice.items.map((it) => it.copyWith(description: it.description)).toList(),
+      items: invoice.items
+          .map((it) => it.copyWith(description: it.description))
+          .toList(),
     );
     return copy;
   }
@@ -74,9 +87,13 @@ class InvoicesCubit extends Cubit<InvoicesState> {
     await load();
   }
 
-  Future<Invoice> createDraft({required String clientId, String currency = 'USD'}) async {
+  Future<Invoice> createDraft({
+    required String clientId,
+    String currency = 'USD',
+  }) async {
     final profile = await businessRepo.load();
-    final number = '${profile?.invoicePrefix ?? 'INV-'}${(profile?.nextInvoiceNumber ?? 1).toString().padLeft(5, '0')}';
+    final number =
+        '${profile?.invoicePrefix ?? 'INV-'}${(profile?.nextInvoiceNumber ?? 1).toString().padLeft(5, '0')}';
     final now = DateTime.now();
     return Invoice(
       id: IdGenerator.create('inv'),

@@ -18,7 +18,9 @@ class HttpApiClient {
     query?.forEach((k, v) {
       if (v != null) qp[k] = v.toString();
     });
-    return Uri.parse('$base$path').replace(queryParameters: qp.isEmpty ? null : qp);
+    return Uri.parse(
+      '$base$path',
+    ).replace(queryParameters: qp.isEmpty ? null : qp);
   }
 
   Future<http.Response> get(
@@ -26,7 +28,8 @@ class HttpApiClient {
     String path, {
     Map<String, String>? headers,
     Map<String, dynamic>? query,
-  }) => _client.get(_uri(base, path, query), headers: headers).timeout(_timeout);
+  }) =>
+      _client.get(_uri(base, path, query), headers: headers).timeout(_timeout);
 
   Future<http.Response> post(
     String base,

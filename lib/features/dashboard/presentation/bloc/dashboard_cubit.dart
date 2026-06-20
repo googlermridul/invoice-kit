@@ -34,7 +34,8 @@ class DashboardCubit extends Cubit<DashboardState> {
       final now = DateTime.now();
       final summary = calc.summarize(invoices, now);
 
-      final sortedInvoices = [...invoices]..sort((a, b) => b.issueDate.compareTo(a.issueDate));
+      final sortedInvoices = [...invoices]
+        ..sort((a, b) => b.issueDate.compareTo(a.issueDate));
 
       final sortedClients = [...clients]
         ..sort((a, b) {

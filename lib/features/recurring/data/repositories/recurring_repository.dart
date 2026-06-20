@@ -36,7 +36,8 @@ class RecurringRepositoryImpl implements RecurringRepository {
   Future<RecurringInvoice?> byId(String id) => _store.byId(id);
 
   @override
-  Future<void> save(RecurringInvoice recurring) => _store.save(recurring, recurring.id);
+  Future<void> save(RecurringInvoice recurring) =>
+      _store.save(recurring, recurring.id);
 
   @override
   Future<void> delete(String id) => _store.delete(id);

@@ -4,7 +4,10 @@ import 'package:invoice_kit/core/api/api_response.dart';
 import 'package:invoice_kit/features/authentication/data/models/auth_session_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<AuthSessionModel> login({required String email, required String password});
+  Future<AuthSessionModel> login({
+    required String email,
+    required String password,
+  });
 
   Future<AuthSessionModel> register({
     required String email,
@@ -22,7 +25,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio _dio;
 
   @override
-  Future<AuthSessionModel> login({required String email, required String password}) async {
+  Future<AuthSessionModel> login({
+    required String email,
+    required String password,
+  }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       ApiEndpoints.login,
       data: {'email': email, 'password': password},

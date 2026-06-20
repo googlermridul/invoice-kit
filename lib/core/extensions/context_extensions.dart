@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoice_kit/core/theme/app_tokens.dart';
 
 extension BuildContextX on BuildContext {
   ThemeData get theme => Theme.of(this);
@@ -18,6 +19,7 @@ extension BuildContextX on BuildContext {
 
   /// Responsive width (out of 375 baseline).
   double rw(double value) => (value / 375) * screenWidth;
+
   /// Responsive height (out of 812 baseline).
   double rh(double value) => (value / 812) * screenHeight;
 
@@ -30,13 +32,14 @@ extension BuildContextX on BuildContext {
     return result.clamp(lower, upper);
   }
 
-  Future<T?> push<T>(Widget page) =>
-      Navigator.of(this).push<T>(MaterialPageRoute(builder: (_) => page));
+  /// Add a Material gap.
+  SizedBox gap(double value) => SizedBox(width: value, height: value);
 
-  Future<T?> pushNamed<T>(String route, {Object? arguments}) =>
-      Navigator.of(this).pushNamed<T>(route, arguments: arguments);
+  /// Horizontal-only gap.
+  SizedBox hgap(double value) => SizedBox(width: value);
 
-  void pop<T>([T? result]) => Navigator.of(this).pop<T>(result);
+  /// Vertical-only gap.
+  SizedBox vgap(double value) => SizedBox(height: value);
 
   void showSnackBar(String message, {Color? color}) {
     ScaffoldMessenger.of(this)
@@ -49,4 +52,10 @@ extension BuildContextX on BuildContext {
         ),
       );
   }
+
+  /// Themed snackbar variants.
+  void showSuccessSnack(String message) =>
+      showSnackBar(message, color: tokens.surfaceInverse);
+  void showErrorSnack(String message) =>
+      showSnackBar(message, color: colors.error);
 }

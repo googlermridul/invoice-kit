@@ -76,6 +76,7 @@ dependencies:
    # File picking / image
    image_picker: ^1.1.2
    file_picker: ^12.0.0-beta.7
+   hugeicons_pro: ^0.0.3
 
 dev_dependencies:
    flutter_test:
@@ -103,3 +104,18 @@ flutter:
       - assets/translations/
       - assets/mock/
       - .env
+
+   # Fonts
+   fonts:
+      - family: DMSans
+        fonts:
+           - asset: assets/fonts/DMSans-Regular.ttf
+           - asset: assets/fonts/DMSans-Medium.ttf
+      - family: Oswald
+        fonts:
+           - asset: assets/fonts/Oswald-Bold.ttf
+           - asset: assets/fonts/Oswald-SemiBold.ttf
+      - family: SpaceGrotesk
+        fonts:
+           - asset: assets/fonts/SpaceGrotesk-Bold.ttf
+           - asset: assets/fonts/SpaceGrotesk-SemiBold.ttf

@@ -22,11 +22,13 @@ class EntitlementService {
   }
 
   /// Whether the user currently has access — trial OR paid.
-  bool hasAccess(SubscriptionStatus status, DateTime now) => status.hasAccess(now);
+  bool hasAccess(SubscriptionStatus status, DateTime now) =>
+      status.hasAccess(now);
 
   /// Whether the user must subscribe to use the app (trial expired or never started
   /// and no active subscription).
-  bool isBlocked(SubscriptionStatus status, DateTime now) => !status.hasAccess(now);
+  bool isBlocked(SubscriptionStatus status, DateTime now) =>
+      !status.hasAccess(now);
 
   /// Whether the user can start a trial at all. Only true if they've never
   /// had a trial before.

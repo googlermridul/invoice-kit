@@ -10,10 +10,14 @@ class AuthInterceptor extends Interceptor {
   final TokenProvider tokenProvider;
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final token = await tokenProvider.accessToken();
     if (token != null && token.isNotEmpty) {
-      options.headers[ApiConstants.authorization] = '${ApiConstants.bearer} $token';
+      options.headers[ApiConstants.authorization] =
+          '${ApiConstants.bearer} $token';
     }
     options.headers[ApiConstants.xAppVersion] = config.appVersion;
     options.headers[ApiConstants.xPlatform] = config.platform;
@@ -25,6 +29,9 @@ class AuthInterceptor extends Interceptor {
 abstract class TokenProvider {
   Future<String?> accessToken();
   Future<String?> refreshToken();
-  Future<void> saveTokens({required String accessToken, required String refreshToken});
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  });
   Future<void> clearTokens();
 }

@@ -86,7 +86,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscure: _obscure,
                   prefixIcon: Icons.lock_outline,
                   suffixIcon: IconButton(
-                    icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                    icon: Icon(
+                      _obscure ? Icons.visibility_off : Icons.visibility,
+                    ),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                   textInputAction: TextInputAction.next,
@@ -101,13 +103,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onSubmitted: (_) => _submit(),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                PrimaryButton(label: l.authSignUp, onPressed: _submit, loading: state.isSubmitting),
+                PrimaryButton(
+                  label: l.authSignUp,
+                  onPressed: _submit,
+                  loading: state.isSubmitting,
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(l.authAlreadyHaveAccount),
-                    TextButton(onPressed: () => context.go('/login'), child: Text(l.authSignIn)),
+                    TextButton(
+                      onPressed: () => GoRouter.of(context).pop(),
+                      child: Text(l.authSignIn),
+                    ),
                   ],
                 ),
               ],

@@ -13,8 +13,11 @@ abstract class BusinessProfileRepository {
 }
 
 class BusinessProfileRepositoryImpl implements BusinessProfileRepository {
-  BusinessProfileRepositoryImpl(this._store, {StreamController<BusinessProfile?>? controller})
-      : _controller = controller ?? StreamController<BusinessProfile?>.broadcast();
+  BusinessProfileRepositoryImpl(
+    this._store, {
+    StreamController<BusinessProfile?>? controller,
+  }) : _controller =
+           controller ?? StreamController<BusinessProfile?>.broadcast();
 
   static const _id = 'me';
   final HiveJsonStore<BusinessProfile> _store;

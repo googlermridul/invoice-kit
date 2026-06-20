@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart' show Invoice;
-import 'package:invoice_kit/features/quotes/domain/entities/quote.dart' show Quote;
+import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart'
+    show Invoice;
+import 'package:invoice_kit/features/quotes/domain/entities/quote.dart'
+    show Quote;
 
 /// Lifecycle of an invoice. Persisted as an int.
 enum InvoiceStatus {
@@ -20,8 +22,10 @@ enum InvoiceStatus {
     InvoiceStatus.cancelled => 'Cancelled',
   };
 
-  static InvoiceStatus fromId(int id) =>
-      InvoiceStatus.values.firstWhere((s) => s.id == id, orElse: () => InvoiceStatus.draft);
+  static InvoiceStatus fromId(int id) => InvoiceStatus.values.firstWhere(
+    (s) => s.id == id,
+    orElse: () => InvoiceStatus.draft,
+  );
 }
 
 /// Lifecycle of a quote. Persisted as an int.
@@ -41,8 +45,10 @@ enum QuoteStatus {
     QuoteStatus.expired => 'Expired',
   };
 
-  static QuoteStatus fromId(int id) =>
-      QuoteStatus.values.firstWhere((s) => s.id == id, orElse: () => QuoteStatus.draft);
+  static QuoteStatus fromId(int id) => QuoteStatus.values.firstWhere(
+    (s) => s.id == id,
+    orElse: () => QuoteStatus.draft,
+  );
 }
 
 /// A document that can be invoiced or quoted. Concrete types are
@@ -84,7 +90,9 @@ abstract class Document extends Equatable {
   double get discountTotal => items.fold(0, (sum, item) => sum + item.discount);
 
   /// Global tax applied at document level, after line taxes.
-  double get globalTax => taxRateOverride == null ? 0 : (subtotal + itemTaxTotal) * (taxRateOverride! / 100.0);
+  double get globalTax => taxRateOverride == null
+      ? 0
+      : (subtotal + itemTaxTotal) * (taxRateOverride! / 100.0);
 
   /// Total amount due / quoted.
   double get total => subtotal + itemTaxTotal + globalTax;

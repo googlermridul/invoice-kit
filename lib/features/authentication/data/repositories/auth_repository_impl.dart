@@ -44,7 +44,11 @@ class AuthRepositoryImpl implements AuthRepository {
     String? name,
   }) async {
     try {
-      final session = await _remote.register(email: email, password: password, name: name);
+      final session = await _remote.register(
+        email: email,
+        password: password,
+        name: name,
+      );
       await _local.cacheSession(session);
       await _tokenProvider.saveTokens(
         accessToken: session.accessToken,
@@ -57,7 +61,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<({Failure? failure, User? user})> forgotPassword({required String email}) async {
+  Future<({Failure? failure, User? user})> forgotPassword({
+    required String email,
+  }) async {
     try {
       await _remote.forgotPassword(email: email);
       return (failure: null, user: null);

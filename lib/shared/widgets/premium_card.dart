@@ -48,10 +48,15 @@ class PremiumCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(title, style: text.titleMedium?.copyWith(color: Colors.white)),
+                  Text(
+                    title,
+                    style: text.titleMedium?.copyWith(color: Colors.white),
+                  ),
                   const SizedBox(height: 2),
                   Text(
-                    trialDays != null ? '$subtitle · $trialDays day${trialDays == 1 ? '' : 's'} left' : subtitle,
+                    trialDays != null
+                        ? '$subtitle · $trialDays day${trialDays == 1 ? '' : 's'} left'
+                        : subtitle,
                     style: text.bodySmall?.copyWith(color: Colors.white70),
                   ),
                 ],
@@ -59,14 +64,20 @@ class PremiumCard extends StatelessWidget {
             ),
             if (cta != null)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   cta!,
-                  style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
           ],

@@ -1,5 +1,6 @@
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kReleaseMode;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kReleaseMode;
 import 'package:flutter/services.dart';
 
 /// Stub root/jailbreak detection. Real implementations should use

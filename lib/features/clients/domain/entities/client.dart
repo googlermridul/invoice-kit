@@ -20,7 +20,9 @@ class Client extends Equatable {
     address: json['address'] as String?,
     company: json['company'] as String?,
     notes: json['notes'] as String?,
-    createdAt: json['createdAt'] == null ? null : DateTime.parse(json['createdAt'] as String),
+    createdAt: json['createdAt'] == null
+        ? null
+        : DateTime.parse(json['createdAt'] as String),
   );
 
   final String id;
@@ -64,5 +66,14 @@ class Client extends Equatable {
   };
 
   @override
-  List<Object?> get props => [id, name, email, phone, address, company, notes, createdAt];
+  List<Object?> get props => [
+    id,
+    name,
+    email,
+    phone,
+    address,
+    company,
+    notes,
+    createdAt,
+  ];
 }

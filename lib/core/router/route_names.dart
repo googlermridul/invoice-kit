@@ -28,5 +28,4 @@ class RouteNames {
   static const String backup = 'backup';
   static const String settings = 'settings';
   static const String home = 'home';
-  static const String notFound = 'not-found';
 }

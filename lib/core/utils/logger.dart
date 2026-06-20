@@ -31,8 +31,9 @@ class AppLogger {
   void f(dynamic message, [Object? error, StackTrace? stackTrace]) =>
       _logger.f(message, error: error, stackTrace: stackTrace);
 
-  AppLogger bootstrap() =>
-      AppLogger.create(enabled: !kReleaseMode && AppConstants.appName.isNotEmpty);
+  AppLogger bootstrap() => AppLogger.create(
+    enabled: !kReleaseMode && AppConstants.appName.isNotEmpty,
+  );
 }
 
 class _SilentFilter extends LogFilter {
