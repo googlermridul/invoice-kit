@@ -15,17 +15,17 @@ void main() {
       double unitPrice = 100,
       double taxRate = 0,
       double discount = 0,
-    }) =>
-        DocumentItem(
-          id: id,
-          description: description,
-          quantity: quantity,
-          unitPrice: unitPrice,
-          taxRate: taxRate,
-          discount: discount,
-        );
+    }) => DocumentItem(
+      id: id,
+      description: description,
+      quantity: quantity,
+      unitPrice: unitPrice,
+      taxRate: taxRate,
+      discount: discount,
+    );
 
-    Invoice makeInvoice(List<DocumentItem> items, {double? globalTax}) => Invoice(
+    Invoice makeInvoice(List<DocumentItem> items, {double? globalTax}) =>
+        Invoice(
           id: 'inv1',
           number: 'INV-00001',
           clientId: 'c1',
@@ -54,7 +54,9 @@ void main() {
     });
 
     test('per-item tax is applied to (qty*price - discount)', () {
-      final items = [item(quantity: 2, unitPrice: 100, taxRate: 10, discount: 0)];
+      final items = [
+        item(quantity: 2, unitPrice: 100, taxRate: 10, discount: 0),
+      ];
       final t = InvoiceCalculator.forDocument(makeInvoice(items));
       expect(t.subtotal, 200);
       expect(t.lineTax, 20); // 200 * 0.10
@@ -79,7 +81,13 @@ void main() {
     test('multi-item totals are summed correctly', () {
       final items = [
         item(id: 'a', quantity: 2, unitPrice: 25, taxRate: 10), // 50 + 5
-        item(id: 'b', quantity: 1, unitPrice: 75, taxRate: 20, discount: 5), // 70 + 14
+        item(
+          id: 'b',
+          quantity: 1,
+          unitPrice: 75,
+          taxRate: 20,
+          discount: 5,
+        ), // 70 + 14
       ];
       final t = InvoiceCalculator.forDocument(makeInvoice(items));
       expect(t.subtotal, 120); // 50 + 70
@@ -93,7 +101,9 @@ void main() {
       // subtotal = 200 - 50 = 150
       // line tax = 150 * 0.10 = 15
       // total = 165
-      final items = [item(quantity: 1, unitPrice: 200, discount: 50, taxRate: 10)];
+      final items = [
+        item(quantity: 1, unitPrice: 200, discount: 50, taxRate: 10),
+      ];
       final t = InvoiceCalculator.forDocument(makeInvoice(items));
       expect(t.subtotal, 150);
       expect(t.lineTax, 15);

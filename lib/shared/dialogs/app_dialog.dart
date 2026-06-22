@@ -4,7 +4,14 @@ import 'package:invoice_kit/core/extensions/context_extensions.dart';
 class AppDialog {
   const AppDialog._();
 
-  static Future<bool> confirm({
+  /// Show a confirmation dialog. Returns:
+  ///   - `true` if the user tapped the confirm button,
+  ///   - `false` if they tapped cancel,
+  ///   - `null` if they dismissed the dialog (tap outside, back button).
+  ///
+  /// Callers should treat `!= true` as "do not proceed with the
+  /// destructive action" — `null` is *not* consent.
+  static Future<bool?> confirm({
     required BuildContext context,
     required String title,
     required String message,
@@ -14,6 +21,7 @@ class AppDialog {
   }) async {
     final result = await showDialog<bool>(
       context: context,
+      barrierDismissible: true,
       builder: (ctx) => AlertDialog(
         title: Text(title),
         content: Text(message),
@@ -32,7 +40,7 @@ class AppDialog {
         ],
       ),
     );
-    return result ?? false;
+    return result;
   }
 
   static Future<void> info(

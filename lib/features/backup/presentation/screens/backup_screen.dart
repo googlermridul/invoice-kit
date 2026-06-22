@@ -74,12 +74,6 @@ class _BackupScreenState extends State<BackupScreen> {
         },
         builder: (context, state) {
           return ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              AppSpacing.xxxl,
-            ),
             children: [
               const SectionHeader(
                 title: 'Export',
@@ -193,7 +187,7 @@ class _BackupScreenState extends State<BackupScreen> {
                                         'Imported ${summary.clients} clients, ${summary.invoices} invoices',
                                       );
                                     }
-                                  } catch (e) {
+                                  } on Exception catch (e) {
                                     if (mounted) {
                                       context.showErrorSnack(e.toString());
                                     }

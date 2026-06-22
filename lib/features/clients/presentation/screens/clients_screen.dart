@@ -45,6 +45,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
         label: const Text('New client'),
       ),
       padding: EdgeInsets.zero,
+      refreshable: true,
+      onRefresh: () => context.read<ClientsCubit>().load(),
       body: Column(
         children: [
           Padding(
@@ -65,21 +67,34 @@ class _ClientsScreenState extends State<ClientsScreen> {
             child: BlocBuilder<ClientsCubit, ClientsState>(
               builder: (context, state) {
                 if (state.loading && state.clients.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  return ListView(
+                    // Keep the RefreshIndicator working while loading.
+                    children: const [
+                      SizedBox(height: 120),
+                      Center(child: CircularProgressIndicator()),
+                    ],
+                  );
                 }
                 if (state.clients.isEmpty) {
-                  return EmptyState(
-                    icon: Icons.people_outline,
-                    title: state.query.isEmpty
-                        ? 'No clients yet'
-                        : 'No clients match "${state.query}"',
-                    subtitle: state.query.isEmpty
-                        ? 'Add your first client to start invoicing.'
-                        : 'Try a different name or company.',
-                    actionLabel: state.query.isEmpty ? 'Add client' : null,
-                    onAction: state.query.isEmpty
-                        ? () => GoRouter.of(context).push(RoutePaths.clientNew)
-                        : null,
+                  return ListView(
+                    children: [
+                      const SizedBox(height: 32),
+                      EmptyState(
+                        icon: Icons.people_outline,
+                        title: state.query.isEmpty
+                            ? 'No clients yet'
+                            : 'No clients match "${state.query}"',
+                        subtitle: state.query.isEmpty
+                            ? 'Add your first client to start invoicing.'
+                            : 'Try a different name or company.',
+                        actionLabel: state.query.isEmpty ? 'Add client' : null,
+                        onAction: state.query.isEmpty
+                            ? () => GoRouter.of(context).push(
+                                RoutePaths.clientNew,
+                              )
+                            : null,
+                      ),
+                    ],
                   );
                 }
                 return ListView.builder(

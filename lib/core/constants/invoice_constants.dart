@@ -3,7 +3,7 @@ class InvoiceConstants {
   const InvoiceConstants._();
 
   // Trial & subscription
-  static const Duration trialDuration = Duration(days: 14);
+  static const Duration trialDuration = Duration(days: 3);
 
   // Recurring invoice generation safety
   static const int maxRecurringCatchup = 50;
@@ -66,6 +66,9 @@ class CurrencyCodes {
     'THB',
     'VND',
   ];
+
+  /// All supported currency codes (common subset).
+  static List<String> get codes => List<String>.unmodifiable(common);
 
   /// Returns the symbol commonly used for a currency code (best-effort).
   static String symbolOf(String code) {

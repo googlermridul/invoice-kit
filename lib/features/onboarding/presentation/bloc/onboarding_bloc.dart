@@ -114,7 +114,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       defaultCurrency: state.currency,
       taxId: state.taxId.trim().isEmpty ? null : state.taxId.trim(),
       defaultPaymentTerms: state.paymentTerms.trim().isEmpty
-          ? 'Payment due within 14 days.'
+          ? 'Payment due within 3 days.'
           : state.paymentTerms.trim(),
       selectedPdfTemplate: 'classic',
     );

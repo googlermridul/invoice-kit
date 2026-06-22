@@ -23,7 +23,8 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    _subscriptionBloc = sl<SubscriptionBloc>()..add(const SubscriptionStarted());
+    _subscriptionBloc = sl<SubscriptionBloc>()
+      ..add(const SubscriptionStarted());
     _router = AppRouter(
       guard: AppRouterGuard(subscriptionBloc: _subscriptionBloc),
     );

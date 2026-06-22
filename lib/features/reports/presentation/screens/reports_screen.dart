@@ -9,7 +9,9 @@ import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/dashboard/presentation/bloc/dashboard_cubit.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
+import 'package:invoice_kit/features/reports/data/services/report_pdf_service.dart';
 import 'package:invoice_kit/features/reports/domain/usecases/reports_calculator.dart';
+import 'package:invoice_kit/shared/widgets/buttons.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -19,45 +21,145 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
+  late DateTime _start;
+  late DateTime _end;
+  bool _exporting = false;
+
   @override
   void initState() {
     super.initState();
+    final now = DateTime.now();
+    _end = DateTime(now.year, now.month, now.day);
+    _start = _end.subtract(const Duration(days: 90));
     context.read<DashboardCubit>().load();
+  }
+
+  Future<void> _pickRange() async {
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+      initialDateRange: DateTimeRange(start: _start, end: _end),
+    );
+    if (picked != null) {
+      setState(() {
+        _start = DateTime(picked.start.year, picked.start.month, picked.start.day);
+        _end = DateTime(picked.end.year, picked.end.month, picked.end.day);
+      });
+    }
+  }
+
+  Future<void> _exportReport({
+    required RevenueSummary summary,
+    required List<ClientRevenue> top,
+    required double tax,
+    required List<({InvoiceStatus status, int count})> breakdown,
+  }) async {
+    if (_exporting) return;
+    setState(() => _exporting = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final svc = const ReportPdfService();
+      final bytes = await svc.build(
+        summary: summary,
+        topClients: top,
+        totalTax: tax,
+        start: _start,
+        end: _end,
+        breakdown: breakdown,
+      );
+      await svc.share(bytes);
+    } on Object catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Could not export: $e')));
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
       title: 'Reports',
+      refreshable: true,
+      onRefresh: () => context.read<DashboardCubit>().load(),
+      actions: [
+        IconButton(
+          tooltip: 'Pick date range',
+          icon: const Icon(Icons.date_range_outlined),
+          onPressed: _pickRange,
+        ),
+      ],
       body: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {
           if (state.loading && state.summary == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state.summary == null) {
-            return const EmptyState(
-              icon: Icons.bar_chart_rounded,
-              title: 'No data yet',
-              subtitle: 'Create a few invoices to see your reports.',
+            return ListView(
+              children: const [
+                SizedBox(height: 120),
+                Center(child: CircularProgressIndicator()),
+              ],
             );
           }
+          if (state.summary == null) {
+            return ListView(
+              children: const [
+                SizedBox(height: 32),
+                EmptyState(
+                  icon: Icons.bar_chart_rounded,
+                  title: 'No data yet',
+                  subtitle: 'Create a few invoices to see your reports.',
+                ),
+              ],
+            );
+          }
+          final inRange = state.recentInvoices
+              .where(
+                (i) =>
+                    !i.issueDate.isBefore(_start) &&
+                    !i.issueDate.isAfter(
+                      _end.add(const Duration(days: 1)),
+                    ),
+              )
+              .toList();
           final calc = const ReportsCalculator();
-          final trend = calc.monthlyTrend(state.recentInvoices);
+          final summary = calc.summarize(inRange, DateTime.now());
+          final trend = calc.monthlyTrend(inRange);
           final top = calc.topClients(
-            invoices: state.recentInvoices,
+            invoices: inRange,
             clientsById: state.clientsById,
             limit: 5,
           );
-          final tax = calc.totalTaxCollected(state.recentInvoices);
-          final breakdown = calc.statusBreakdown(state.recentInvoices);
+          final tax = calc.totalTaxCollected(inRange);
+          final breakdownMap = calc.statusBreakdown(inRange);
+          final breakdown = breakdownMap.entries.map((e) => (status: e.key, count: e.value.round())).toList();
           return ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              AppSpacing.xxxl,
-            ),
             children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: AppCard(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        size: 18,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          '${Formatters.date(_start)} — ${Formatters.date(_end)}  ·  ${inRange.length} invoice${inRange.length == 1 ? '' : 's'}',
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _pickRange,
+                        child: const Text('Change'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -69,7 +171,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   MetricCard(
                     label: 'Total revenue',
                     value: Formatters.currency(
-                      state.summary!.totalRevenue,
+                      summary.totalRevenue,
                       code: 'USD',
                     ),
                     icon: Icons.payments_outlined,
@@ -78,7 +180,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   MetricCard(
                     label: 'Outstanding',
                     value: Formatters.currency(
-                      state.summary!.outstanding,
+                      summary.outstanding,
                       code: 'USD',
                     ),
                     icon: Icons.hourglass_bottom_rounded,
@@ -92,7 +194,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                   MetricCard(
                     label: 'Invoices',
-                    value: Formatters.number(state.summary!.totalCount),
+                    value: Formatters.number(summary.totalCount),
                     icon: Icons.assignment_outlined,
                     color: AppColors.tertiary,
                   ),
@@ -188,7 +290,22 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 padding: EdgeInsets.zero,
               ),
               const SizedBox(height: AppSpacing.sm),
-              _StatusBreakdown(breakdown: breakdown),
+              _StatusBreakdown(breakdown: breakdownMap),
+              const SizedBox(height: AppSpacing.xl),
+              PrimaryButton(
+                label: 'Export & share PDF',
+                icon: Icons.ios_share_rounded,
+                loading: _exporting,
+                onPressed: _exporting
+                    ? null
+                    : () => _exportReport(
+                        summary: summary,
+                        top: top,
+                        tax: tax,
+                        breakdown: breakdown,
+                      ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
             ],
           );
         },
@@ -287,7 +404,7 @@ class _StatusBreakdown extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    e.key.name,
+                    e.key.label,
                     style: context.textTheme.bodyMedium,
                   ),
                 ),

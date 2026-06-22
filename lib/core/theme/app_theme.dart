@@ -18,17 +18,33 @@ abstract class AppTheme {
 
     final primary = isLight ? AppColors.primary : AppColors.primaryAccent;
     final onPrimary = AppColors.white;
-    final background = isLight ? AppColors.lightBackground : AppColors.darkBackground;
+    final background = isLight
+        ? AppColors.lightBackground
+        : AppColors.darkBackground;
     final surface = isLight ? AppColors.lightSurface : AppColors.darkSurface;
-    final surfaceContainerLowest = isLight ? AppColors.lightBackground : AppColors.darkBackground;
-    final surfaceContainerLow = isLight ? AppColors.lightSurface : AppColors.darkSurface;
-    final surfaceContainer = isLight ? AppColors.lightSurfaceAlt : AppColors.darkSurfaceAlt;
-    final surfaceContainerHigh = isLight ? AppColors.lightSurfaceAlt : AppColors.darkSurfaceAlt;
-    final surfaceContainerHighest = isLight ? AppColors.lightSurfaceAlt : AppColors.darkSurfaceAlt;
+    final surfaceContainerLowest = isLight
+        ? AppColors.lightBackground
+        : AppColors.darkBackground;
+    final surfaceContainerLow = isLight
+        ? AppColors.lightSurface
+        : AppColors.darkSurface;
+    final surfaceContainer = isLight
+        ? AppColors.lightSurfaceAlt
+        : AppColors.darkSurfaceAlt;
+    final surfaceContainerHigh = isLight
+        ? AppColors.lightSurfaceAlt
+        : AppColors.darkSurfaceAlt;
+    final surfaceContainerHighest = isLight
+        ? AppColors.lightSurfaceAlt
+        : AppColors.darkSurfaceAlt;
     final onSurface = isLight ? AppColors.lightText : AppColors.darkText;
-    final onSurfaceMuted = isLight ? AppColors.lightTextMuted : AppColors.darkTextMuted;
+    final onSurfaceMuted = isLight
+        ? AppColors.lightTextMuted
+        : AppColors.darkTextMuted;
     final outline = isLight ? AppColors.lightBorder : AppColors.darkBorder;
-    final outlineVariant = isLight ? AppColors.lightBorder : AppColors.darkBorder;
+    final outlineVariant = isLight
+        ? AppColors.lightBorder
+        : AppColors.darkBorder;
 
     final colorScheme = ColorScheme(
       brightness: brightness,
@@ -61,7 +77,9 @@ abstract class AppTheme {
       shadow: isLight ? const Color(0xFF0F172A) : const Color(0xFF000000),
       scrim: isLight ? const Color(0x66000000) : const Color(0x99000000),
       inverseSurface: isLight ? AppColors.lightText : AppColors.darkSurfaceAlt,
-      onInverseSurface: isLight ? AppColors.lightBackground : AppColors.darkText,
+      onInverseSurface: isLight
+          ? AppColors.lightBackground
+          : AppColors.darkText,
       inversePrimary: AppColors.primaryAccent,
       surfaceTint: primary,
     );
@@ -118,7 +136,9 @@ abstract class AppTheme {
         surfaceTintColor: AppColors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shadowColor: isLight ? const Color(0x140B1220) : const Color(0x66000000),
+        shadowColor: isLight
+            ? const Color(0x140B1220)
+            : const Color(0x66000000),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),

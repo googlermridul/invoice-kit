@@ -61,23 +61,26 @@ void main() {
       expect(result.first.recurringId, 'rec1');
     });
 
-    test('three months of catchup yields three invoices and advances counter', () {
-      final schedule = makeSchedule(
-        frequency: RecurringFrequency.monthly,
-        nextRun: start,
-      );
-      final result = RecurringInvoiceGenerator.generate(
-        schedule: schedule,
-        now: start.add(const Duration(days: 70)),
-        invoiceCounter: 1,
-        invoicePrefix: 'INV-',
-      );
-      // Jan 1, Feb 1, Mar 1 → 3 months
-      expect(result, hasLength(3));
-      expect(result[0].number, 'INV-00001');
-      expect(result[1].number, 'INV-00002');
-      expect(result[2].number, 'INV-00003');
-    });
+    test(
+      'three months of catchup yields three invoices and advances counter',
+      () {
+        final schedule = makeSchedule(
+          frequency: RecurringFrequency.monthly,
+          nextRun: start,
+        );
+        final result = RecurringInvoiceGenerator.generate(
+          schedule: schedule,
+          now: start.add(const Duration(days: 70)),
+          invoiceCounter: 1,
+          invoicePrefix: 'INV-',
+        );
+        // Jan 1, Feb 1, Mar 1 → 3 months
+        expect(result, hasLength(3));
+        expect(result[0].number, 'INV-00001');
+        expect(result[1].number, 'INV-00002');
+        expect(result[2].number, 'INV-00003');
+      },
+    );
 
     test('end date caps catchup', () {
       final schedule = makeSchedule(
@@ -97,13 +100,19 @@ void main() {
 
     test('weekly schedule advances by 7 days', () {
       final from = DateTime(2026, 3, 1);
-      final next = RecurringInvoiceGenerator.advance(from, RecurringFrequency.weekly);
+      final next = RecurringInvoiceGenerator.advance(
+        from,
+        RecurringFrequency.weekly,
+      );
       expect(next, from.add(const Duration(days: 7)));
     });
 
     test('yearly schedule advances by 12 months', () {
       final from = DateTime(2026, 1, 31);
-      final next = RecurringInvoiceGenerator.advance(from, RecurringFrequency.yearly);
+      final next = RecurringInvoiceGenerator.advance(
+        from,
+        RecurringFrequency.yearly,
+      );
       expect(next.year, 2027);
       expect(next.month, 1);
       expect(next.day, 31);
@@ -111,7 +120,10 @@ void main() {
 
     test('monthly schedule at end of month clamps day', () {
       final from = DateTime(2026, 1, 31);
-      final next = RecurringInvoiceGenerator.advance(from, RecurringFrequency.monthly);
+      final next = RecurringInvoiceGenerator.advance(
+        from,
+        RecurringFrequency.monthly,
+      );
       // Feb has 28 days in 2026
       expect(next.year, 2026);
       expect(next.month, 2);

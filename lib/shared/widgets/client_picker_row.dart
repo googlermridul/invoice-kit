@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
-import 'package:invoice_kit/core/widgets/app_bottom_sheet.dart';
+import 'package:invoice_kit/core/theme/app_tokens.dart';
 import 'package:invoice_kit/core/widgets/app_card.dart';
+import 'package:invoice_kit/shared/widgets/searchable_picker_sheet.dart';
 
 /// Tappable row that opens a bottom sheet to pick a client.
 class ClientPickerRow extends StatelessWidget {
@@ -29,21 +30,35 @@ class ClientPickerRow extends StatelessWidget {
       );
       return;
     }
-    final id = await AppBottomSheet.show<String>(
+    final id = await SearchablePickerSheet.show<String>(
       context: context,
       title: label,
-      children: options
+      hint: 'Search clients',
+      options: options
           .map(
-            (c) => ListTile(
-              title: Text(c.name),
-              subtitle: c.subtitle == null || c.subtitle!.isEmpty ? null : Text(c.subtitle!),
-              trailing: c.name == selectedName ? Icon(Icons.check, color: context.colors.primary) : null,
-              onTap: () => Navigator.pop(context, c.id),
+            (c) => SearchableOption<String>(
+              value: c.id,
+              label: c.name,
+              subtitle: c.subtitle,
+              searchTerms: c.subtitle == null ? null : [c.subtitle!],
             ),
           )
           .toList(),
+      leadingBuilder: (o) => CircleAvatar(
+        radius: 14,
+        backgroundColor: context.tokens.brandSubtle,
+        child: Text(
+          o.label.isEmpty ? '?' : o.label.characters.first.toUpperCase(),
+          style: context.textTheme.labelSmall?.copyWith(
+            color: context.colors.primary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
     );
-    if (id != null) onSelected(id);
+    if (id != null) {
+      onSelected(id);
+    }
   }
 
   @override

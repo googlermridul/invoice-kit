@@ -15,6 +15,7 @@ class Quote extends Document {
     super.terms,
     super.taxRateOverride,
     this.validUntil,
+    this.pdfTemplateId,
   });
 
   factory Quote.fromJson(Map<String, dynamic> json) => Quote(
@@ -31,13 +32,16 @@ class Quote extends Document {
     terms: json['terms'] as String?,
     taxRateOverride: (json['taxRateOverride'] as num?)?.toDouble(),
     status: QuoteStatus.fromId((json['status'] as num?)?.toInt() ?? 0),
-    validUntil: json['validUntil'] == null
-        ? null
-        : DateTime.parse(json['validUntil'] as String),
+    validUntil: json['validUntil'] == null ? null : DateTime.parse(json['validUntil'] as String),
+    pdfTemplateId: json['pdfTemplateId'] as String?,
   );
 
   final QuoteStatus status;
   final DateTime? validUntil;
+
+  /// Optional per-quote PDF template override. Falls back to the
+  /// business profile's selected template when null.
+  final String? pdfTemplateId;
 
   Quote copyWith({
     String? id,
@@ -52,6 +56,8 @@ class Quote extends Document {
     double? taxRateOverride,
     QuoteStatus? status,
     DateTime? validUntil,
+    String? pdfTemplateId,
+    bool clearPdfTemplate = false,
   }) {
     return Quote(
       id: id ?? this.id,
@@ -66,6 +72,7 @@ class Quote extends Document {
       taxRateOverride: taxRateOverride ?? this.taxRateOverride,
       status: status ?? this.status,
       validUntil: validUntil ?? this.validUntil,
+      pdfTemplateId: clearPdfTemplate ? null : (pdfTemplateId ?? this.pdfTemplateId),
     );
   }
 
@@ -105,6 +112,7 @@ class Quote extends Document {
     'taxRateOverride': taxRateOverride,
     'status': status.id,
     'validUntil': validUntil?.toIso8601String(),
+    'pdfTemplateId': pdfTemplateId,
   };
 
   @override
@@ -121,5 +129,6 @@ class Quote extends Document {
     taxRateOverride,
     status,
     validUntil,
+    pdfTemplateId,
   ];
 }

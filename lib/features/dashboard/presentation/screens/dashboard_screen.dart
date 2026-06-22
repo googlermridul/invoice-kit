@@ -9,6 +9,9 @@ import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/dashboard/presentation/bloc/dashboard_cubit.dart';
+import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart'
+    as sub_domain;
+import 'package:invoice_kit/features/subscription/domain/services/entitlement_service.dart';
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
 
@@ -124,20 +127,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ],
                             ),
                           ),
-                          if (subState.isTrialing) ...[
-                            const SizedBox(height: AppSpacing.lg),
-                            PremiumCard(
-                              title: 'Free trial active',
-                              subtitle: 'Full access to every feature',
-                              icon: Icons.workspace_premium_rounded,
-                              cta: 'Upgrade',
-                              trialDays: subState.trialDaysRemaining,
-                              onTap: () => GoRouter.of(
-                                context,
-                              ).push(AppRoutes.subscription),
-                            ),
-                          ],
-                          const SizedBox(height: AppSpacing.lg),
+                          _PremiumBanner(subState: subState),
+                          const SizedBox(height: AppSpacing.sm),
                           GridView.count(
                             crossAxisCount: 2,
                             shrinkWrap: true,
@@ -227,36 +218,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             )
                           else
-                            AppCard(
-                              padding: EdgeInsets.zero,
-                              child: Column(
-                                children: [
-                                  for (
-                                    var i = 0;
-                                    i < state.recentClients.length;
-                                    i++
-                                  ) ...[
-                                    if (i > 0)
-                                      const Divider(
-                                        height: 1,
-                                        indent: AppSpacing.md,
-                                        endIndent: AppSpacing.md,
-                                      ),
-                                    ClientRow(
-                                      name: state.recentClients[i].name,
-                                      subtitle:
-                                          state.recentClients[i].email ??
-                                          state.recentClients[i].company ??
-                                          '',
-                                      onTap: () => GoRouter.of(context).push(
-                                        RoutePaths.clientDetailPath(
-                                          state.recentClients[i].id,
-                                        ),
+                            Column(
+                              children: [
+                                for (
+                                  var i = 0;
+                                  i < state.recentClients.length;
+                                  i++
+                                ) ...[
+                                  // if (i > 0)
+                                  //   const Divider(
+                                  //     height: 1,
+                                  //     indent: AppSpacing.md,
+                                  //     endIndent: AppSpacing.md,
+                                  //   ),
+                                  ClientRow(
+                                    name: state.recentClients[i].name,
+                                    subtitle:
+                                        state.recentClients[i].email ??
+                                        state.recentClients[i].company ??
+                                        '',
+                                    onTap: () => GoRouter.of(context).push(
+                                      RoutePaths.clientDetailPath(
+                                        state.recentClients[i].id,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ],
-                              ),
+                              ],
                             ),
                         ]),
                       ),
@@ -349,3 +337,83 @@ class _ActionCard extends StatelessWidget {
     );
   }
 }
+
+class _PremiumBanner extends StatelessWidget {
+  const _PremiumBanner({required this.subState});
+
+  final SubscriptionState subState;
+
+  bool _canStartTrial(sub_domain.SubscriptionStatus status) {
+    return const EntitlementService().canStartTrial(status);
+  }
+
+  void _startTrial(BuildContext context) {
+    final bloc = context.read<SubscriptionBloc>();
+    final svc = const EntitlementService();
+    final now = DateTime.now();
+    final updated = svc.startTrial(bloc.state.currentStatus, now);
+    bloc.add(SubscriptionTrialStarted(updated));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final status = subState.currentStatus;
+    if (status.isActive) return const SizedBox.shrink();
+
+    final String title;
+    final String subtitle;
+    final String cta;
+    final IconData icon;
+    final int? trialDays;
+    final VoidCallback onTap;
+
+    if (status.isTrialing) {
+      title = 'Free trial active';
+      subtitle = 'Full access to every feature';
+      cta = 'Upgrade';
+      icon = Icons.workspace_premium_rounded;
+      trialDays = subState.trialDaysRemaining;
+      onTap = () => GoRouter.of(context).push(AppRoutes.subscription);
+    } else if (status.isExpired ||
+        status.state == sub_domain.SubscriptionState.none) {
+      if (_canStartTrial(status)) {
+        title = 'Start your free trial';
+        subtitle = 'Unlock every feature for 3 days, no credit card required';
+        cta = 'Start trial';
+        icon = Icons.rocket_launch_rounded;
+        trialDays = null;
+        onTap = () => _startTrial(context);
+      } else {
+        title = 'Trial ended';
+        subtitle = 'Upgrade to keep creating unlimited invoices and quotes';
+        cta = 'Upgrade';
+        icon = Icons.lock_open_rounded;
+        trialDays = null;
+        onTap = () => GoRouter.of(context).push(AppRoutes.subscription);
+      }
+    } else {
+      // Cancelled but still has access — surface the option to re-subscribe.
+      title = 'Plan cancelled';
+      subtitle = 'Resubscribe to keep premium features';
+      cta = 'Manage plan';
+      icon = Icons.settings_brightness_rounded;
+      trialDays = null;
+      onTap = () => GoRouter.of(context).push(AppRoutes.subscription);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.lg),
+      child: PremiumCard(
+        title: title,
+        subtitle: subtitle,
+        icon: icon,
+        cta: cta,
+        trialDays: trialDays,
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+// (No additional private events required — the banner dispatches
+// `SubscriptionTrialStarted` from the bloc's public event API.)

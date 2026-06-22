@@ -22,6 +22,8 @@ import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/invoices/domain/services/pdf_generator.dart';
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/invoices/presentation/bloc/invoices_cubit.dart';
+import 'package:invoice_kit/shared/dialogs/app_dialog.dart';
+import 'package:invoice_kit/shared/widgets/template_preview_header.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
 import 'package:printing/printing.dart';
 
@@ -76,6 +78,17 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               case 'cancel':
                 await cubit.setStatus(inv, InvoiceStatus.cancelled);
               case 'delete':
+                final confirmed = await AppDialog.confirm(
+                  context: context,
+                  title: 'Delete invoice?',
+                  message:
+                      'This will permanently remove the invoice. '
+                      'This cannot be undone.',
+                  confirmText: 'Delete',
+                  cancelText: 'Cancel',
+                  destructive: true,
+                );
+                if (confirmed != true) break;
                 await cubit.remove(inv.id);
                 if (mounted) GoRouter.of(context).pop();
               case 'pdf':
@@ -93,22 +106,32 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           ],
         ),
       ],
-      body: BlocBuilder<InvoicesCubit, InvoicesState>(
-        builder: (context, state) {
-          final inv = state.invoices
-              .where((i) => i.id == widget.invoiceId)
-              .cast<Invoice?>()
-              .firstOrNull;
-          if (inv == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return BlocBuilder<ClientsCubit, ClientsState>(
-            builder: (context, cstate) {
-              final client = cstate.clients
-                  .where((c) => c.id == inv.clientId)
-                  .cast<Client?>()
+      body: FutureBuilder<BusinessProfile?>(
+        future: sl<BusinessProfileRepository>().load(),
+        builder: (context, snap) {
+          final profile = snap.data;
+          return BlocBuilder<InvoicesCubit, InvoicesState>(
+            builder: (context, state) {
+              final inv = state.invoices
+                  .where((i) => i.id == widget.invoiceId)
+                  .cast<Invoice?>()
                   .firstOrNull;
-              return _InvoiceBody(invoice: inv, client: client);
+              if (inv == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return BlocBuilder<ClientsCubit, ClientsState>(
+                builder: (context, cstate) {
+                  final client = cstate.clients
+                      .where((c) => c.id == inv.clientId)
+                      .cast<Client?>()
+                      .firstOrNull;
+                  return _InvoiceBody(
+                    invoice: inv,
+                    client: client,
+                    business: profile,
+                  );
+                },
+              );
             },
           );
         },
@@ -139,6 +162,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       invoice: invoice,
       business: profile,
       client: client ?? _emptyClient(invoice.clientId),
+      templateId: invoice.pdfTemplateId,
     );
     await Printing.layoutPdf(onLayout: (_) async => bytes);
   }
@@ -154,13 +178,21 @@ extension _FirstOrNull<E> on Iterable<E> {
 }
 
 class _InvoiceBody extends StatelessWidget {
-  const _InvoiceBody({required this.invoice, this.client});
+  const _InvoiceBody({
+    required this.invoice,
+    this.client,
+    this.business,
+  });
   final Invoice invoice;
   final Client? client;
+  final BusinessProfile? business;
 
   @override
   Widget build(BuildContext context) {
     final totals = InvoiceCalculator.forDocument(invoice);
+    final style = TemplateStyle.forId(
+      invoice.pdfTemplateId ?? business?.selectedPdfTemplate,
+    );
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
@@ -169,27 +201,30 @@ class _InvoiceBody extends StatelessWidget {
         AppSpacing.xxxl,
       ),
       children: [
+        TemplatePreviewHeader(
+          style: style,
+          title: invoice.number,
+          subtitle: 'Billed to ${client?.name ?? "Unknown client"}',
+          rightLabel: 'TOTAL',
+          rightValue: Formatters.currency(
+            invoice.total,
+            code: invoice.currency,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Text(
-                invoice.number,
-                style: context.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.4,
-                ),
+            InvoiceStatusBadge(invoice.status),
+            const Spacer(),
+            Text(
+              'Template · ${style.label}',
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4,
               ),
             ),
-            InvoiceStatusBadge(invoice.status),
           ],
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'Billed to ${client?.name ?? "Unknown client"}',
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: context.colors.onSurfaceVariant,
-          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         Row(
@@ -260,7 +295,7 @@ class _InvoiceBody extends StatelessWidget {
                         code: invoice.currency,
                       ),
                       bold: true,
-                      valueColor: context.colors.primary,
+                      valueColor: style.accent,
                     ),
                   ],
                 ),

@@ -20,7 +20,10 @@ void main() {
       final dio = DioException(
         requestOptions: RequestOptions(path: '/x'),
         type: DioExceptionType.badResponse,
-        response: Response(requestOptions: RequestOptions(path: '/x'), statusCode: 401),
+        response: Response(
+          requestOptions: RequestOptions(path: '/x'),
+          statusCode: 401,
+        ),
       );
       final mapped = mapper.map(dio);
       expect(mapped, isA<UnauthorizedFailure>());

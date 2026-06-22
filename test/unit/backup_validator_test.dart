@@ -4,7 +4,8 @@ import 'package:invoice_kit/features/backup/domain/usecases/backup_validator.dar
 
 void main() {
   group('BackupValidator', () {
-    BackupValidationResult v(Map<String, dynamic>? json) => BackupValidator.validate(json);
+    BackupValidationResult v(Map<String, dynamic>? json) =>
+        BackupValidator.validate(json);
 
     Map<String, dynamic> valid() => {
       'schemaVersion': InvoiceConstants.backupSchemaVersion,
@@ -46,7 +47,8 @@ void main() {
     });
 
     test('future schemaVersion is rejected with helpful message', () {
-      final payload = valid()..['schemaVersion'] = InvoiceConstants.backupSchemaVersion + 100;
+      final payload = valid()
+        ..['schemaVersion'] = InvoiceConstants.backupSchemaVersion + 100;
       final r = v(payload);
       expect(r.valid, isFalse);
       expect(r.errors.first, contains('newer'));

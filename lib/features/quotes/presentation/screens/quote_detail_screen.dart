@@ -19,6 +19,7 @@ import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/quotes/domain/entities/quote.dart';
 import 'package:invoice_kit/features/quotes/presentation/bloc/quotes_cubit.dart';
+import 'package:invoice_kit/shared/dialogs/app_dialog.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
 
 class QuoteDetailScreen extends StatefulWidget {
@@ -69,6 +70,17 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
                   GoRouter.of(context).pushReplacement('/invoices/${inv.id}');
                 }
               case 'delete':
+                final confirmed = await AppDialog.confirm(
+                  context: context,
+                  title: 'Delete quote?',
+                  message:
+                      'This will permanently remove the quote. '
+                      'This cannot be undone.',
+                  confirmText: 'Delete',
+                  cancelText: 'Cancel',
+                  destructive: true,
+                );
+                if (confirmed != true) break;
                 await cubit.remove(q.id);
                 if (mounted) GoRouter.of(context).pop();
             }

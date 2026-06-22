@@ -7,6 +7,7 @@ class ClientsState extends Equatable {
     this.clients = const [],
     this.invoiceCountByClient = const {},
     this.quoteCountByClient = const {},
+    this.error,
   });
 
   factory ClientsState.initial() => const ClientsState();
@@ -16,6 +17,7 @@ class ClientsState extends Equatable {
   final List<Client> clients;
   final Map<String, int> invoiceCountByClient;
   final Map<String, int> quoteCountByClient;
+  final String? error;
 
   ClientsState copyWith({
     bool? loading,
@@ -23,12 +25,15 @@ class ClientsState extends Equatable {
     List<Client>? clients,
     Map<String, int>? invoiceCountByClient,
     Map<String, int>? quoteCountByClient,
+    String? error,
+    bool clearError = false,
   }) => ClientsState(
     loading: loading ?? this.loading,
     query: query ?? this.query,
     clients: clients ?? this.clients,
     invoiceCountByClient: invoiceCountByClient ?? this.invoiceCountByClient,
     quoteCountByClient: quoteCountByClient ?? this.quoteCountByClient,
+    error: clearError ? null : (error ?? this.error),
   );
 
   @override
@@ -38,5 +43,6 @@ class ClientsState extends Equatable {
     clients,
     invoiceCountByClient,
     quoteCountByClient,
+    error,
   ];
 }

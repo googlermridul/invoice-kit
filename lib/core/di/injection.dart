@@ -28,6 +28,7 @@ import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.
 import 'package:invoice_kit/features/backup/data/repositories/backup_repository.dart';
 import 'package:invoice_kit/features/backup/presentation/bloc/backup_cubit.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
+import 'package:invoice_kit/features/business_profile/data/services/logo_storage.dart';
 import 'package:invoice_kit/features/business_profile/presentation/bloc/business_profile_cubit.dart';
 import 'package:invoice_kit/features/clients/data/repositories/client_repository.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
@@ -43,6 +44,7 @@ import 'package:invoice_kit/features/quotes/data/repositories/quote_repository.d
 import 'package:invoice_kit/features/quotes/presentation/bloc/quotes_cubit.dart';
 import 'package:invoice_kit/features/recurring/data/repositories/recurring_repository.dart';
 import 'package:invoice_kit/features/recurring/presentation/bloc/recurring_cubit.dart';
+import 'package:invoice_kit/features/reports/data/services/report_pdf_service.dart';
 import 'package:invoice_kit/features/settings/data/repositories/settings_repository.dart';
 import 'package:invoice_kit/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:invoice_kit/features/splash/presentation/bloc/splash_bloc.dart';
@@ -80,6 +82,8 @@ Future<void> configureDependencies({
     ..registerSingleton<ErrorHandler>(ErrorHandler(sl<ErrorMapper>()))
     ..registerSingleton<PdfGenerator>(const PdfGenerator())
     ..registerSingleton<EntitlementService>(const EntitlementService())
+    ..registerSingleton<LogoStorage>(const LogoStorage())
+    ..registerSingleton<ReportPdfService>(const ReportPdfService())
     ..registerSingleton<SharedPreferences>(
       await SharedPreferences.getInstance(),
     );

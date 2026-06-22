@@ -1,3 +1,4 @@
+import 'package:invoice_kit/core/router/app_router.dart' show AppRouter;
 import 'package:invoice_kit/core/router/route_names.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
 

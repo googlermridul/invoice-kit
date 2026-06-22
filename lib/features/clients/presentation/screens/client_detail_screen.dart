@@ -12,6 +12,7 @@ import 'package:invoice_kit/core/widgets/kv_row.dart';
 import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
+import 'package:invoice_kit/shared/dialogs/app_dialog.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
 
 class ClientDetailScreen extends StatefulWidget {
@@ -49,20 +50,17 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
       ],
       body: BlocBuilder<ClientsCubit, ClientsState>(
         builder: (context, state) {
-          final client = state.clients
-              .where((c) => c.id == widget.clientId)
-              .cast<Client?>()
-              .firstOrNull;
+          final client = state.clients.where((c) => c.id == widget.clientId).cast<Client?>().firstOrNull;
           if (client == null) {
             return const Center(child: CircularProgressIndicator());
           }
           final c = client;
           return ListView(
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.sm,
-              AppSpacing.lg,
-              AppSpacing.xxxl,
+              AppSpacing.xs,
+              AppSpacing.xs,
+              AppSpacing.xs,
+              AppSpacing.xs,
             ),
             children: [
               Center(
@@ -154,29 +152,30 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
   }
 
   Future<void> _confirmDelete() async {
-    final cubit = context.read<ClientsCubit>();
-    final ok = await showDialog<bool>(
+    final confirmed = await AppDialog.confirm(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Delete client?'),
-        content: const Text(
-          'Existing invoices and quotes will keep their reference.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton.tonal(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+      title: 'Delete client?',
+      message:
+          'Existing invoices and quotes will keep their reference. '
+          'This cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      destructive: true,
     );
-    if (ok == true) {
+    if (confirmed != true || !mounted) return;
+    final cubit = context.read<ClientsCubit>();
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
       await cubit.remove(widget.clientId);
-      if (mounted) GoRouter.of(context).pop();
+      if (!mounted) return;
+      messenger.showSnackBar(const SnackBar(content: Text('Client deleted')));
+      router.pop();
+    } catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('Could not delete client: $e')),
+      );
     }
   }
 }

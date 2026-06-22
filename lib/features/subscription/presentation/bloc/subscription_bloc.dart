@@ -17,6 +17,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
     on<SubscriptionPlanPurchased>(_onPurchased);
     on<SubscriptionRestored>(_onRestored);
     on<SubscriptionExpired>(_onExpired);
+    on<SubscriptionTrialStarted>(_onTrialStarted);
   }
 
   final SubscriptionRepository repository;
@@ -131,6 +132,23 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
         status: SubscriptionStatusX.ready,
         subscriptionStatus: updated,
         hasAccess: false,
+      ),
+    );
+  }
+
+  Future<void> _onTrialStarted(
+    SubscriptionTrialStarted event,
+    Emitter<SubscriptionState> emit,
+  ) async {
+    await repository.save(event.status);
+    final now = DateTime.now();
+    emit(
+      state.copyWith(
+        status: SubscriptionStatusX.ready,
+        subscriptionStatus: event.status,
+        hasAccess: entitlements.hasAccess(event.status, now),
+        trialDaysRemaining: entitlements.trialDaysRemaining(event.status, now),
+        message: 'Trial started',
       ),
     );
   }

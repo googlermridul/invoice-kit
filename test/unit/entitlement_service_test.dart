@@ -24,19 +24,22 @@ void main() {
         final s = svc.startTrial(SubscriptionStatus.initial(), now);
         expect(svc.hasAccess(s, now), isTrue);
         expect(svc.isInTrial(s, now), isTrue);
-        expect(svc.trialDaysRemaining(s, now), InvoiceConstants.trialDuration.inDays);
+        expect(
+          svc.trialDaysRemaining(s, now),
+          InvoiceConstants.trialDuration.inDays,
+        );
       });
 
       test('trial days remaining counts whole days only', () {
-        final started = now.subtract(const Duration(days: 3, hours: 12));
+        final started = now.subtract(const Duration(days: 1, hours: 12));
         final s = SubscriptionStatus(
           state: SubscriptionState.trialing,
           trialStart: started,
           trialEnd: started.add(InvoiceConstants.trialDuration),
         );
         expect(svc.isInTrial(s, now), isTrue);
-        // 14 day trial, 3.5 days elapsed → 10 whole days remaining
-        expect(svc.trialDaysRemaining(s, now), 10);
+        // 3 day trial, 1.5 days elapsed → 1 whole day remaining
+        expect(svc.trialDaysRemaining(s, now), 1);
       });
 
       test('blocked once trial ends', () {

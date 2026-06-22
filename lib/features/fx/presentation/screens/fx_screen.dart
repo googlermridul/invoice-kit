@@ -8,6 +8,7 @@ import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/fx/presentation/bloc/fx_cubit.dart';
 import 'package:invoice_kit/shared/widgets/app_text_field.dart';
+import 'package:invoice_kit/shared/widgets/searchable_picker_sheet.dart';
 
 class FxScreen extends StatefulWidget {
   const FxScreen({super.key});
@@ -54,6 +55,8 @@ class _FxScreenState extends State<FxScreen> {
           onPressed: () => context.read<FxCubit>().refresh(base: _from),
         ),
       ],
+      refreshable: true,
+      onRefresh: () => context.read<FxCubit>().refresh(base: _from),
       body: BlocBuilder<FxCubit, FxState>(
         builder: (context, state) {
           final codes = {
@@ -68,12 +71,6 @@ class _FxScreenState extends State<FxScreen> {
           );
           final rateLine = state.rates.where((r) => r.base == _from && r.quote == _to).map((r) => r.rate).firstOrNull;
           return ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              AppSpacing.xxxl,
-            ),
             children: [
               const SectionHeader(
                 title: 'Convert',
@@ -268,14 +265,10 @@ class _CurrencyDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      items: options.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-      onChanged: onChanged,
+    return SearchableCurrencyPickerRow(
+      selected: value,
+      options: options,
+      onSelected: onChanged,
     );
   }
 }

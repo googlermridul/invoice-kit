@@ -19,9 +19,9 @@ class SettingsScreen extends StatelessWidget {
       title: 'Settings',
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg,
+          AppSpacing.sm,
           AppSpacing.md,
-          AppSpacing.lg,
+          AppSpacing.sm,
           AppSpacing.xxxl,
         ),
         children: [
@@ -34,64 +34,67 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                BlocBuilder<SubscriptionBloc, SubscriptionState>(
-                  builder: (context, state) {
-                    return ListTile(
-                      leading: Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: context.tokens.brandSubtle,
-                          borderRadius: BorderRadius.circular(10),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  BlocBuilder<SubscriptionBloc, SubscriptionState>(
+                    builder: (context, state) {
+                      return ListTile(
+                        leading: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: context.tokens.brandSubtle,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.workspace_premium_outlined,
+                            color: context.colors.primary,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.workspace_premium_outlined,
-                          color: context.colors.primary,
+                        title: const Text('Subscription'),
+                        subtitle: Text(
+                          state.isTrialing
+                              ? 'Trial · ${state.trialDaysRemaining} days left'
+                              : state.isActive
+                              ? 'Active · ${state.currentStatus.plan?.label ?? ''}'
+                              : 'Inactive',
+                          style: TextStyle(
+                            color: context.colors.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                      title: const Text('Subscription'),
-                      subtitle: Text(
-                        state.isTrialing
-                            ? 'Trial · ${state.trialDaysRemaining} days left'
-                            : state.isActive
-                            ? 'Active · ${state.currentStatus.plan?.label ?? ''}'
-                            : 'Inactive',
-                        style: TextStyle(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () =>
-                          GoRouter.of(context).push(AppRoutes.subscription),
-                    );
-                  },
-                ),
-                const Divider(
-                  height: 1,
-                  indent: AppSpacing.md,
-                  endIndent: AppSpacing.md,
-                ),
-                ListTile(
-                  leading: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: context.tokens.brandSubtle,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.storefront_outlined,
-                      color: context.colors.primary,
-                    ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () =>
+                            GoRouter.of(context).push(AppRoutes.subscription),
+                      );
+                    },
                   ),
-                  title: const Text('Business profile'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () =>
-                      GoRouter.of(context).push(AppRoutes.businessProfile),
-                ),
-              ],
+                  const Divider(
+                    height: 1,
+                    indent: AppSpacing.md,
+                    endIndent: AppSpacing.md,
+                  ),
+                  ListTile(
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: context.tokens.brandSubtle,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.storefront_outlined,
+                        color: context.colors.primary,
+                      ),
+                    ),
+                    title: const Text('Business profile'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () =>
+                        GoRouter.of(context).push(AppRoutes.businessProfile),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -104,38 +107,41 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: EdgeInsets.zero,
-            child: BlocBuilder<ThemeBloc, ThemeState>(
-              builder: (context, state) {
-                return Column(
-                  children: [
-                    _ThemeOption(
-                      label: 'Match system',
-                      value: ThemeMode.system,
-                      groupValue: state.mode,
-                    ),
-                    const Divider(
-                      height: 1,
-                      indent: AppSpacing.md,
-                      endIndent: AppSpacing.md,
-                    ),
-                    _ThemeOption(
-                      label: 'Light',
-                      value: ThemeMode.light,
-                      groupValue: state.mode,
-                    ),
-                    const Divider(
-                      height: 1,
-                      indent: AppSpacing.md,
-                      endIndent: AppSpacing.md,
-                    ),
-                    _ThemeOption(
-                      label: 'Dark',
-                      value: ThemeMode.dark,
-                      groupValue: state.mode,
-                    ),
-                  ],
-                );
-              },
+            child: Material(
+              color: Colors.transparent,
+              child: BlocBuilder<ThemeBloc, ThemeState>(
+                builder: (context, state) {
+                  return Column(
+                    children: [
+                      _ThemeOption(
+                        label: 'Match system',
+                        value: ThemeMode.system,
+                        groupValue: state.mode,
+                      ),
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
+                      ),
+                      _ThemeOption(
+                        label: 'Light',
+                        value: ThemeMode.light,
+                        groupValue: state.mode,
+                      ),
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
+                      ),
+                      _ThemeOption(
+                        label: 'Dark',
+                        value: ThemeMode.dark,
+                        groupValue: state.mode,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -151,75 +157,78 @@ class SettingsScreen extends StatelessWidget {
               final s = state.settings;
               return AppCard(
                 padding: EdgeInsets.zero,
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(
-                        Icons.attach_money,
-                        color: context.colors.onSurfaceVariant,
-                      ),
-                      title: const Text('Default currency'),
-                      subtitle: Text(
-                        s.currency,
-                        style: TextStyle(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(
+                          Icons.attach_money,
                           color: context.colors.onSurfaceVariant,
                         ),
+                        title: const Text('Default currency'),
+                        subtitle: Text(
+                          s.currency,
+                          style: TextStyle(
+                            color: context.colors.onSurfaceVariant,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => _pickCurrency(context, s.currency),
                       ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _pickCurrency(context, s.currency),
-                    ),
-                    const Divider(
-                      height: 1,
-                      indent: AppSpacing.md,
-                      endIndent: AppSpacing.md,
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        Icons.picture_as_pdf_outlined,
-                        color: context.colors.onSurfaceVariant,
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
                       ),
-                      title: const Text('Default PDF template'),
-                      subtitle: Text(
-                        PdfTemplateIds.displayName(s.selectedPdfTemplate),
-                        style: TextStyle(
+                      ListTile(
+                        leading: Icon(
+                          Icons.picture_as_pdf_outlined,
                           color: context.colors.onSurfaceVariant,
                         ),
+                        title: const Text('Default PDF template'),
+                        subtitle: Text(
+                          PdfTemplateIds.displayName(s.selectedPdfTemplate),
+                          style: TextStyle(
+                            color: context.colors.onSurfaceVariant,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () =>
+                            _pickTemplate(context, s.selectedPdfTemplate),
                       ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () =>
-                          _pickTemplate(context, s.selectedPdfTemplate),
-                    ),
-                    const Divider(
-                      height: 1,
-                      indent: AppSpacing.md,
-                      endIndent: AppSpacing.md,
-                    ),
-                    SwitchListTile(
-                      secondary: Icon(
-                        Icons.notifications_outlined,
-                        color: context.colors.onSurfaceVariant,
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
                       ),
-                      title: const Text('Send payment reminders'),
-                      value: s.sendReminders,
-                      onChanged: (v) =>
-                          context.read<SettingsCubit>().setSendReminders(v),
-                    ),
-                    const Divider(
-                      height: 1,
-                      indent: AppSpacing.md,
-                      endIndent: AppSpacing.md,
-                    ),
-                    SwitchListTile(
-                      secondary: Icon(
-                        Icons.warning_amber_outlined,
-                        color: context.colors.onSurfaceVariant,
+                      SwitchListTile(
+                        secondary: Icon(
+                          Icons.notifications_outlined,
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                        title: const Text('Send payment reminders'),
+                        value: s.sendReminders,
+                        onChanged: (v) =>
+                            context.read<SettingsCubit>().setSendReminders(v),
                       ),
-                      title: const Text('Auto-mark overdue'),
-                      value: s.markOverdueAuto,
-                      onChanged: (v) =>
-                          context.read<SettingsCubit>().setMarkOverdueAuto(v),
-                    ),
-                  ],
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
+                      ),
+                      SwitchListTile(
+                        secondary: Icon(
+                          Icons.warning_amber_outlined,
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                        title: const Text('Auto-mark overdue'),
+                        value: s.markOverdueAuto,
+                        onChanged: (v) =>
+                            context.read<SettingsCubit>().setMarkOverdueAuto(v),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -234,32 +243,35 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           AppCard(
             padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    Icons.cloud_sync_outlined,
-                    color: context.colors.onSurfaceVariant,
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(
+                      Icons.cloud_sync_outlined,
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                    title: const Text('Backup & restore'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => GoRouter.of(context).push(AppRoutes.backup),
                   ),
-                  title: const Text('Backup & restore'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => GoRouter.of(context).push(AppRoutes.backup),
-                ),
-                const Divider(
-                  height: 1,
-                  indent: AppSpacing.md,
-                  endIndent: AppSpacing.md,
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.swap_horiz,
-                    color: context.colors.onSurfaceVariant,
+                  const Divider(
+                    height: 1,
+                    indent: AppSpacing.md,
+                    endIndent: AppSpacing.md,
                   ),
-                  title: const Text('FX rates'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => GoRouter.of(context).push(AppRoutes.fx),
-                ),
-              ],
+                  ListTile(
+                    leading: Icon(
+                      Icons.swap_horiz,
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                    title: const Text('FX rates'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => GoRouter.of(context).push(AppRoutes.fx),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -271,11 +283,14 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           const AppCard(
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(Icons.info_outline),
-              title: Text('InvoiceKit'),
-              subtitle: Text('1.0.0'),
+            child: Material(
+              color: Colors.transparent,
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(Icons.info_outline),
+                title: Text('InvoiceKit'),
+                subtitle: Text('1.0.0'),
+              ),
             ),
           ),
         ],

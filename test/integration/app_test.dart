@@ -7,6 +7,6 @@ void main() {
   testWidgets('App boots and shows splash screen', (tester) async {
     await tester.pumpWidget(const App());
     await tester.pump();
-    expect(find.text('Flutter Boilerplate'), findsWidgets);
+    expect(find.text('InvoiceKit'), findsWidgets);
   });
 }

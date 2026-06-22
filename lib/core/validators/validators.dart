@@ -61,4 +61,40 @@ class Validators {
     }
     return null;
   }
+
+  /// Phone validator that allows empty input. Returns null when the
+  /// field is empty or whitespace; otherwise runs the same format
+  /// check as [Validators.phone]. Use for optional phone fields like
+  /// on the client form.
+  static String? phoneLenient(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    if (!value.isPhone) return 'Enter a valid phone number';
+    return null;
+  }
+
+  /// Validates that a numeric field parses to a non-negative number
+  /// (zero or greater). Use for tax rate, discount, and unit price.
+  static String? nonNegativeNumber(
+    String? value, {
+    String fieldName = 'This field',
+  }) {
+    if (value.isNullOrEmpty) return '$fieldName is required';
+    final parsed = double.tryParse(value!.trim());
+    if (parsed == null) return 'Enter a valid number';
+    if (parsed < 0) return '$fieldName cannot be negative';
+    return null;
+  }
+
+  /// Validates that a numeric field parses to a strictly positive
+  /// number (> 0). Use for quantity.
+  static String? positiveNumber(
+    String? value, {
+    String fieldName = 'This field',
+  }) {
+    if (value.isNullOrEmpty) return '$fieldName is required';
+    final parsed = double.tryParse(value!.trim());
+    if (parsed == null) return 'Enter a valid number';
+    if (parsed <= 0) return '$fieldName must be greater than 0';
+    return null;
+  }
 }

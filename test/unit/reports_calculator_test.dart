@@ -28,7 +28,12 @@ void main() {
         dueDate: dueDate ?? now.subtract(const Duration(days: 14)),
         currency: 'USD',
         items: [
-          DocumentItem(id: 'i1', description: 'Service', quantity: 1, unitPrice: total),
+          DocumentItem(
+            id: 'i1',
+            description: 'Service',
+            quantity: 1,
+            unitPrice: total,
+          ),
         ],
         status: status,
         paidDate: paidDate,
@@ -49,8 +54,18 @@ void main() {
     test('paid invoices count toward revenue', () {
       final s = calc.summarize(
         [
-          invoice(id: '1', status: InvoiceStatus.paid, total: 100, paidDate: now),
-          invoice(id: '2', status: InvoiceStatus.paid, total: 250, paidDate: now),
+          invoice(
+            id: '1',
+            status: InvoiceStatus.paid,
+            total: 100,
+            paidDate: now,
+          ),
+          invoice(
+            id: '2',
+            status: InvoiceStatus.paid,
+            total: 250,
+            paidDate: now,
+          ),
         ],
         now,
       );
@@ -122,25 +137,52 @@ void main() {
       expect(s.totalCount, 2);
     });
 
-    test('topClients ranks by total invoiced, excluding drafts and cancelled', () {
-      final clients = {
-        'a': Client(id: 'a', name: 'Alice', createdAt: now),
-        'b': Client(id: 'b', name: 'Bob', createdAt: now),
-        'c': Client(id: 'c', name: 'Carol', createdAt: now),
-      };
-      final invoices = [
-        invoice(id: '1', status: InvoiceStatus.paid, total: 500, clientId: 'a'),
-        invoice(id: '2', status: InvoiceStatus.paid, total: 200, clientId: 'a'),
-        invoice(id: '3', status: InvoiceStatus.sent, total: 300, clientId: 'b'),
-        invoice(id: '4', status: InvoiceStatus.draft, total: 9999, clientId: 'c'),
-      ];
-      final top = calc.topClients(invoices: invoices, clientsById: clients, limit: 5);
-      expect(top, hasLength(2));
-      expect(top[0].client.id, 'a');
-      expect(top[0].total, 700);
-      expect(top[1].client.id, 'b');
-      expect(top[1].total, 300);
-    });
+    test(
+      'topClients ranks by total invoiced, excluding drafts and cancelled',
+      () {
+        final clients = {
+          'a': Client(id: 'a', name: 'Alice', createdAt: now),
+          'b': Client(id: 'b', name: 'Bob', createdAt: now),
+          'c': Client(id: 'c', name: 'Carol', createdAt: now),
+        };
+        final invoices = [
+          invoice(
+            id: '1',
+            status: InvoiceStatus.paid,
+            total: 500,
+            clientId: 'a',
+          ),
+          invoice(
+            id: '2',
+            status: InvoiceStatus.paid,
+            total: 200,
+            clientId: 'a',
+          ),
+          invoice(
+            id: '3',
+            status: InvoiceStatus.sent,
+            total: 300,
+            clientId: 'b',
+          ),
+          invoice(
+            id: '4',
+            status: InvoiceStatus.draft,
+            total: 9999,
+            clientId: 'c',
+          ),
+        ];
+        final top = calc.topClients(
+          invoices: invoices,
+          clientsById: clients,
+          limit: 5,
+        );
+        expect(top, hasLength(2));
+        expect(top[0].client.id, 'a');
+        expect(top[0].total, 700);
+        expect(top[1].client.id, 'b');
+        expect(top[1].total, 300);
+      },
+    );
 
     test('topClients filters out missing clients', () {
       final clients = {
@@ -148,7 +190,12 @@ void main() {
       };
       final invoices = [
         invoice(id: '1', status: InvoiceStatus.paid, total: 100, clientId: 'a'),
-        invoice(id: '2', status: InvoiceStatus.paid, total: 50, clientId: 'unknown'),
+        invoice(
+          id: '2',
+          status: InvoiceStatus.paid,
+          total: 50,
+          clientId: 'unknown',
+        ),
       ];
       final top = calc.topClients(invoices: invoices, clientsById: clients);
       expect(top, hasLength(1));

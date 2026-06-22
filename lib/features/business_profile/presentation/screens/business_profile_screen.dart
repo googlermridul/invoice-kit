@@ -11,6 +11,8 @@ import 'package:invoice_kit/features/business_profile/presentation/bloc/business
 import 'package:invoice_kit/features/invoices/domain/entities/pdf_template.dart';
 import 'package:invoice_kit/shared/widgets/app_text_field.dart';
 import 'package:invoice_kit/shared/widgets/buttons.dart';
+import 'package:invoice_kit/shared/widgets/logo_picker.dart';
+import 'package:invoice_kit/shared/widgets/searchable_picker_sheet.dart';
 
 class BusinessProfileScreen extends StatefulWidget {
   const BusinessProfileScreen({super.key});
@@ -36,6 +38,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
 
   String _currency = 'USD';
   String _pdfTemplate = PdfTemplateIds.classic;
+  String? _logoPath;
   bool _loaded = false;
 
   @override
@@ -64,6 +67,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     _quotePrefix.text = p.quotePrefix;
     _currency = p.defaultCurrency;
     _pdfTemplate = p.selectedPdfTemplate;
+    _logoPath = p.logoPath;
   }
 
   @override
@@ -95,6 +99,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
       address: _nullIfEmpty(_address.text),
       website: _nullIfEmpty(_website.text),
       taxId: _nullIfEmpty(_taxId.text),
+      logoPath: _logoPath,
       defaultCurrency: _currency,
       invoicePrefix: _invoicePrefix.text.trim().isEmpty
           ? InvoiceConstants.defaultInvoicePrefix
@@ -102,9 +107,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
       quotePrefix: _quotePrefix.text.trim().isEmpty ? InvoiceConstants.defaultQuotePrefix : _quotePrefix.text.trim(),
       nextInvoiceNumber: existing?.nextInvoiceNumber ?? 1,
       nextQuoteNumber: existing?.nextQuoteNumber ?? 1,
-      defaultPaymentTerms: _defaultTerms.text.trim().isEmpty
-          ? 'Payment due within 14 days.'
-          : _defaultTerms.text.trim(),
+      defaultPaymentTerms: _defaultTerms.text.trim().isEmpty ? 'Payment due within 3 days.' : _defaultTerms.text.trim(),
       bankDetails: _nullIfEmpty(_bankDetails.text),
       paymentInstructions: _nullIfEmpty(_paymentInstructions.text),
       selectedPdfTemplate: _pdfTemplate,
@@ -123,6 +126,8 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
     }
     return AppScaffold(
       title: 'Business profile',
+      refreshable: true,
+      onRefresh: () => context.read<BusinessProfileCubit>().load(),
       actions: [
         IconButton(
           icon: const Icon(Icons.save_outlined),
@@ -133,12 +138,6 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.md,
-            AppSpacing.lg,
-            AppSpacing.xxxl,
-          ),
           children: [
             const SectionHeader(
               title: 'Business',
@@ -150,6 +149,11 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
             AppCard(
               child: Column(
                 children: [
+                  LogoPicker(
+                    value: _logoPath,
+                    onChanged: (p) => setState(() => _logoPath = p),
+                  ),
+                  const Divider(height: AppSpacing.lg),
                   AppTextField(
                     controller: _businessName,
                     label: 'Business name',
@@ -202,21 +206,10 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
             AppCard(
               child: Column(
                 children: [
-                  DropdownButtonFormField<String>(
-                    initialValue: _currency,
-                    decoration: const InputDecoration(
-                      labelText: 'Default currency',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: CurrencyCodes.common
-                        .map(
-                          (c) => DropdownMenuItem(
-                            value: c,
-                            child: Text('${CurrencyCodes.symbolOf(c)}  $c'),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (v) => setState(() => _currency = v ?? 'USD'),
+                  SearchableCurrencyPickerRow(
+                    selected: _currency,
+                    options: CurrencyCodes.common,
+                    onSelected: (c) => setState(() => _currency = c),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   AppTextField(
@@ -240,7 +233,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
                   AppTextField(
                     controller: _defaultTerms,
                     label: 'Default payment terms',
-                    hint: 'Payment due within 14 days.',
+                    hint: 'Payment due within 3 days.',
                     maxLines: 3,
                   ),
                 ],
@@ -270,46 +263,6 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
                     hint: 'Pay via bank transfer to the account above.',
                     maxLines: 4,
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            const SectionHeader(
-              title: 'PDF template',
-              uppercase: true,
-              tone: SectionHeaderTone.primary,
-              padding: EdgeInsets.zero,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            AppCard(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  for (var i = 0; i < PdfTemplateIds.all.length; i++) ...[
-                    if (i > 0)
-                      const Divider(
-                        height: 1,
-                        indent: AppSpacing.md,
-                        endIndent: AppSpacing.md,
-                      ),
-                    RadioListTile<String>(
-                      value: PdfTemplateIds.all[i],
-                      // ignore: deprecated_member_use
-                      groupValue: _pdfTemplate,
-                      onChanged: (v) => setState(
-                        () => _pdfTemplate = v ?? PdfTemplateIds.all[i],
-                      ),
-                      title: Text(
-                        PdfTemplateIds.displayName(PdfTemplateIds.all[i]),
-                      ),
-                      subtitle: Text(
-                        PdfTemplateIds.description(PdfTemplateIds.all[i]),
-                        style: TextStyle(
-                          color: context.colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
             ),

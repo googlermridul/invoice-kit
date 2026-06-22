@@ -12,12 +12,24 @@ class LineItemEditor extends StatefulWidget {
     super.key,
     this.onRemove,
     this.showTax = false,
+    this.validatorDescription,
+    this.validatorQuantity,
+    this.validatorUnitPrice,
+    this.validatorTaxRate,
   });
 
   final DocumentItem item;
   final ValueChanged<DocumentItem> onChanged;
   final VoidCallback? onRemove;
   final bool showTax;
+
+  /// Optional per-field validators. When supplied, the parent
+  /// `Form.validate()` will invoke them. Keep them `null` for
+  /// line items that should not be validated.
+  final FormFieldValidator<String>? validatorDescription;
+  final FormFieldValidator<String>? validatorQuantity;
+  final FormFieldValidator<String>? validatorUnitPrice;
+  final FormFieldValidator<String>? validatorTaxRate;
 
   @override
   State<LineItemEditor> createState() => _LineItemEditorState();
@@ -29,13 +41,18 @@ class _LineItemEditorState extends State<LineItemEditor> {
     text: _formatQty(widget.item.quantity),
   );
   late final _priceCtrl = TextEditingController(
-    text: widget.item.unitPrice == 0 ? '' : widget.item.unitPrice.toStringAsFixed(2),
+    text: widget.item.unitPrice == 0
+        ? ''
+        : widget.item.unitPrice.toStringAsFixed(2),
   );
   late final _taxCtrl = TextEditingController(
-    text: widget.item.taxRate == 0 ? '' : widget.item.taxRate.toStringAsFixed(0),
+    text: widget.item.taxRate == 0
+        ? ''
+        : widget.item.taxRate.toStringAsFixed(0),
   );
 
-  String _formatQty(double q) => q == q.roundToDouble() ? q.toInt().toString() : q.toString();
+  String _formatQty(double q) =>
+      q == q.roundToDouble() ? q.toInt().toString() : q.toString();
 
   @override
   void dispose() {
@@ -69,6 +86,7 @@ class _LineItemEditorState extends State<LineItemEditor> {
             label: 'Description',
             hint: 'Service or product',
             dense: true,
+            validator: widget.validatorDescription,
             onChanged: (_) => _emit(),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -82,6 +100,7 @@ class _LineItemEditorState extends State<LineItemEditor> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  validator: widget.validatorQuantity,
                   onChanged: (_) => _emit(),
                 ),
               ),
@@ -95,6 +114,7 @@ class _LineItemEditorState extends State<LineItemEditor> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
+                  validator: widget.validatorUnitPrice,
                   onChanged: (_) => _emit(),
                 ),
               ),
@@ -108,6 +128,7 @@ class _LineItemEditorState extends State<LineItemEditor> {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
+                    validator: widget.validatorTaxRate,
                     onChanged: (_) => _emit(),
                   ),
                 ),

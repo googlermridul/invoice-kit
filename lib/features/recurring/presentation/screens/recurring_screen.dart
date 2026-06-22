@@ -68,16 +68,29 @@ class _RecurringScreenState extends State<RecurringScreen> {
           onPressed: _runDue,
         ),
       ],
+      refreshable: true,
+      onRefresh: () => context.read<RecurringCubit>().load(),
       body: BlocBuilder<RecurringCubit, RecurringState>(
         builder: (context, state) {
           if (state.loading && state.schedules.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView(
+              children: const [
+                SizedBox(height: 120),
+                Center(child: CircularProgressIndicator()),
+              ],
+            );
           }
           if (state.schedules.isEmpty) {
-            return const EmptyState(
-              icon: Icons.repeat_rounded,
-              title: 'No recurring schedules',
-              subtitle: 'Set a schedule to auto-generate invoices on a daily, weekly, monthly, or yearly cadence.',
+            return ListView(
+              children: const [
+                SizedBox(height: 32),
+                EmptyState(
+                  icon: Icons.repeat_rounded,
+                  title: 'No recurring schedules',
+                  subtitle:
+                      'Set a schedule to auto-generate invoices on a daily, weekly, monthly, or yearly cadence.',
+                ),
+              ],
             );
           }
           return BlocBuilder<ClientsCubit, ClientsState>(

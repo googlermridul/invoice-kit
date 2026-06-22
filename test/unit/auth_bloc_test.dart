@@ -47,12 +47,18 @@ void main() {
       ).thenAnswer((_) async => (failure: null, session: session));
     },
     build: build,
-    act: (b) => b.add(const AuthLoginRequested(email: 'jane@example.com', password: 'secret')),
+    act: (b) => b.add(
+      const AuthLoginRequested(email: 'jane@example.com', password: 'secret'),
+    ),
     expect: () => [
       isA<AuthState>()
           .having((s) => s.isSubmitting, 'submitting', isTrue)
           .having((s) => s.message, 'message', isNull),
-      isA<AuthState>().having((s) => s.isAuthenticated, 'authenticated', isTrue),
+      isA<AuthState>().having(
+        (s) => s.isAuthenticated,
+        'authenticated',
+        isTrue,
+      ),
     ],
   );
 
@@ -64,10 +70,15 @@ void main() {
           email: any(named: 'email'),
           password: any(named: 'password'),
         ),
-      ).thenAnswer((_) async => (failure: const ApiFailure(message: 'Bad creds'), session: null));
+      ).thenAnswer(
+        (_) async =>
+            (failure: const ApiFailure(message: 'Bad creds'), session: null),
+      );
     },
     build: build,
-    act: (b) => b.add(const AuthLoginRequested(email: 'jane@example.com', password: 'wrong')),
+    act: (b) => b.add(
+      const AuthLoginRequested(email: 'jane@example.com', password: 'wrong'),
+    ),
     expect: () => [
       isA<AuthState>().having((s) => s.isSubmitting, 'submitting', isTrue),
       isA<AuthState>()
@@ -79,13 +90,19 @@ void main() {
   blocTest<AuthBloc, AuthState>(
     'logout resets state',
     setUp: () {
-      when(() => logoutUseCase()).thenAnswer((_) async => (failure: null, success: true));
+      when(
+        () => logoutUseCase(),
+      ).thenAnswer((_) async => (failure: null, success: true));
     },
     build: build,
     act: (b) => b.add(const AuthLogoutRequested()),
     expect: () => [
       isA<AuthState>().having((s) => s.isSubmitting, 'submitting', isTrue),
-      isA<AuthState>().having((s) => s.status, 'status', AuthStatus.unauthenticated),
+      isA<AuthState>().having(
+        (s) => s.status,
+        'status',
+        AuthStatus.unauthenticated,
+      ),
     ],
   );
 }

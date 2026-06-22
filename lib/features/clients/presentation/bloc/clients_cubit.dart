@@ -21,33 +21,41 @@ class ClientsCubit extends Cubit<ClientsState> {
   final QuoteRepository quoteRepo;
 
   Future<void> load() async {
-    emit(state.copyWith(loading: true));
-    final clients = await clientRepo.all();
-    final invoices = await invoiceRepo.all();
-    final quotes = await quoteRepo.all();
-    emit(
-      state.copyWith(
-        loading: false,
-        clients: clients,
-        invoiceCountByClient: _countByKey(invoices, (i) => i.clientId),
-        quoteCountByClient: _countByKey(quotes, (q) => q.clientId),
-      ),
-    );
+    emit(state.copyWith(loading: true, clearError: true));
+    try {
+      final clients = await clientRepo.all();
+      final invoices = await invoiceRepo.all();
+      final quotes = await quoteRepo.all();
+      emit(
+        state.copyWith(
+          loading: false,
+          clients: clients,
+          invoiceCountByClient: _countByKey(invoices, (i) => i.clientId),
+          quoteCountByClient: _countByKey(quotes, (q) => q.clientId),
+        ),
+      );
+    } catch (e) {
+      emit(state.copyWith(loading: false, error: e.toString()));
+    }
   }
 
   Future<void> search(String query) async {
-    emit(state.copyWith(loading: true, query: query));
-    final clients = await clientRepo.search(query);
-    final invoices = await invoiceRepo.all();
-    final quotes = await quoteRepo.all();
-    emit(
-      state.copyWith(
-        loading: false,
-        clients: clients,
-        invoiceCountByClient: _countByKey(invoices, (i) => i.clientId),
-        quoteCountByClient: _countByKey(quotes, (q) => q.clientId),
-      ),
-    );
+    emit(state.copyWith(loading: true, query: query, clearError: true));
+    try {
+      final clients = await clientRepo.search(query);
+      final invoices = await invoiceRepo.all();
+      final quotes = await quoteRepo.all();
+      emit(
+        state.copyWith(
+          loading: false,
+          clients: clients,
+          invoiceCountByClient: _countByKey(invoices, (i) => i.clientId),
+          quoteCountByClient: _countByKey(quotes, (q) => q.clientId),
+        ),
+      );
+    } catch (e) {
+      emit(state.copyWith(loading: false, error: e.toString()));
+    }
   }
 
   Future<void> upsert(Client client) async {
@@ -68,8 +76,13 @@ class ClientsCubit extends Cubit<ClientsState> {
   }
 
   Future<void> remove(String id) async {
-    await clientRepo.delete(id);
-    await load();
+    emit(state.copyWith(clearError: true));
+    try {
+      await clientRepo.delete(id);
+      await load();
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
   }
 
   Map<String, int> _countByKey<T>(List<T> items, String Function(T) key) {

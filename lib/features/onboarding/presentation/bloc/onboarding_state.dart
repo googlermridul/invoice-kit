@@ -10,7 +10,7 @@ class OnboardingState extends Equatable {
     this.businessName = '',
     this.currency = 'USD',
     this.taxId = '',
-    this.paymentTerms = 'Payment due within 14 days.',
+    this.paymentTerms = 'Payment due within 3 days.',
     this.themeModeName = 'system',
     this.error,
   });

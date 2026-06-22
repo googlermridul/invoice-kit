@@ -140,8 +140,19 @@ class AppRouter {
                 GoRoute(
                   path: RoutePaths.invoices,
                   name: RouteNames.invoices,
-                  builder: (_, _) => BlocProvider(
-                    create: (_) => sl<InvoicesCubit>(),
+                  // builder: (_, _) => BlocProvider(
+                  //   create: (_) => sl<InvoicesCubit>(),
+                  //   child: const InvoicesScreen(),
+                  // ),
+                  builder: (_, _) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider<InvoicesCubit>(
+                        create: (_) => sl<InvoicesCubit>(),
+                      ),
+                      BlocProvider<ClientsCubit>(
+                        create: (_) => sl<ClientsCubit>(),
+                      ),
+                    ],
                     child: const InvoicesScreen(),
                   ),
                   routes: [

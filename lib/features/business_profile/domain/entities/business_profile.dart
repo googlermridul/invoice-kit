@@ -15,7 +15,7 @@ class BusinessProfile extends Equatable {
     this.quotePrefix = 'QUO-',
     this.nextInvoiceNumber = 1,
     this.nextQuoteNumber = 1,
-    this.defaultPaymentTerms = 'Payment due within 14 days.',
+    this.defaultPaymentTerms = 'Payment due within 3 days.',
     this.defaultNotes,
     this.bankDetails,
     this.paymentInstructions,
@@ -38,7 +38,7 @@ class BusinessProfile extends Equatable {
         nextInvoiceNumber: (json['nextInvoiceNumber'] as num?)?.toInt() ?? 1,
         nextQuoteNumber: (json['nextQuoteNumber'] as num?)?.toInt() ?? 1,
         defaultPaymentTerms:
-            (json['defaultPaymentTerms'] ?? 'Payment due within 14 days.')
+            (json['defaultPaymentTerms'] ?? 'Payment due within 3 days.')
                 .toString(),
         defaultNotes: json['defaultNotes'] as String?,
         bankDetails: json['bankDetails'] as String?,
@@ -75,6 +75,7 @@ class BusinessProfile extends Equatable {
     String? website,
     String? taxId,
     String? logoPath,
+    bool clearLogo = false,
     String? defaultCurrency,
     String? invoicePrefix,
     String? quotePrefix,
@@ -94,7 +95,7 @@ class BusinessProfile extends Equatable {
       address: address ?? this.address,
       website: website ?? this.website,
       taxId: taxId ?? this.taxId,
-      logoPath: logoPath ?? this.logoPath,
+      logoPath: clearLogo ? null : (logoPath ?? this.logoPath),
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       invoicePrefix: invoicePrefix ?? this.invoicePrefix,
       quotePrefix: quotePrefix ?? this.quotePrefix,

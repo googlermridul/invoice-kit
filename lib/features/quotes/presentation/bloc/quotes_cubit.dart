@@ -22,22 +22,32 @@ class QuotesCubit extends Cubit<QuotesState> {
   final BusinessProfileRepository businessRepo;
 
   Future<void> load() async {
-    emit(state.copyWith(loading: true));
-    final all = await quoteRepo.all();
-    final profile = await businessRepo.load();
-    final sorted = [...all]..sort((a, b) => b.issueDate.compareTo(a.issueDate));
-    emit(
-      state.copyWith(
-        loading: false,
-        quotes: sorted,
-        defaultCurrency: profile?.defaultCurrency,
-      ),
-    );
+    emit(state.copyWith(loading: true, clearError: true));
+    try {
+      final all = await quoteRepo.all();
+      final profile = await businessRepo.load();
+      final sorted = [...all]
+        ..sort((a, b) => b.issueDate.compareTo(a.issueDate));
+      emit(
+        state.copyWith(
+          loading: false,
+          quotes: sorted,
+          defaultCurrency: profile?.defaultCurrency,
+        ),
+      );
+    } catch (e) {
+      emit(state.copyWith(loading: false, error: e.toString()));
+    }
   }
 
   Future<void> remove(String id) async {
-    await quoteRepo.delete(id);
-    await load();
+    emit(state.copyWith(clearError: true));
+    try {
+      await quoteRepo.delete(id);
+      await load();
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
   }
 
   Future<Quote> duplicate(Quote quote, {String? newNumber}) async {
@@ -87,6 +97,7 @@ class QuotesCubit extends Cubit<QuotesState> {
       items: [DocumentItem.empty(IdGenerator.create('item'))],
       notes: profile?.defaultNotes,
       status: QuoteStatus.draft,
+      pdfTemplateId: profile?.selectedPdfTemplate,
     );
   }
 
@@ -108,6 +119,7 @@ class QuotesCubit extends Cubit<QuotesState> {
       terms: quote.terms ?? profile?.defaultPaymentTerms,
       taxRateOverride: quote.taxRateOverride,
       status: InvoiceStatus.draft,
+      pdfTemplateId: quote.pdfTemplateId,
     );
   }
 }

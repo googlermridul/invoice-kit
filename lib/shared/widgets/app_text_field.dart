@@ -22,6 +22,8 @@ class AppTextField extends StatelessWidget {
     this.initialValue,
     this.dense = false,
     this.inputFormatters,
+    this.validator,
+    this.autovalidateMode,
   }) : assert(
          controller != null || initialValue != null,
          'Provide either controller or initialValue',
@@ -43,11 +45,42 @@ class AppTextField extends StatelessWidget {
   final bool dense;
   final List<TextInputFormatter>? inputFormatters;
 
+  /// Optional form validator. When provided, the underlying input is a
+  /// [TextFormField] so it participates in `Form.validate()` calls.
+  final FormFieldValidator<String>? validator;
+  final AutovalidateMode? autovalidateMode;
+
   @override
   Widget build(BuildContext context) {
     final controller =
         this.controller ?? TextEditingController(text: initialValue);
     final tt = context.textTheme;
+    final field = TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      onChanged: onChanged,
+      onFieldSubmitted: onSubmitted,
+      maxLines: obscure ? 1 : maxLines,
+      inputFormatters: inputFormatters,
+      validator: validator,
+      autovalidateMode: autovalidateMode,
+      style: tt.bodyLarge,
+      decoration: InputDecoration(
+        hintText: hint,
+        errorText: error,
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
+        suffixIcon: suffixIcon,
+        isDense: dense,
+        contentPadding: dense
+            ? const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm + 2,
+              )
+            : null,
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -61,30 +94,7 @@ class AppTextField extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
         ],
-        TextField(
-          controller: controller,
-          obscureText: obscure,
-          keyboardType: keyboardType,
-          textInputAction: textInputAction,
-          onChanged: onChanged,
-          onSubmitted: onSubmitted,
-          maxLines: obscure ? 1 : maxLines,
-          inputFormatters: inputFormatters,
-          style: tt.bodyLarge,
-          decoration: InputDecoration(
-            hintText: hint,
-            errorText: error,
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
-            suffixIcon: suffixIcon,
-            isDense: dense,
-            contentPadding: dense
-                ? const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm + 2,
-                  )
-                : null,
-          ),
-        ),
+        field,
       ],
     );
   }

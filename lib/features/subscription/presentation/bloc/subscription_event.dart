@@ -28,3 +28,12 @@ class SubscriptionRestored extends SubscriptionEvent {
 class SubscriptionExpired extends SubscriptionEvent {
   const SubscriptionExpired();
 }
+
+/// Fired by the dashboard banner when the user taps "Start trial" so the
+/// bloc can persist a freshly started trial.
+class SubscriptionTrialStarted extends SubscriptionEvent {
+  const SubscriptionTrialStarted(this.status);
+  final SubscriptionStatus status;
+  @override
+  List<Object?> get props => [status];
+}

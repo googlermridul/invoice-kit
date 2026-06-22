@@ -9,4 +9,5 @@ export 'document_row.dart';
 export 'line_item_editor.dart';
 export 'plan_card.dart';
 export 'premium_card.dart';
+export 'searchable_picker_sheet.dart';
 export 'status_chip.dart';

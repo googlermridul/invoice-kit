@@ -22,36 +22,47 @@ class InvoicesCubit extends Cubit<InvoicesState> {
   final BusinessProfileRepository businessRepo;
 
   Future<void> load() async {
-    emit(state.copyWith(loading: true));
-    final all = await invoiceRepo.all();
-    final profile = await businessRepo.load();
-    final now = DateTime.now();
-    final updated = all.map((i) {
-      if (i.isOverdueOn(now) && i.status == InvoiceStatus.sent) {
-        return i.copyWith(status: InvoiceStatus.overdue);
+    emit(state.copyWith(loading: true, clearError: true));
+    try {
+      final all = await invoiceRepo.all();
+      final profile = await businessRepo.load();
+      final now = DateTime.now();
+      final updated = all.map((i) {
+        if (i.isOverdueOn(now) && i.status == InvoiceStatus.sent) {
+          return i.copyWith(status: InvoiceStatus.overdue);
+        }
+        return i;
+      }).toList();
+      for (final inv in updated.where(
+        (i) => i.status == InvoiceStatus.overdue,
+      )) {
+        if (all.firstWhere((a) => a.id == inv.id).status !=
+            InvoiceStatus.overdue) {
+          await invoiceRepo.save(inv);
+        }
       }
-      return i;
-    }).toList();
-    for (final inv in updated.where((i) => i.status == InvoiceStatus.overdue)) {
-      if (all.firstWhere((a) => a.id == inv.id).status !=
-          InvoiceStatus.overdue) {
-        await invoiceRepo.save(inv);
-      }
+      final sorted = [...updated]
+        ..sort((a, b) => b.issueDate.compareTo(a.issueDate));
+      emit(
+        state.copyWith(
+          loading: false,
+          invoices: sorted,
+          defaultCurrency: profile?.defaultCurrency,
+        ),
+      );
+    } catch (e) {
+      emit(state.copyWith(loading: false, error: e.toString()));
     }
-    final sorted = [...updated]
-      ..sort((a, b) => b.issueDate.compareTo(a.issueDate));
-    emit(
-      state.copyWith(
-        loading: false,
-        invoices: sorted,
-        defaultCurrency: profile?.defaultCurrency,
-      ),
-    );
   }
 
   Future<void> remove(String id) async {
-    await invoiceRepo.delete(id);
-    await load();
+    emit(state.copyWith(clearError: true));
+    try {
+      await invoiceRepo.delete(id);
+      await load();
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
   }
 
   Future<Invoice> duplicate(Invoice invoice, {String? newNumber}) async {
@@ -66,6 +77,7 @@ class InvoicesCubit extends Cubit<InvoicesState> {
       issueDate: DateTime.now(),
       dueDate: DateTime.now().add(const Duration(days: 14)),
       paidDate: null,
+      pdfTemplateId: invoice.pdfTemplateId,
       items: invoice.items
           .map((it) => it.copyWith(description: it.description))
           .toList(),
@@ -106,6 +118,7 @@ class InvoicesCubit extends Cubit<InvoicesState> {
       notes: profile?.defaultNotes,
       terms: profile?.defaultPaymentTerms,
       status: InvoiceStatus.draft,
+      pdfTemplateId: profile?.selectedPdfTemplate,
     );
   }
 

@@ -91,7 +91,8 @@ class ReportsCalculator {
       for (final inv in invoices) {
         if (inv.status != InvoiceStatus.paid) continue;
         if (inv.paidDate == null) continue;
-        if (inv.paidDate!.isBefore(monthStart) || !inv.paidDate!.isBefore(monthEnd)) {
+        if (inv.paidDate!.isBefore(monthStart) ||
+            !inv.paidDate!.isBefore(monthEnd)) {
           continue;
         }
         total += inv.total;
@@ -110,7 +111,8 @@ class ReportsCalculator {
   }) {
     final totals = <String, double>{};
     for (final inv in invoices) {
-      if (inv.status == InvoiceStatus.cancelled || inv.status == InvoiceStatus.draft) {
+      if (inv.status == InvoiceStatus.cancelled ||
+          inv.status == InvoiceStatus.draft) {
         continue;
       }
       totals.update(
@@ -134,7 +136,8 @@ class ReportsCalculator {
   double totalTaxCollected(List<Invoice> invoices) {
     var total = 0.0;
     for (final inv in invoices) {
-      if (inv.status == InvoiceStatus.cancelled || inv.status == InvoiceStatus.draft) {
+      if (inv.status == InvoiceStatus.cancelled ||
+          inv.status == InvoiceStatus.draft) {
         continue;
       }
       total += inv.itemTaxTotal + inv.globalTax;
