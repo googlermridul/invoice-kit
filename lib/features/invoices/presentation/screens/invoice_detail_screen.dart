@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
@@ -15,8 +16,7 @@ import 'package:invoice_kit/features/business_profile/data/repositories/business
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
-    show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/invoices/domain/services/pdf_generator.dart';
@@ -49,14 +49,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       title: 'Invoice',
       actions: [
         IconButton(
-          icon: const Icon(Icons.edit_outlined),
+          icon: const Icon(HugeIconsStroke.edit02, size: 18),
           tooltip: 'Edit',
           onPressed: () => GoRouter.of(
             context,
           ).push(RoutePaths.invoiceEditPath(widget.invoiceId)),
         ),
         PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert),
+          icon: const Icon(HugeIconsStroke.moreVertical),
           onSelected: (v) async {
             final cubit = context.read<InvoicesCubit>();
             final inv = _invoice(context);
@@ -112,19 +112,13 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           final profile = snap.data;
           return BlocBuilder<InvoicesCubit, InvoicesState>(
             builder: (context, state) {
-              final inv = state.invoices
-                  .where((i) => i.id == widget.invoiceId)
-                  .cast<Invoice?>()
-                  .firstOrNull;
+              final inv = state.invoices.where((i) => i.id == widget.invoiceId).cast<Invoice?>().firstOrNull;
               if (inv == null) {
                 return const Center(child: CircularProgressIndicator());
               }
               return BlocBuilder<ClientsCubit, ClientsState>(
                 builder: (context, cstate) {
-                  final client = cstate.clients
-                      .where((c) => c.id == inv.clientId)
-                      .cast<Client?>()
-                      .firstOrNull;
+                  final client = cstate.clients.where((c) => c.id == inv.clientId).cast<Client?>().firstOrNull;
                   return _InvoiceBody(
                     invoice: inv,
                     client: client,
@@ -141,16 +135,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   Invoice? _invoice(BuildContext context) {
     final s = context.read<InvoicesCubit>().state;
-    return s.invoices
-        .where((i) => i.id == widget.invoiceId)
-        .cast<Invoice?>()
-        .firstOrNull;
+    return s.invoices.where((i) => i.id == widget.invoiceId).cast<Invoice?>().firstOrNull;
   }
 
   Future<void> _openPdf(BuildContext context, Invoice invoice) async {
     final generator = sl<PdfGenerator>();
-    final profile =
-        await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
+    final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
     final client = context
         .read<ClientsCubit>()
         .state
@@ -167,8 +157,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     await Printing.layoutPdf(onLayout: (_) async => bytes);
   }
 
-  Client _emptyClient(String id) =>
-      Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
+  Client _emptyClient(String id) => Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
 
   BusinessProfile _emptyProfile() => const BusinessProfile(businessName: '');
 }

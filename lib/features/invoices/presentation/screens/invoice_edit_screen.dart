@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/constants/invoice_constants.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
@@ -17,8 +18,7 @@ import 'package:invoice_kit/features/business_profile/data/repositories/business
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/features/invoices/data/repositories/invoice_repository.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
-    show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/pdf_template.dart';
@@ -69,7 +69,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
     try {
       await clientsCubit.load();
       await cubit.load();
-    } catch (_) {
+    } on Exception catch (_) {
       // Cubits surface the error in their state; keep going so the
       // form can still be opened and the user can retry.
     }
@@ -85,7 +85,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
         _invoice = await cubit.createDraft(
           clientId: widget.presetClientId ?? '',
         );
-      } catch (e) {
+      } on Exception {
         _invoice = null;
       }
       _notesCtrl.text = _invoice?.notes ?? '';
@@ -150,7 +150,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
       } else {
         router.pop();
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(content: Text('Could not save invoice: $e')),
@@ -178,8 +178,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
         body: const EmptyState(
           icon: Icons.error_outline,
           title: 'Could not open the editor',
-          subtitle:
-              'There was a problem creating a draft. Please go back and try again.',
+          subtitle: 'There was a problem creating a draft. Please go back and try again.',
         ),
       );
     }
@@ -189,7 +188,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
       title: widget.invoiceId == null ? 'New invoice' : 'Edit invoice',
       actions: [
         IconButton(
-          icon: const Icon(Icons.save_outlined),
+          icon: const Icon(HugeIconsStroke.folder01, size: 18),
           tooltip: 'Save',
           onPressed: _saving ? null : _save,
         ),
@@ -200,16 +199,12 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
             return EmptyState(
               icon: Icons.people_outline,
               title: 'Add a client first',
-              subtitle:
-                  'Invoices need a client. Add one and you can come back here.',
+              subtitle: 'Invoices need a client. Add one and you can come back here.',
               actionLabel: 'Add client',
               onAction: () => GoRouter.of(context).push(RoutePaths.clientNew),
             );
           }
-          final selectedName = cstate.clients
-              .where((c) => c.id == inv.clientId)
-              .map((c) => c.name)
-              .firstOrNull;
+          final selectedName = cstate.clients.where((c) => c.id == inv.clientId).map((c) => c.name).firstOrNull;
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -296,10 +291,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                         RadioListTile<String>(
                           value: PdfTemplateIds.all[i],
                           // ignore: deprecated_member_use
-                          groupValue:
-                              inv.pdfTemplateId ??
-                              _profile?.selectedPdfTemplate ??
-                              PdfTemplateIds.classic,
+                          groupValue: inv.pdfTemplateId ?? _profile?.selectedPdfTemplate ?? PdfTemplateIds.classic,
                           onChanged: (v) => setState(() {
                             _invoice = _invoice!.copyWith(
                               pdfTemplateId: v,
@@ -337,8 +329,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                       v,
                       fieldName: 'Description',
                     ),
-                    validatorQuantity: (v) =>
-                        Validators.positiveNumber(v, fieldName: 'Quantity'),
+                    validatorQuantity: (v) => Validators.positiveNumber(v, fieldName: 'Quantity'),
                     validatorUnitPrice: (v) => Validators.nonNegativeNumber(
                       v,
                       fieldName: 'Unit price',
@@ -369,7 +360,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                         DocumentItem.empty(IdGenerator.create('item')),
                       ]);
                     },
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(HugeIconsStroke.plusSign, size: 18),
                     label: const Text('Add line item'),
                   ),
                 ),
@@ -440,7 +431,7 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                 const SizedBox(height: AppSpacing.xl),
                 PrimaryButton(
                   label: 'Save invoice',
-                  icon: Icons.check,
+                  icon: HugeIconsStroke.tick01,
                   loading: _saving,
                   onPressed: _saving ? null : _save,
                 ),

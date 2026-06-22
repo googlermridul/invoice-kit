@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
@@ -63,7 +64,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
       title: 'Recurring',
       actions: [
         IconButton(
-          icon: const Icon(Icons.play_circle_outline),
+          icon: const Icon(HugeIconsStroke.flag01, size: 18),
           tooltip: 'Run due now',
           onPressed: _runDue,
         ),
@@ -87,8 +88,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                 EmptyState(
                   icon: Icons.repeat_rounded,
                   title: 'No recurring schedules',
-                  subtitle:
-                      'Set a schedule to auto-generate invoices on a daily, weekly, monthly, or yearly cadence.',
+                  subtitle: 'Set a schedule to auto-generate invoices on a daily, weekly, monthly, or yearly cadence.',
                 ),
               ],
             );
@@ -179,7 +179,7 @@ class _ScheduleCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              Icon(Icons.event_outlined, size: 16, color: muted),
+              Icon(HugeIconsStroke.clock01, size: 16, color: muted),
               const SizedBox(width: AppSpacing.xs),
               Text(
                 'Next run ${Formatters.date(schedule.nextRunDate)}',
@@ -191,7 +191,7 @@ class _ScheduleCard extends StatelessWidget {
             const SizedBox(height: 4),
             Row(
               children: [
-                Icon(Icons.event_busy_outlined, size: 16, color: muted),
+                Icon(HugeIconsStroke.calendar01, size: 16, color: muted),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   'Ends ${Formatters.date(schedule.endDate!)}',
@@ -208,7 +208,7 @@ class _ScheduleCard extends StatelessWidget {
             children: [
               TextButton.icon(
                 onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline, size: 18),
+                icon: const Icon(HugeIconsStroke.delete01, size: 18),
                 label: const Text('Delete'),
               ),
             ],

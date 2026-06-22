@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
@@ -26,9 +27,7 @@ class CurrencyPickerRow extends StatelessWidget {
           .map(
             (c) => ListTile(
               title: Text(c),
-              trailing: c == selected
-                  ? Icon(Icons.check, color: context.colors.primary)
-                  : null,
+              trailing: c == selected ? Icon(HugeIconsStroke.at, size: 24) : null,
               onTap: () => Navigator.pop(context, c),
             ),
           )

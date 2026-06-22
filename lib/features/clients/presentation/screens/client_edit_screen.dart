@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/validators/validators.dart';
 import 'package:invoice_kit/core/widgets/app_scaffold.dart';
@@ -45,10 +46,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
       // the form can still be opened and the user can retry.
     }
     if (widget.clientId != null && mounted) {
-      final existing = cubit.state.clients
-          .where((c) => c.id == widget.clientId)
-          .cast<Client?>()
-          .firstOrNull;
+      final existing = cubit.state.clients.where((c) => c.id == widget.clientId).cast<Client?>().firstOrNull;
       if (existing != null) {
         _name.text = existing.name;
         _email.text = existing.email ?? '';
@@ -73,8 +71,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
   }
 
   String? _validateName(String? value) {
-    if ((value == null || value.trim().isEmpty) &&
-        _company.text.trim().isEmpty) {
+    if ((value == null || value.trim().isEmpty) && _company.text.trim().isEmpty) {
       return 'Name or company is required';
     }
     return null;
@@ -91,9 +88,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
       final id = widget.clientId ?? IdGenerator.create('cli');
       final client = Client(
         id: id,
-        name: _name.text.trim().isEmpty
-            ? _company.text.trim()
-            : _name.text.trim(),
+        name: _name.text.trim().isEmpty ? _company.text.trim() : _name.text.trim(),
         email: _nullIfEmpty(_email.text),
         phone: _nullIfEmpty(_phone.text),
         address: _nullIfEmpty(_address.text),
@@ -215,7 +210,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
             const SizedBox(height: AppSpacing.xl),
             PrimaryButton(
               label: isNew ? 'Add client' : 'Save changes',
-              icon: Icons.check,
+              icon: HugeIconsStroke.tick01,
               loading: _saving,
               onPressed: _saving ? null : _save,
             ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
@@ -64,12 +65,12 @@ class _LogoPickerState extends State<LogoPicker> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
+              leading: const Icon(HugeIconsStroke.image01, size: 18),
               title: const Text('Choose from gallery'),
               onTap: () => Navigator.pop(ctx, ImageSource.gallery),
             ),
             ListTile(
-              leading: const Icon(Icons.camera_alt_outlined),
+              leading: const Icon(HugeIconsStroke.camera01, size: 18),
               title: const Text('Take a photo'),
               onTap: () => Navigator.pop(ctx, ImageSource.camera),
             ),
@@ -128,9 +129,7 @@ class _LogoPickerState extends State<LogoPicker> {
               ),
               const SizedBox(height: 2),
               Text(
-                hasLogo
-                    ? 'Shown on invoices and PDF exports.'
-                    : 'Add a logo to brand your invoices and PDFs.',
+                hasLogo ? 'Shown on invoices and PDF exports.' : 'Add a logo to brand your invoices and PDFs.',
                 style: context.textTheme.bodySmall?.copyWith(
                   color: context.colors.onSurfaceVariant,
                 ),
@@ -142,13 +141,13 @@ class _LogoPickerState extends State<LogoPicker> {
                 children: [
                   OutlinedButton.icon(
                     onPressed: _busy ? null : _showSourceSheet,
-                    icon: const Icon(Icons.upload_outlined, size: 18),
+                    icon: const Icon(HugeIconsStroke.upload01, size: 18),
                     label: Text(hasLogo ? 'Replace' : 'Upload'),
                   ),
                   if (hasLogo)
                     TextButton.icon(
                       onPressed: _busy ? null : _remove,
-                      icon: const Icon(Icons.delete_outline, size: 18),
+                      icon: const Icon(HugeIconsStroke.delete01, size: 18),
                       label: const Text('Remove'),
                     ),
                 ],

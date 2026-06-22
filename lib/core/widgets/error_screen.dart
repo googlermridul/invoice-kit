@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 
@@ -16,7 +17,7 @@ class ErrorScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline, size: 64),
+              const Icon(HugeIconsStroke.fileNotFound, size: 64),
               const SizedBox(height: AppSpacing.lg),
               Text('Route not found', style: context.textTheme.headlineSmall),
               const SizedBox(height: AppSpacing.sm),

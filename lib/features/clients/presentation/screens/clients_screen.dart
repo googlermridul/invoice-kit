@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
@@ -41,7 +42,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
       leading: const SizedBox.shrink(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => GoRouter.of(context).push(RoutePaths.clientNew),
-        icon: const Icon(Icons.person_add_alt_1),
+        icon: const Icon(HugeIconsStroke.plusSign, size: 18),
         label: const Text('New client'),
       ),
       padding: EdgeInsets.zero,
@@ -81,9 +82,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       const SizedBox(height: 32),
                       EmptyState(
                         icon: Icons.people_outline,
-                        title: state.query.isEmpty
-                            ? 'No clients yet'
-                            : 'No clients match "${state.query}"',
+                        title: state.query.isEmpty ? 'No clients yet' : 'No clients match "${state.query}"',
                         subtitle: state.query.isEmpty
                             ? 'Add your first client to start invoicing.'
                             : 'Try a different name or company.',
@@ -112,9 +111,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     return ClientRow(
                       name: c.name,
                       subtitle: _clientSubtitle(c),
-                      trailing: (invoices > 0 || quotes > 0)
-                          ? _CountBadges(invoices: invoices, quotes: quotes)
-                          : null,
+                      trailing: (invoices > 0 || quotes > 0) ? _CountBadges(invoices: invoices, quotes: quotes) : null,
                       onTap: () => GoRouter.of(context).push(
                         RoutePaths.clientDetailPath(c.id),
                       ),
@@ -148,8 +145,7 @@ class _CountBadges extends StatelessWidget {
     return Wrap(
       spacing: 4,
       children: [
-        if (invoices > 0)
-          _Badge(icon: Icons.receipt_long_outlined, n: invoices),
+        if (invoices > 0) _Badge(icon: Icons.receipt_long_outlined, n: invoices),
         if (quotes > 0) _Badge(icon: Icons.description_outlined, n: quotes),
       ],
     );

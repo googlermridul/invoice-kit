@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
@@ -45,9 +46,7 @@ class PlanCard extends StatelessWidget {
                       name,
                       style: tt.titleLarge?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: selected
-                            ? context.colors.primary
-                            : context.colors.onSurface,
+                        color: selected ? context.colors.primary : context.colors.onSurface,
                       ),
                     ),
                   ),
@@ -64,9 +63,7 @@ class PlanCard extends StatelessWidget {
                     style: tt.displaySmall?.copyWith(
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.6,
-                      color: selected
-                          ? context.colors.primary
-                          : context.colors.onSurface,
+                      color: selected ? context.colors.primary : context.colors.onSurface,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -89,10 +86,8 @@ class PlanCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
-                        Icons.check_circle,
-                        color: selected
-                            ? context.colors.primary
-                            : context.colors.onSurfaceVariant,
+                        HugeIconsStroke.tickDouble01,
+                        color: selected ? context.colors.primary : context.colors.onSurfaceVariant,
                         size: 16,
                       ),
                       const SizedBox(width: AppSpacing.sm),
@@ -148,15 +143,11 @@ class _RadioDot extends StatelessWidget {
         shape: BoxShape.circle,
         color: selected ? context.colors.primary : Colors.transparent,
         border: Border.all(
-          color: selected
-              ? context.colors.primary
-              : context.colors.onSurfaceVariant,
+          color: selected ? context.colors.primary : context.colors.onSurfaceVariant,
           width: 2,
         ),
       ),
-      child: selected
-          ? const Icon(Icons.check, size: 14, color: Colors.white)
-          : null,
+      child: selected ? const Icon(HugeIconsStroke.tick01, size: 14, color: Colors.white) : null,
     );
   }
 }

@@ -32,7 +32,7 @@ class AuthRepositoryImpl implements AuthRepository {
         refreshToken: session.refreshToken,
       );
       return (failure: null, session: session);
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       return (failure: _errorHandler.map(e, st), session: null);
     }
   }
@@ -55,7 +55,7 @@ class AuthRepositoryImpl implements AuthRepository {
         refreshToken: session.refreshToken,
       );
       return (failure: null, session: session);
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       return (failure: _errorHandler.map(e, st), session: null);
     }
   }
@@ -67,7 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _remote.forgotPassword(email: email);
       return (failure: null, user: null);
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       return (failure: _errorHandler.map(e, st), user: null);
     }
   }
@@ -77,7 +77,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _remote.logout();
       return (failure: null, success: true);
-    } catch (_) {
+    } on Exception catch (_) {
       // Even if remote logout fails, clear local state.
     } finally {
       await _local.clear();

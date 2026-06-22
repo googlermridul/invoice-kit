@@ -34,7 +34,7 @@ class ClientsCubit extends Cubit<ClientsState> {
           quoteCountByClient: _countByKey(quotes, (q) => q.clientId),
         ),
       );
-    } catch (e) {
+    } on Exception catch (e) {
       emit(state.copyWith(loading: false, error: e.toString()));
     }
   }
@@ -53,7 +53,7 @@ class ClientsCubit extends Cubit<ClientsState> {
           quoteCountByClient: _countByKey(quotes, (q) => q.clientId),
         ),
       );
-    } catch (e) {
+    } on Exception catch (e) {
       emit(state.copyWith(loading: false, error: e.toString()));
     }
   }
@@ -80,7 +80,7 @@ class ClientsCubit extends Cubit<ClientsState> {
     try {
       await clientRepo.delete(id);
       await load();
-    } catch (e) {
+    } on Exception catch (e) {
       emit(state.copyWith(error: e.toString()));
     }
   }

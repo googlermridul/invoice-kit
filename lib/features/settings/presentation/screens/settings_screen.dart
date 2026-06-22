@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/constants/invoice_constants.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/app_routes.dart';
@@ -64,9 +65,8 @@ class SettingsScreen extends StatelessWidget {
                             color: context.colors.onSurfaceVariant,
                           ),
                         ),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () =>
-                            GoRouter.of(context).push(AppRoutes.subscription),
+                        trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
+                        onTap: () => GoRouter.of(context).push(AppRoutes.subscription),
                       );
                     },
                   ),
@@ -89,9 +89,8 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                     title: const Text('Business profile'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () =>
-                        GoRouter.of(context).push(AppRoutes.businessProfile),
+                    trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
+                    onTap: () => GoRouter.of(context).push(AppRoutes.businessProfile),
                   ),
                 ],
               ),
@@ -173,7 +172,7 @@ class SettingsScreen extends StatelessWidget {
                             color: context.colors.onSurfaceVariant,
                           ),
                         ),
-                        trailing: const Icon(Icons.chevron_right),
+                        trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
                         onTap: () => _pickCurrency(context, s.currency),
                       ),
                       const Divider(
@@ -193,9 +192,8 @@ class SettingsScreen extends StatelessWidget {
                             color: context.colors.onSurfaceVariant,
                           ),
                         ),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () =>
-                            _pickTemplate(context, s.selectedPdfTemplate),
+                        trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
+                        onTap: () => _pickTemplate(context, s.selectedPdfTemplate),
                       ),
                       const Divider(
                         height: 1,
@@ -209,8 +207,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         title: const Text('Send payment reminders'),
                         value: s.sendReminders,
-                        onChanged: (v) =>
-                            context.read<SettingsCubit>().setSendReminders(v),
+                        onChanged: (v) => context.read<SettingsCubit>().setSendReminders(v),
                       ),
                       const Divider(
                         height: 1,
@@ -224,8 +221,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         title: const Text('Auto-mark overdue'),
                         value: s.markOverdueAuto,
-                        onChanged: (v) =>
-                            context.read<SettingsCubit>().setMarkOverdueAuto(v),
+                        onChanged: (v) => context.read<SettingsCubit>().setMarkOverdueAuto(v),
                       ),
                     ],
                   ),
@@ -253,7 +249,7 @@ class SettingsScreen extends StatelessWidget {
                       color: context.colors.onSurfaceVariant,
                     ),
                     title: const Text('Backup & restore'),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
                     onTap: () => GoRouter.of(context).push(AppRoutes.backup),
                   ),
                   const Divider(
@@ -267,7 +263,7 @@ class SettingsScreen extends StatelessWidget {
                       color: context.colors.onSurfaceVariant,
                     ),
                     title: const Text('FX rates'),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
                     onTap: () => GoRouter.of(context).push(AppRoutes.fx),
                   ),
                 ],
@@ -287,7 +283,7 @@ class SettingsScreen extends StatelessWidget {
               color: Colors.transparent,
               child: ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.info_outline),
+                leading: Icon(HugeIconsStroke.informationCircle, size: 18),
                 title: Text('InvoiceKit'),
                 subtitle: Text('1.0.0'),
               ),
@@ -308,7 +304,7 @@ class SettingsScreen extends StatelessWidget {
           for (final c in CurrencyCodes.common)
             ListTile(
               title: Text('${CurrencyCodes.symbolOf(c)}  $c'),
-              trailing: c == current ? const Icon(Icons.check) : null,
+              trailing: c == current ? Icon(HugeIconsStroke.tick01, size: 18) : null,
               onTap: () => Navigator.pop(context, c),
             ),
         ],
@@ -328,7 +324,7 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text(PdfTemplateIds.displayName(t)),
               subtitle: Text(PdfTemplateIds.description(t)),
-              trailing: t == current ? const Icon(Icons.check) : null,
+              trailing: t == current ? Icon(HugeIconsStroke.tick01, size: 18) : null,
               onTap: () => Navigator.pop(context, t),
             ),
         ],

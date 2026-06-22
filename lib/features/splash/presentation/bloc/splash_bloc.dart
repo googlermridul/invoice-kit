@@ -22,8 +22,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     Emitter<SplashState> emit,
   ) async {
     try {
-      final onboardingCompleted =
-          localStorage.getBool(StorageKeys.onboardingCompleted) ?? false;
+      final onboardingCompleted = localStorage.getBool(StorageKeys.onboardingCompleted) ?? false;
 
       if (!onboardingCompleted) {
         emit(const SplashNavigateToOnboarding());
@@ -40,7 +39,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       } else {
         emit(const SplashNavigateToSubscription());
       }
-    } catch (e) {
+    } on Exception catch (e) {
       add(AppInitializationFailed(e.toString()));
     }
   }

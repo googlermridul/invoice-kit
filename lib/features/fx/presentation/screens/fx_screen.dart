@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/theme/app_tokens.dart';
@@ -50,7 +51,7 @@ class _FxScreenState extends State<FxScreen> {
       title: 'FX Converter',
       actions: [
         IconButton(
-          icon: const Icon(Icons.refresh),
+          icon: const Icon(HugeIconsStroke.refresh, size: 18),
           tooltip: 'Refresh rates',
           onPressed: () => context.read<FxCubit>().refresh(base: _from),
         ),
@@ -112,7 +113,7 @@ class _FxScreenState extends State<FxScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: AppSpacing.lg),
                           child: IconButton.filledTonal(
-                            icon: const Icon(Icons.swap_horiz),
+                            icon: const Icon(HugeIconsStroke.exchange01, size: 18),
                             tooltip: 'Swap',
                             onPressed: _swap,
                           ),

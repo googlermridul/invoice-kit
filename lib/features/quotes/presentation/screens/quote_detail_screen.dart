@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
@@ -14,8 +17,7 @@ import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/features/invoices/data/repositories/invoice_repository.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
-    show QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/quotes/domain/entities/quote.dart';
 import 'package:invoice_kit/features/quotes/presentation/bloc/quotes_cubit.dart';
@@ -34,8 +36,8 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<QuotesCubit>().load();
-    context.read<ClientsCubit>().load();
+    unawaited(context.read<QuotesCubit>().load());
+    unawaited(context.read<ClientsCubit>().load());
   }
 
   @override
@@ -44,14 +46,14 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
       title: 'Quote',
       actions: [
         IconButton(
-          icon: const Icon(Icons.edit_outlined),
+          icon: const Icon(HugeIconsStroke.edit02, size: 18),
           tooltip: 'Edit',
           onPressed: () => GoRouter.of(context).push(
             RoutePaths.quoteEditPath(widget.quoteId),
           ),
         ),
         PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert),
+          icon: const Icon(HugeIconsStroke.moreVertical),
           onSelected: (v) async {
             final cubit = context.read<QuotesCubit>();
             final q = _quote(context);
@@ -97,19 +99,13 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
       ],
       body: BlocBuilder<QuotesCubit, QuotesState>(
         builder: (context, state) {
-          final q = state.quotes
-              .where((x) => x.id == widget.quoteId)
-              .cast<Quote?>()
-              .firstOrNull;
+          final q = state.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
           if (q == null) {
             return const Center(child: CircularProgressIndicator());
           }
           return BlocBuilder<ClientsCubit, ClientsState>(
             builder: (context, cstate) {
-              final client = cstate.clients
-                  .where((c) => c.id == q.clientId)
-                  .cast<Client?>()
-                  .firstOrNull;
+              final client = cstate.clients.where((c) => c.id == q.clientId).cast<Client?>().firstOrNull;
               return _Body(quote: q, client: client);
             },
           );
@@ -120,10 +116,7 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
 
   Quote? _quote(BuildContext context) {
     final s = context.read<QuotesCubit>().state;
-    return s.quotes
-        .where((x) => x.id == widget.quoteId)
-        .cast<Quote?>()
-        .firstOrNull;
+    return s.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
   }
 }
 

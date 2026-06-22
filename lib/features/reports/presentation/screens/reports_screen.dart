@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_colors.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
@@ -85,7 +86,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       actions: [
         IconButton(
           tooltip: 'Pick date range',
-          icon: const Icon(Icons.date_range_outlined),
+          icon: const Icon(HugeIconsStroke.calendar01, size: 18),
           onPressed: _pickRange,
         ),
       ],

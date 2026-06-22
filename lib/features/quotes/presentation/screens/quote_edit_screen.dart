@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
@@ -14,8 +15,7 @@ import 'package:invoice_kit/core/widgets/kv_row.dart';
 import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
-    show QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/quotes/data/repositories/quote_repository.dart';
@@ -61,7 +61,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     try {
       await clientsCubit.load();
       await cubit.load();
-    } catch (_) {
+    } on Exception catch (_) {
       // Cubits surface the error in their state; keep going so the
       // form can still be opened and the user can retry.
     }
@@ -71,7 +71,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
     } else {
       try {
         _quote = await cubit.createDraft(clientId: widget.presetClientId ?? '');
-      } catch (_) {
+      } on Exception catch (_) {
         _quote = null;
       }
       _notesCtrl.text = _quote?.notes ?? '';
@@ -128,11 +128,11 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         ),
       );
       if (widget.quoteId == null) {
-        router.pushReplacement(RoutePaths.quoteDetailPath(toSave.id));
+        await router.pushReplacement(RoutePaths.quoteDetailPath(toSave.id));
       } else {
         router.pop();
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(content: Text('Could not save quote: $e')),
@@ -158,8 +158,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         body: const EmptyState(
           icon: Icons.error_outline,
           title: 'Could not open the editor',
-          subtitle:
-              'There was a problem creating a draft. Please go back and try again.',
+          subtitle: 'There was a problem creating a draft. Please go back and try again.',
         ),
       );
     }
@@ -168,7 +167,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
       title: widget.quoteId == null ? 'New quote' : 'Edit quote',
       actions: [
         IconButton(
-          icon: const Icon(Icons.save_outlined),
+          icon: const Icon(HugeIconsStroke.folder01, size: 18),
           tooltip: 'Save',
           onPressed: _saving ? null : _save,
         ),
@@ -179,16 +178,12 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             return EmptyState(
               icon: Icons.people_outline,
               title: 'Add a client first',
-              subtitle:
-                  'Quotes need a client. Add one and you can come back here.',
+              subtitle: 'Quotes need a client. Add one and you can come back here.',
               actionLabel: 'Add client',
               onAction: () => GoRouter.of(context).push(RoutePaths.clientNew),
             );
           }
-          final selectedName = cstate.clients
-              .where((c) => c.id == q.clientId)
-              .map((c) => c.name)
-              .firstOrNull;
+          final selectedName = cstate.clients.where((c) => c.id == q.clientId).map((c) => c.name).firstOrNull;
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -238,9 +233,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 DateRow(
                   label: 'Valid until',
-                  value:
-                      q.validUntil ??
-                      DateTime.now().add(const Duration(days: 30)),
+                  value: q.validUntil ?? DateTime.now().add(const Duration(days: 30)),
                   onPicked: (d) => setState(
                     () => _quote = _quote!.copyWith(validUntil: d),
                   ),
@@ -257,10 +250,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                   return LineItemEditor(
                     key: ValueKey(item.id),
                     item: item,
-                    validatorDescription: (v) =>
-                        Validators.required(v, fieldName: 'Description'),
-                    validatorQuantity: (v) =>
-                        Validators.positiveNumber(v, fieldName: 'Quantity'),
+                    validatorDescription: (v) => Validators.required(v, fieldName: 'Description'),
+                    validatorQuantity: (v) => Validators.positiveNumber(v, fieldName: 'Quantity'),
                     validatorUnitPrice: (v) => Validators.nonNegativeNumber(
                       v,
                       fieldName: 'Unit price',
@@ -291,7 +282,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                         DocumentItem.empty(IdGenerator.create('item')),
                       ]);
                     },
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(HugeIconsStroke.plusSign, size: 18),
                     label: const Text('Add line item'),
                   ),
                 ),
@@ -346,7 +337,7 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 const SizedBox(height: AppSpacing.xl),
                 PrimaryButton(
                   label: 'Save quote',
-                  icon: Icons.check,
+                  icon: HugeIconsStroke.tick01,
                   loading: _saving,
                   onPressed: _saving ? null : _save,
                 ),

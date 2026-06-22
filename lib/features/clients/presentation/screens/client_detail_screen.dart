@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
@@ -36,14 +37,14 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
       title: 'Client',
       actions: [
         IconButton(
-          icon: const Icon(Icons.edit_outlined),
+          icon: const Icon(HugeIconsStroke.edit02, size: 18),
           tooltip: 'Edit',
           onPressed: () => GoRouter.of(context).push(
             RoutePaths.clientEditPath(widget.clientId),
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.delete_outline),
+          icon: const Icon(HugeIconsStroke.delete01, size: 18),
           tooltip: 'Delete',
           onPressed: _confirmDelete,
         ),
@@ -171,7 +172,7 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
       if (!mounted) return;
       messenger.showSnackBar(const SnackBar(content: Text('Client deleted')));
       router.pop();
-    } catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
       messenger.showSnackBar(
         SnackBar(content: Text('Could not delete client: $e')),

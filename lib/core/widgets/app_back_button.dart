@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 
 /// A safe, reusable back button for non-root screens.
 ///
@@ -31,7 +32,7 @@ class AppBackButton extends StatelessWidget {
     if (!router.canPop()) return const SizedBox.shrink();
 
     return IconButton(
-      icon: const Icon(Icons.arrow_back),
+      icon: const Icon(HugeIconsStroke.arrowLeft01, size: 24),
       tooltip: MaterialLocalizations.of(context).backButtonTooltip,
       color: color,
       onPressed: onPressed ?? router.pop,

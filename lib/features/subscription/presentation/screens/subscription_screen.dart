@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/app_routes.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
@@ -139,7 +140,7 @@ class _Header extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(Icons.close_rounded, color: Colors.white),
+                icon: const Icon(Icons.workspace_premium_rounded, size: 24),
                 tooltip: 'Close',
               ),
             ],
@@ -367,7 +368,7 @@ class _ToggleOption extends StatelessWidget {
                       width: 2,
                     ),
                   ),
-                  child: selected ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                  child: selected ? const Icon(HugeIconsStroke.tick02, size: 12, color: Colors.white) : null,
                 ),
               ],
             ),

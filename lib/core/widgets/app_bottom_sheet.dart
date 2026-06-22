@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 
@@ -80,9 +81,9 @@ class AppBottomSheet extends StatelessWidget {
               ),
               if (onClose != null)
                 IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    Navigator.of(context).maybePop();
+                  icon: Icon(HugeIconsStroke.cancel01, size: 18),
+                  onPressed: () async {
+                    await Navigator.of(context).maybePop();
                     onClose!();
                   },
                 ),

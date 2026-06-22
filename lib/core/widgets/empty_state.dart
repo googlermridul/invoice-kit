@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
@@ -58,7 +59,7 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: AppSpacing.xl),
               ElevatedButton.icon(
                 onPressed: onAction,
-                icon: const Icon(Icons.add, size: 18),
+                icon: const Icon(HugeIconsStroke.plusSign, size: 18),
                 label: Text(actionLabel!),
               ),
             ],

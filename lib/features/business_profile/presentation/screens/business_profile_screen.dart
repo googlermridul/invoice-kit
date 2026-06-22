@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/constants/invoice_constants.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
@@ -130,7 +131,7 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
       onRefresh: () => context.read<BusinessProfileCubit>().load(),
       actions: [
         IconButton(
-          icon: const Icon(Icons.save_outlined),
+          icon: const Icon(HugeIconsStroke.folder01, size: 18),
           tooltip: 'Save',
           onPressed: _save,
         ),

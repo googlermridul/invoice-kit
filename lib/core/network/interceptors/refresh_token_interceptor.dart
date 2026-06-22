@@ -36,9 +36,7 @@ class RefreshTokenInterceptor extends Interceptor {
         data: {'refreshToken': refreshToken},
         options: Options(headers: {'_skipRefresh': 'true'}),
       );
-      final data = response.data is Map
-          ? Map<String, dynamic>.from(response.data as Map)
-          : <String, dynamic>{};
+      final data = response.data is Map ? Map<String, dynamic>.from(response.data as Map) : <String, dynamic>{};
       final api = ApiResponse<Map<String, dynamic>>.fromJson(
         data,
         (raw) => Map<String, dynamic>.from(raw as Map),
@@ -55,7 +53,7 @@ class RefreshTokenInterceptor extends Interceptor {
       // Retry the original request.
       final retryResponse = await dio.fetch<dynamic>(err.requestOptions);
       return handler.resolve(retryResponse);
-    } catch (_) {
+    } on Exception catch (_) {
       await secureStorage.deleteAll();
       return handler.next(err);
     } finally {

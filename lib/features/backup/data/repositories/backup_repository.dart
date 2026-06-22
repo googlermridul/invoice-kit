@@ -189,7 +189,7 @@ class BackupRepositoryImpl implements BackupRepository {
         );
       }
       return BackupValidator.validate(raw);
-    } catch (e) {
+    } on Exception catch (e) {
       return BackupValidationResult(valid: false, errors: ['Invalid JSON: $e']);
     }
   }
@@ -262,7 +262,7 @@ class BackupRepositoryImpl implements BackupRepository {
             (e) => ExportRecord.fromJson(Map<String, dynamic>.from(e as Map)),
           )
           .toList();
-    } catch (_) {
+    } on Exception catch (_) {
       return const [];
     }
   }

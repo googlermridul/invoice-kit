@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/theme/app_tokens.dart';
@@ -288,7 +289,7 @@ class _BackupScreenState extends State<BackupScreen> {
                         side: BorderSide(color: context.colors.error),
                       ),
                       onPressed: _confirmWipe,
-                      icon: const Icon(Icons.delete_forever_outlined),
+                      icon: const Icon(HugeIconsStroke.delete01, size: 18),
                       label: const Text('Wipe all local data'),
                     ),
                   ],

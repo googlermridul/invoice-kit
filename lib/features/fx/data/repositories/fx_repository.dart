@@ -43,11 +43,9 @@ class FxRepositoryImpl implements FxRepository {
     final all = await this.all();
     try {
       return all.firstWhere(
-        (r) =>
-            (r.base == base && r.quote == quote) ||
-            (r.base == quote && r.quote == base),
+        (r) => (r.base == base && r.quote == quote) || (r.base == quote && r.quote == base),
       );
-    } catch (_) {
+    } on Exception catch (_) {
       return null;
     }
   }

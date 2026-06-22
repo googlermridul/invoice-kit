@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
@@ -32,7 +33,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
       leading: const SizedBox.shrink(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => GoRouter.of(context).push(RoutePaths.quoteNew),
-        icon: const Icon(Icons.add),
+        icon: const Icon(HugeIconsStroke.plusSign, size: 18),
         label: const Text('New quote'),
       ),
       padding: EdgeInsets.zero,

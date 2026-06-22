@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/filters/document_filter.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
@@ -113,7 +114,7 @@ class DocumentFilterChips extends StatelessWidget {
           ...chips,
           TextButton.icon(
             onPressed: onClear,
-            icon: const Icon(Icons.clear_all, size: 18),
+            icon: const Icon(HugeIconsStroke.cancel01, size: 18),
             label: const Text('Clear all'),
           ),
         ],
@@ -337,7 +338,7 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.calendar_today_outlined),
+                      icon: const Icon(HugeIconsStroke.calendar01, size: 18),
                       label: Text(
                         _filter.issueAfter == null ? 'From' : _short(_filter.issueAfter!),
                       ),
@@ -359,7 +360,7 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.calendar_today_outlined),
+                      icon: const Icon(HugeIconsStroke.calendar01, size: 18),
                       label: Text(
                         _filter.issueBefore == null ? 'To' : _short(_filter.issueBefore!),
                       ),
@@ -417,7 +418,7 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
                   Expanded(
                     child: PrimaryButton(
                       label: 'Apply',
-                      icon: Icons.check,
+                      icon: HugeIconsStroke.tick01,
                       onPressed: () {
                         widget.onApply(_filter);
                         Navigator.pop(ctx);

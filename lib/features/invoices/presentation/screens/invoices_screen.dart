@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/filters/document_filter.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
@@ -49,7 +50,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
       leading: const SizedBox.shrink(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => GoRouter.of(context).push(RoutePaths.invoiceNew),
-        icon: const Icon(Icons.add),
+        icon: const Icon(HugeIconsStroke.plusSign, size: 18),
         label: const Text('New invoice'),
       ),
       padding: EdgeInsets.zero,

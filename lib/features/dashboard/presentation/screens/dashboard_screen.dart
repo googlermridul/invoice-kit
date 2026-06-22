@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/app_routes.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
@@ -9,8 +10,7 @@ import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/dashboard/presentation/bloc/dashboard_cubit.dart';
-import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart'
-    as sub_domain;
+import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart' as sub_domain;
 import 'package:invoice_kit/features/subscription/domain/services/entitlement_service.dart';
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
@@ -53,16 +53,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       title: const Text('InvoiceKit'),
                       actions: [
                         IconButton(
-                          icon: const Icon(Icons.bar_chart_rounded),
+                          icon: const Icon(HugeIconsStroke.barChart, size: 18),
                           tooltip: 'Reports',
-                          onPressed: () =>
-                              GoRouter.of(context).go(AppRoutes.reports),
+                          onPressed: () => GoRouter.of(context).go(AppRoutes.reports),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.settings_outlined),
+                          icon: const Icon(HugeIconsStroke.settings01, size: 18),
                           tooltip: 'Settings',
-                          onPressed: () =>
-                              GoRouter.of(context).go(AppRoutes.settings),
+                          onPressed: () => GoRouter.of(context).go(AppRoutes.settings),
                         ),
                       ],
                     ),
@@ -82,12 +80,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               children: [
                                 Text(
                                   'Total revenue',
-                                  style: context.textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: Colors.white70,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.6,
-                                      ),
+                                  style: context.textTheme.labelMedium?.copyWith(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.6,
+                                  ),
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
@@ -95,12 +92,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     s?.totalRevenue ?? 0,
                                     code: _currency(state),
                                   ),
-                                  style: context.textTheme.displaySmall
-                                      ?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: -0.6,
-                                      ),
+                                  style: context.textTheme.displaySmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.6,
+                                  ),
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
                                 Row(
@@ -115,12 +111,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     const SizedBox(width: 4),
                                     Text(
                                       '${s?.paidCount ?? 0} paid · ${s?.sentCount ?? 0} sent',
-                                      style: context.textTheme.bodySmall
-                                          ?.copyWith(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.85,
-                                            ),
-                                          ),
+                                      style: context.textTheme.bodySmall?.copyWith(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.85,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -145,13 +140,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 icon: Icons.hourglass_bottom_rounded,
                                 color: AppColors.warning,
-                                subtitle:
-                                    '${s?.sentCount ?? 0} sent · ${s?.overdueCount ?? 0} overdue',
+                                subtitle: '${s?.sentCount ?? 0} sent · ${s?.overdueCount ?? 0} overdue',
                               ),
                               MetricCard(
                                 label: 'Paid invoices',
                                 value: Formatters.number(s?.paidCount ?? 0),
-                                icon: Icons.check_circle_outline,
+                                icon: HugeIconsStroke.tickDouble01,
                                 color: AppColors.success,
                               ),
                               MetricCard(
@@ -213,18 +207,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: EmptyState(
                                 icon: Icons.people_outline,
                                 title: 'No clients yet',
-                                subtitle:
-                                    'Add your first client to start invoicing.',
+                                subtitle: 'Add your first client to start invoicing.',
                               ),
                             )
                           else
                             Column(
                               children: [
-                                for (
-                                  var i = 0;
-                                  i < state.recentClients.length;
-                                  i++
-                                ) ...[
+                                for (var i = 0; i < state.recentClients.length; i++) ...[
                                   // if (i > 0)
                                   //   const Divider(
                                   //     height: 1,
@@ -233,10 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   //   ),
                                   ClientRow(
                                     name: state.recentClients[i].name,
-                                    subtitle:
-                                        state.recentClients[i].email ??
-                                        state.recentClients[i].company ??
-                                        '',
+                                    subtitle: state.recentClients[i].email ?? state.recentClients[i].company ?? '',
                                     onTap: () => GoRouter.of(context).push(
                                       RoutePaths.clientDetailPath(
                                         state.recentClients[i].id,
@@ -374,8 +360,7 @@ class _PremiumBanner extends StatelessWidget {
       icon = Icons.workspace_premium_rounded;
       trialDays = subState.trialDaysRemaining;
       onTap = () => GoRouter.of(context).push(AppRoutes.subscription);
-    } else if (status.isExpired ||
-        status.state == sub_domain.SubscriptionState.none) {
+    } else if (status.isExpired || status.state == sub_domain.SubscriptionState.none) {
       if (_canStartTrial(status)) {
         title = 'Start your free trial';
         subtitle = 'Unlock every feature for 3 days, no credit card required';

@@ -31,7 +31,7 @@ class LogoStorage {
     if (!file.path.startsWith('${dir.path}${Platform.pathSeparator}')) return;
     try {
       await file.delete();
-    } catch (_) {
+    } on Exception catch (_) {
       // Best-effort cleanup; ignore.
     }
   }

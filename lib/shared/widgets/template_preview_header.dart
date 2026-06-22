@@ -26,63 +26,62 @@ class TemplateStyle {
   final bool serif;
   final String label;
 
-  static TemplateStyle forId(String? id) =>
-      switch (id ?? PdfTemplateIds.classic) {
-        PdfTemplateIds.minimal => const TemplateStyle(
-          id: PdfTemplateIds.minimal,
-          accent: Color(0xFF0F172A),
-          onAccent: Color(0xFFFFFFFF),
-          background: Color(0xFFFAFAF7),
-          elevated: Color(0xFFFFFFFF),
-          serif: false,
-          label: 'Minimal',
-        ),
-        PdfTemplateIds.modern => const TemplateStyle(
-          id: PdfTemplateIds.modern,
-          accent: Color(0xFF0EA5E9),
-          onAccent: Color(0xFFFFFFFF),
-          background: Color(0xFF0F172A),
-          elevated: Color(0xFF1E293B),
-          serif: false,
-          label: 'Modern',
-        ),
-        PdfTemplateIds.elegant => const TemplateStyle(
-          id: PdfTemplateIds.elegant,
-          accent: Color(0xFF8B5E34),
-          onAccent: Color(0xFFFFFFFF),
-          background: Color(0xFFFBF7F1),
-          elevated: Color(0xFFFFFFFF),
-          serif: true,
-          label: 'Elegant',
-        ),
-        PdfTemplateIds.bold => const TemplateStyle(
-          id: PdfTemplateIds.bold,
-          accent: Color(0xFFE11D48),
-          onAccent: Color(0xFFFFFFFF),
-          background: Color(0xFFFFFFFF),
-          elevated: Color(0xFFFFFFFF),
-          serif: false,
-          label: 'Bold Business',
-        ),
-        PdfTemplateIds.service => const TemplateStyle(
-          id: PdfTemplateIds.service,
-          accent: Color(0xFF15803D),
-          onAccent: Color(0xFFFFFFFF),
-          background: Color(0xFFF7FEE7),
-          elevated: Color(0xFFFFFFFF),
-          serif: false,
-          label: 'Service Freelancer',
-        ),
-        _ => const TemplateStyle(
-          id: PdfTemplateIds.classic,
-          accent: Color(0xFF4338CA),
-          onAccent: Color(0xFFFFFFFF),
-          background: Color(0xFFFFFFFF),
-          elevated: Color(0xFFFFFFFF),
-          serif: false,
-          label: 'Classic',
-        ),
-      };
+  static TemplateStyle forId(String? id) => switch (id ?? PdfTemplateIds.classic) {
+    PdfTemplateIds.minimal => const TemplateStyle(
+      id: PdfTemplateIds.minimal,
+      accent: Color(0xFF0F172A),
+      onAccent: Color(0xFFFFFFFF),
+      background: Color(0xFFFAFAF7),
+      elevated: Color(0xFFFFFFFF),
+      serif: false,
+      label: 'Minimal',
+    ),
+    PdfTemplateIds.modern => const TemplateStyle(
+      id: PdfTemplateIds.modern,
+      accent: Color(0xFF0EA5E9),
+      onAccent: Color(0xFFFFFFFF),
+      background: Color(0xFF0F172A),
+      elevated: Color(0xFF1E293B),
+      serif: false,
+      label: 'Modern',
+    ),
+    PdfTemplateIds.elegant => const TemplateStyle(
+      id: PdfTemplateIds.elegant,
+      accent: Color(0xFF8B5E34),
+      onAccent: Color(0xFFFFFFFF),
+      background: Color(0xFFFBF7F1),
+      elevated: Color(0xFFFFFFFF),
+      serif: true,
+      label: 'Elegant',
+    ),
+    PdfTemplateIds.bold => const TemplateStyle(
+      id: PdfTemplateIds.bold,
+      accent: Color(0xFFE11D48),
+      onAccent: Color(0xFFFFFFFF),
+      background: Color(0xFFFFFFFF),
+      elevated: Color(0xFFFFFFFF),
+      serif: false,
+      label: 'Bold Business',
+    ),
+    PdfTemplateIds.service => const TemplateStyle(
+      id: PdfTemplateIds.service,
+      accent: Color(0xFF15803D),
+      onAccent: Color(0xFFFFFFFF),
+      background: Color(0xFFF7FEE7),
+      elevated: Color(0xFFFFFFFF),
+      serif: false,
+      label: 'Service Freelancer',
+    ),
+    _ => const TemplateStyle(
+      id: PdfTemplateIds.classic,
+      accent: Color(0xFF4338CA),
+      onAccent: Color(0xFFFFFFFF),
+      background: Color(0xFFFFFFFF),
+      elevated: Color(0xFFFFFFFF),
+      serif: false,
+      label: 'Classic',
+    ),
+  };
 }
 
 /// Renders a header block at the top of the invoice detail screen that
@@ -105,9 +104,7 @@ class TemplatePreviewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentOnBg = style.background.computeLuminance() > 0.5
-        ? Colors.black87
-        : Colors.white;
+    final accentOnBg = style.background.computeLuminance() > 0.5 ? Colors.black87 : Colors.white;
     final subtitleColor = accentOnBg.withValues(alpha: 0.75);
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
