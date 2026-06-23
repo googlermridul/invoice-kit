@@ -109,8 +109,7 @@ class AppRouter {
 
         // ── Bottom-nav shell: Dashboard / Invoices / Clients / Reports / Settings ──
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) =>
-              AppShellScaffold(navigationShell: navigationShell),
+          builder: (context, state, navigationShell) => AppShellScaffold(navigationShell: navigationShell),
           branches: [
             // Branch 0 — Home / Dashboard
             StatefulShellBranch(
@@ -140,10 +139,6 @@ class AppRouter {
                 GoRoute(
                   path: RoutePaths.invoices,
                   name: RouteNames.invoices,
-                  // builder: (_, _) => BlocProvider(
-                  //   create: (_) => sl<InvoicesCubit>(),
-                  //   child: const InvoicesScreen(),
-                  // ),
                   builder: (_, _) => MultiBlocProvider(
                     providers: [
                       BlocProvider<InvoicesCubit>(

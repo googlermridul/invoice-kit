@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -23,11 +25,16 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    _subscriptionBloc = sl<SubscriptionBloc>()
-      ..add(const SubscriptionStarted());
+    _subscriptionBloc = sl<SubscriptionBloc>()..add(const SubscriptionStarted());
     _router = AppRouter(
       guard: AppRouterGuard(subscriptionBloc: _subscriptionBloc),
     );
+  }
+
+  @override
+  void dispose() {
+    unawaited(_subscriptionBloc.close());
+    super.dispose();
   }
 
   @override

@@ -34,17 +34,17 @@ class SettingsCubit extends Cubit<SettingsState> {
     await save(next);
   }
 
-  Future<void> setTaxInclusive(bool value) async {
+  Future<void> setTaxInclusive({required bool value}) async {
     final next = state.settings.copyWith(taxInclusive: value);
     await save(next);
   }
 
-  Future<void> setSendReminders(bool value) async {
+  Future<void> setSendReminders({required bool value}) async {
     final next = state.settings.copyWith(sendReminders: value);
     await save(next);
   }
 
-  Future<void> setMarkOverdueAuto(bool value) async {
+  Future<void> setMarkOverdueAuto({required bool value}) async {
     final next = state.settings.copyWith(markOverdueAuto: value);
     await save(next);
   }

@@ -26,7 +26,7 @@ class LogoStorage {
     if (path == null || path.isEmpty) return;
     final dir = await _logoDirectory();
     final file = File(path);
-    if (!await file.exists()) return;
+    if (!file.existsSync()) return;
     // Only allow removing files inside the managed logo directory.
     if (!file.path.startsWith('${dir.path}${Platform.pathSeparator}')) return;
     try {
@@ -39,7 +39,7 @@ class LogoStorage {
   Future<Directory> _logoDirectory() async {
     final base = await getApplicationDocumentsDirectory();
     final dir = Directory('${base.path}/$_logoDir');
-    if (!await dir.exists()) {
+    if (!dir.existsSync()) {
       await dir.create(recursive: true);
     }
     return dir;

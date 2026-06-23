@@ -207,7 +207,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         title: const Text('Send payment reminders'),
                         value: s.sendReminders,
-                        onChanged: (v) => context.read<SettingsCubit>().setSendReminders(v),
+                        onChanged: (v) => context.read<SettingsCubit>().setSendReminders(value: v),
                       ),
                       const Divider(
                         height: 1,
@@ -221,7 +221,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         title: const Text('Auto-mark overdue'),
                         value: s.markOverdueAuto,
-                        onChanged: (v) => context.read<SettingsCubit>().setMarkOverdueAuto(v),
+                        onChanged: (v) => context.read<SettingsCubit>().setMarkOverdueAuto(value: v),
                       ),
                     ],
                   ),
