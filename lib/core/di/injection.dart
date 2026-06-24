@@ -166,6 +166,7 @@ Future<void> configureDependencies({
       SubscriptionRepositoryImpl(
         remote: sl<SubscriptionRemoteDataSource>(),
         storage: sl<HiveStorageService>(),
+        localStorage: sl<LocalStorageService>(),
       ),
     )
     ..registerSingleton<FxRemoteDataSource>(FxRemoteDataSourceImpl(sl<Dio>()))
@@ -199,9 +200,10 @@ Future<void> configureDependencies({
         settingsRepo: sl<SettingsRepository>(),
         subscriptionRepo: sl<SubscriptionRepository>(),
         entitlements: sl<EntitlementService>(),
+        subscriptionBloc: sl<SubscriptionBloc>(),
       ),
     )
-    ..registerFactory<SubscriptionBloc>(
+    ..registerLazySingleton<SubscriptionBloc>(
       () => SubscriptionBloc(
         repository: sl<SubscriptionRepository>(),
         entitlements: sl<EntitlementService>(),

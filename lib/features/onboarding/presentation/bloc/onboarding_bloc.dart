@@ -8,6 +8,7 @@ import 'package:invoice_kit/features/settings/data/repositories/settings_reposit
 import 'package:invoice_kit/features/settings/domain/entities/app_settings.dart';
 import 'package:invoice_kit/features/subscription/data/repositories/subscription_repository.dart';
 import 'package:invoice_kit/features/subscription/domain/services/entitlement_service.dart';
+import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
 
 part 'onboarding_event.dart';
 part 'onboarding_state.dart';
@@ -19,6 +20,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     required this.settingsRepo,
     required this.subscriptionRepo,
     required this.entitlements,
+    required this.subscriptionBloc,
   }) : super(OnboardingState.initial()) {
     on<OnboardingStarted>(_onStarted);
     on<OnboardingStepChanged>(_onStepChanged);
@@ -36,6 +38,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   final SettingsRepository settingsRepo;
   final SubscriptionRepository subscriptionRepo;
   final EntitlementService entitlements;
+  final SubscriptionBloc subscriptionBloc;
 
   Future<void> _onStarted(
     OnboardingStarted event,
@@ -135,6 +138,13 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     }
 
     await localStorage.setBool(StorageKeys.onboardingCompleted, true);
+
+    // Push the freshly persisted trial into the live SubscriptionBloc so
+    // the router guard observes `hasAccess = true` on the very next
+    // navigation. Without this, the guard reads the bloc's stale
+    // initial state and redirects every premium route back to the
+    // dashboard while the trial is active.
+    subscriptionBloc.add(const SubscriptionStarted());
 
     emit(state.copyWith(status: OnboardingStatus.completed));
   }

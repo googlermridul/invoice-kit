@@ -6,6 +6,7 @@ import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/theme/app_tokens.dart';
+import 'package:invoice_kit/core/theme/theme_bloc/theme_bloc.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:invoice_kit/shared/widgets/app_text_field.dart';
@@ -459,32 +460,44 @@ class _ThemeStep extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           AppCard(
             padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                for (var i = 0; i < _themeOptions.length; i++) ...[
-                  if (i > 0)
-                    const Divider(
-                      height: 1,
-                      indent: AppSpacing.md,
-                      endIndent: AppSpacing.md,
-                    ),
-                  RadioListTile<String>(
-                    value: _themeOptions[i].value,
-                    // ignore: deprecated_member_use
-                    groupValue: value,
-                    onChanged: (v) {
-                      if (v != null) onChanged(v);
-                    },
-                    title: Text(_themeOptions[i].label),
-                    subtitle: Text(
-                      _themeOptions[i].subtitle,
-                      style: TextStyle(
-                        color: context.colors.onSurfaceVariant,
+            child: Material(
+              color: Colors.transparent,
+              child: BlocBuilder<ThemeBloc, ThemeState>(
+                builder: (context, state) {
+                  return Column(
+                    children: [
+                      _ThemeOption(
+                        label: 'Match system',
+                        subtitle: "Follow your system's theme setting",
+                        value: ThemeMode.system,
+                        groupValue: state.mode,
                       ),
-                    ),
-                  ),
-                ],
-              ],
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
+                      ),
+                      _ThemeOption(
+                        label: 'Light',
+                        subtitle: 'Always use light mode',
+                        value: ThemeMode.light,
+                        groupValue: state.mode,
+                      ),
+                      const Divider(
+                        height: 1,
+                        indent: AppSpacing.md,
+                        endIndent: AppSpacing.md,
+                      ),
+                      _ThemeOption(
+                        label: 'Dark',
+                        subtitle: 'Always use dark mode',
+                        value: ThemeMode.dark,
+                        groupValue: state.mode,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -493,18 +506,37 @@ class _ThemeStep extends StatelessWidget {
   }
 }
 
-class _ThemeOption {
-  const _ThemeOption(this.value, this.label, this.subtitle);
-  final String value;
-  final String label;
-  final String subtitle;
-}
+class _ThemeOption extends StatelessWidget {
+  const _ThemeOption({
+    required this.label,
+    required this.value,
+    required this.groupValue,
+    required this.subtitle,
+  });
 
-const _themeOptions = <_ThemeOption>[
-  _ThemeOption('light', 'Light', 'Always use light mode'),
-  _ThemeOption('dark', 'Dark', 'Always use dark mode'),
-  _ThemeOption('system', 'Match system', 'Follow the device setting'),
-];
+  final String label;
+  final ThemeMode value;
+  final ThemeMode groupValue;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return RadioListTile<ThemeMode>(
+      title: Text(label),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          color: context.colors.onSurfaceVariant,
+        ),
+      ),
+      value: value,
+      groupValue: groupValue,
+      onChanged: (m) {
+        if (m != null) context.read<ThemeBloc>().add(ThemeChanged(m));
+      },
+    );
+  }
+}
 
 class _ReviewStep extends StatelessWidget {
   const _ReviewStep({

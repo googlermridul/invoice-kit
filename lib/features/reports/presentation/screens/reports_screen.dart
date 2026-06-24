@@ -86,7 +86,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       actions: [
         IconButton(
           tooltip: 'Pick date range',
-          icon: const Icon(HugeIconsStroke.calendar01, size: 18),
+          icon: const Icon(HugeIconsStroke.calendar01),
           onPressed: _pickRange,
         ),
       ],
@@ -295,7 +295,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               const SizedBox(height: AppSpacing.xl),
               PrimaryButton(
                 label: 'Export & share PDF',
-                icon: Icons.ios_share_rounded,
+                icon: HugeIconsStroke.share03,
                 loading: _exporting,
                 onPressed: _exporting
                     ? null

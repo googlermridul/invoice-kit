@@ -11,6 +11,7 @@ import 'package:invoice_kit/core/services/app_info_service.dart';
 import 'package:invoice_kit/core/storage/local_storage_service.dart';
 import 'package:invoice_kit/core/theme/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Holds a singleton runtime config (set in `bootstrap`).
 final RuntimeConfigHolder runtimeConfig = RuntimeConfigHolder();
@@ -41,7 +42,13 @@ Future<void> bootstrap(Widget Function() builder) async {
       // 4. DI
       await configureDependencies(config: config, localStorage: localStorage);
 
-      // 5. System UI
+      // 5. Supabase
+      await Supabase.initialize(
+        url: config.supabaseUrl,
+        publishableKey: config.supabasePublishableKey,
+      );
+
+      // 6. System UI
       await SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,

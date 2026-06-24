@@ -84,7 +84,8 @@ class _BackupScreenState extends State<BackupScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               AppCard(
-                variant: AppCardVariant.tinted,
+                variant: AppCardVariant.elevated,
+                elevation: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -137,6 +138,8 @@ class _BackupScreenState extends State<BackupScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               AppCard(
+                variant: AppCardVariant.elevated,
+                elevation: true,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -221,6 +224,8 @@ class _BackupScreenState extends State<BackupScreen> {
               const SizedBox(height: AppSpacing.sm),
               if (state.history.isEmpty)
                 const AppCard(
+                  variant: AppCardVariant.elevated,
+                  elevation: true,
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
                     child: EmptyState(

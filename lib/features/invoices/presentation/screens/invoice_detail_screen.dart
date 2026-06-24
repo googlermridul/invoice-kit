@@ -184,9 +184,9 @@ class _InvoiceBody extends StatelessWidget {
     );
     return ListView(
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
         AppSpacing.sm,
-        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.sm,
         AppSpacing.xxxl,
       ),
       children: [

@@ -87,6 +87,7 @@ class _LineItemEditorState extends State<LineItemEditor> {
           ),
           const SizedBox(height: AppSpacing.md),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: AppTextField(

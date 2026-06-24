@@ -22,6 +22,12 @@ class EntitlementService {
   }
 
   /// Whether the user currently has access — trial OR paid.
+  ///
+  /// Single source of truth for the access decision. Implements:
+  ///
+  ///   hasPremiumAccess = subscriptionActive || freeTrialActive
+  ///
+  /// Used by feature gates, route guards, and the dashboard paywall card.
   bool hasAccess(SubscriptionStatus status, DateTime now) =>
       status.hasAccess(now);
 

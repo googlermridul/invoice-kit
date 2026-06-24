@@ -17,6 +17,7 @@ class StorageKeys {
   static const String businessProfile = 'business_profile_v1';
   static const String subscriptionStatus = 'subscription_status_v1';
   static const String trialStart = 'trial_start_v1';
+  static const String trialEnd = 'trial_end_v1';
   static const String clientNextNumber = 'client_next_number_v1';
   static const String invoiceNextNumber = 'invoice_next_number_v1';
   static const String quoteNextNumber = 'quote_next_number_v1';

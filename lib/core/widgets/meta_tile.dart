@@ -30,7 +30,7 @@ class MetaTile extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             value,
-            style: context.textTheme.titleMedium?.copyWith(
+            style: context.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),

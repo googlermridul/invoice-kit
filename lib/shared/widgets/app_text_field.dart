@@ -52,35 +52,65 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller =
-        this.controller ?? TextEditingController(text: initialValue);
     final tt = context.textTheme;
-    final field = TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      onChanged: onChanged,
-      onFieldSubmitted: onSubmitted,
-      maxLines: obscure ? 1 : maxLines,
-      inputFormatters: inputFormatters,
-      validator: validator,
-      autovalidateMode: autovalidateMode,
-      style: tt.bodyLarge,
-      decoration: InputDecoration(
-        hintText: hint,
-        errorText: error,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
-        suffixIcon: suffixIcon,
-        isDense: dense,
-        contentPadding: dense
-            ? const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm + 2,
-              )
-            : null,
-      ),
-    );
+    // Use a persistent controller only if one is supplied.
+    // When no controller is provided we rely on the built‑in `initialValue`
+    // of TextFormField to avoid recreating a controller on every rebuild,
+    // which can cause the cursor to reset to the start and make newly typed
+    // characters appear reversed.
+    final field = controller != null
+        ? TextFormField(
+            controller: controller,
+            obscureText: obscure,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            onChanged: onChanged,
+            onFieldSubmitted: onSubmitted,
+            maxLines: obscure ? 1 : maxLines,
+            inputFormatters: inputFormatters,
+            validator: validator,
+            autovalidateMode: autovalidateMode,
+            style: context.textTheme.bodyLarge,
+            decoration: InputDecoration(
+              hintText: hint,
+              errorText: error,
+              prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
+              suffixIcon: suffixIcon,
+              isDense: dense,
+              contentPadding: dense
+                  ? const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm + 2,
+                    )
+                  : null,
+            ),
+          )
+        : TextFormField(
+            initialValue: initialValue,
+            obscureText: obscure,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            onChanged: onChanged,
+            onFieldSubmitted: onSubmitted,
+            maxLines: obscure ? 1 : maxLines,
+            inputFormatters: inputFormatters,
+            validator: validator,
+            autovalidateMode: autovalidateMode,
+            style: context.textTheme.bodyLarge,
+            decoration: InputDecoration(
+              hintText: hint,
+              errorText: error,
+              prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
+              suffixIcon: suffixIcon,
+              isDense: dense,
+              contentPadding: dense
+                  ? const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm + 2,
+                    )
+                  : null,
+            ),
+          );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

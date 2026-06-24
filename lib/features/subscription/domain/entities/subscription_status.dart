@@ -90,6 +90,17 @@ class SubscriptionStatus extends Equatable {
       state == SubscriptionState.expired || state == SubscriptionState.none;
 
   /// Whether the user currently has access to premium features.
+  ///
+  /// Implements the contract:
+  ///
+  ///   hasPremiumAccess = subscriptionActive || freeTrialActive
+  ///
+  /// `subscriptionActive` covers both paid (`active`) and grace-period
+  /// (`cancelled` while still inside the paid window). `freeTrialActive`
+  /// covers the `trialing` state while the trial window is still open.
+  /// Evaluated against [now] on every call so an expired trial takes
+  /// effect on the very next read — the router guard relies on this
+  /// rather than on any cached bloc state.
   bool hasAccess(DateTime now) {
     switch (state) {
       case SubscriptionState.trialing:

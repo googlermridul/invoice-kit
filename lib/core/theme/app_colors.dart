@@ -10,9 +10,7 @@ class AppColors {
 
   // Brand — navy primary with cyan accent
   static const Color primary = Color(0xFF1E3A8A); // navy
-  static const Color primaryDark = Color(
-    0xFF172554,
-  ); // darker navy for dark theme
+  static const Color primaryDark = Color(0xFF172554); // darker navy for dark theme
   static const Color primaryAccent = Color(0xFF60A5FA); // sky
   static const Color tertiary = Color(0xFF0EA5B7); // cyan accent
   static const Color tertiaryDark = Color(0xFF22D3EE);
@@ -38,23 +36,23 @@ class AppColors {
   static const Color darkTextMuted = Color(0xFF9AA4B2);
 
   // Semantic
-  static const Color success = Color(0xFF15803D);
-  static const Color successLight = Color(0xFF22C55E);
-  static const Color warning = Color(0xFFD97706);
-  static const Color warningLight = Color(0xFFF59E0B);
-  static const Color error = Color(0xFFE04A4A); // coral
+  static const Color success = Color(0xFF22C55E);
+  static const Color successLight = Color(0xFF4ADE80);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color warningLight = Color(0xFFFBBF24);
+  static const Color error = Color(0xFFEF4444);
   static const Color errorLight = Color(0xFFF87171);
-  static const Color info = Color(0xFF0284C7);
+  static const Color info = Color(0xFF3B82F6);
 
-  // Document statuses
-  static const Color statusDraft = Color(0xFF64748B);
-  static const Color statusSent = Color(0xFF0284C7);
-  static const Color statusPaid = Color(0xFF15803D);
-  static const Color statusOverdue = Color(0xFFE04A4A);
-  static const Color statusCancelled = Color(0xFF6B7280);
-  static const Color statusAccepted = Color(0xFF15803D);
-  static const Color statusDeclined = Color(0xFFE04A4A);
-  static const Color statusExpired = Color(0xFFB45309);
+  // Status
+  static const Color statusDraft = Color(0xFF71717A);
+  static const Color statusSent = Color(0xFF3B82F6);
+  static const Color statusPaid = Color(0xFF22C55E);
+  static const Color statusOverdue = Color(0xFFEF4444);
+  static const Color statusCancelled = Color(0xFFF59E0B);
+  static const Color statusAccepted = Color(0xFF22C55E);
+  static const Color statusDeclined = Color(0xFFEF4444);
+  static const Color statusExpired = Color(0xFFD97706);
 
   // Premium gradient — navy → violet
   static const LinearGradient premiumGradient = LinearGradient(

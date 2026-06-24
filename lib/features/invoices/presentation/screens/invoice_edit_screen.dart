@@ -325,19 +325,10 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                     key: ValueKey(item.id),
                     item: item,
                     showTax: true,
-                    validatorDescription: (v) => Validators.required(
-                      v,
-                      fieldName: 'Description',
-                    ),
+                    validatorDescription: (v) => Validators.required(v, fieldName: 'Description'),
                     validatorQuantity: (v) => Validators.positiveNumber(v, fieldName: 'Quantity'),
-                    validatorUnitPrice: (v) => Validators.nonNegativeNumber(
-                      v,
-                      fieldName: 'Unit price',
-                    ),
-                    validatorTaxRate: (v) => Validators.nonNegativeNumber(
-                      v,
-                      fieldName: 'Tax',
-                    ),
+                    validatorUnitPrice: (v) => Validators.nonNegativeNumber(v, fieldName: 'Unit price'),
+                    validatorTaxRate: (v) => Validators.nonNegativeNumber(v, fieldName: 'Tax'),
                     onChanged: (updated) {
                       final list = [..._invoice!.items];
                       list[index] = updated;
