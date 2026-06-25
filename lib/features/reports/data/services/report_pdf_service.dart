@@ -2,16 +2,14 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:invoice_kit/core/di/injection.dart';
+import 'package:invoice_kit/core/services/document_share_service.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
-    show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
 import 'package:invoice_kit/features/reports/domain/usecases/reports_calculator.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:share_plus/share_plus.dart';
 
 /// Generates a PDF report for a date range and offers share/save.
 class ReportPdfService {
@@ -30,8 +28,7 @@ class ReportPdfService {
     required List<({InvoiceStatus status, int count})> breakdown,
   }) async {
     final doc = pw.Document();
-    final profile =
-        await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
+    final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
     final logoBytes = await _loadLogoBytes(profile);
     final currency = 'USD';
     final generatedAt = DateTime.now();
@@ -61,18 +58,9 @@ class ReportPdfService {
 
   /// Writes the PDF to a temp file and invokes the system share sheet.
   Future<void> share(Uint8List bytes, {String? subject}) async {
-    final dir = await getTemporaryDirectory();
-    final stamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-    final file = File('${dir.path}/invoicekit_report_$stamp.pdf');
-    await file.writeAsBytes(bytes, flush: true);
-    await Share.shareXFiles(
-      [
-        XFile(
-          file.path,
-          mimeType: 'application/pdf',
-          name: file.uri.pathSegments.last,
-        ),
-      ],
+    await sl<DocumentShareService>().share(
+      bytes,
+      filename: DocumentShareService.reportFilename(),
       subject: subject ?? 'InvoiceKit Report',
     );
   }
@@ -112,9 +100,7 @@ class ReportPdfService {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
-                  profile.businessName.isEmpty
-                      ? 'InvoiceKit Report'
-                      : profile.businessName,
+                  profile.businessName.isEmpty ? 'InvoiceKit Report' : profile.businessName,
                   style: pw.TextStyle(
                     fontSize: 22,
                     fontWeight: pw.FontWeight.bold,

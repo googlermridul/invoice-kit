@@ -18,7 +18,6 @@ class DocumentFilterChips extends StatelessWidget {
     required this.onChanged,
     required this.onClear,
     required this.isInvoice,
-    this.clientName,
     super.key,
   });
 
@@ -26,35 +25,24 @@ class DocumentFilterChips extends StatelessWidget {
   final ValueChanged<DocumentFilter> onChanged;
   final VoidCallback onClear;
   final bool isInvoice;
-  final String? clientName;
 
   @override
   Widget build(BuildContext context) {
     if (filter.isEmpty) return const SizedBox.shrink();
     final chips = <Widget>[];
 
-    final status = isInvoice ? filter.invoiceStatus : filter.quoteStatus;
-    if (status != null) {
+    final statuses = isInvoice ? filter.invoiceStatuses : filter.quoteStatuses;
+    if (statuses.isNotEmpty) {
       chips.add(
         _chip(
           context,
-          // label: 'Status · ${status.label}',
-          label: 'Status · ${filter.invoiceStatus}',
+          label: 'Status · ${statuses.length}',
           onDelete: () => onChanged(
             filter.copyWith(
-              clearInvoiceStatus: isInvoice,
-              clearQuoteStatus: !isInvoice,
+              invoiceStatuses: isInvoice ? <InvoiceStatus>{} : null,
+              quoteStatuses: isInvoice ? null : <QuoteStatus>{},
             ),
           ),
-        ),
-      );
-    }
-    if (filter.clientId != null) {
-      chips.add(
-        _chip(
-          context,
-          label: 'Client · ${clientName ?? "Selected"}',
-          onDelete: () => onChanged(filter.copyWith(clearClient: true)),
         ),
       );
     }
@@ -148,37 +136,36 @@ class DocumentFilterSheet extends StatefulWidget {
     required this.initial,
     required this.onApply,
     required this.isInvoice,
-    required this.clients,
     super.key,
   });
 
   /// Show the document filter bottom sheet and return the selected filter.
+  ///
+  /// Returns `null` if the sheet is dismissed without Apply/Reset (e.g. the
+  /// user taps outside the sheet or the back button). The Apply button
+  /// pops with the current filter; the Reset button pops with an empty
+  /// filter.
   static Future<DocumentFilter?> show({
     required BuildContext context,
     required DocumentFilter initial,
     required bool isInvoice,
-    required List<({String id, String name})> clients,
-  }) async {
-    DocumentFilter? result;
-    await AppBottomSheet.show<DocumentFilter>(
+  }) {
+    return AppBottomSheet.show<DocumentFilter>(
       context: context,
       title: 'Filters',
       children: [
         DocumentFilterSheet(
           initial: initial,
-          onApply: (f) => result = f,
+          onApply: (_) {},
           isInvoice: isInvoice,
-          clients: clients,
         ),
       ],
-    ).then((value) => result = value);
-    return result;
+    );
   }
 
   final DocumentFilter initial;
   final ValueChanged<DocumentFilter> onApply;
   final bool isInvoice;
-  final List<({String id, String name})> clients;
 
   @override
   State<DocumentFilterSheet> createState() => _DocumentFilterSheetState();
@@ -221,6 +208,26 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
     });
   }
 
+  void _toggleInvoiceStatus(InvoiceStatus s, {required bool selected}) {
+    final next = Set<InvoiceStatus>.of(_filter.invoiceStatuses);
+    if (selected) {
+      next.add(s);
+    } else {
+      next.remove(s);
+    }
+    setState(() => _filter = _filter.copyWith(invoiceStatuses: next));
+  }
+
+  void _toggleQuoteStatus(QuoteStatus s, {required bool selected}) {
+    final next = Set<QuoteStatus>.of(_filter.quoteStatuses);
+    if (selected) {
+      next.add(s);
+    } else {
+      next.remove(s);
+    }
+    setState(() => _filter = _filter.copyWith(quoteStatuses: next));
+  }
+
   @override
   Widget build(BuildContext context) {
     // Build the content of the bottom sheet; the static `show` method
@@ -234,75 +241,42 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
       ),
       child: StatefulBuilder(
         builder: (ctx, setLocal) {
+          final selected = widget.isInvoice
+              ? _filter.invoiceStatuses.length
+              : _filter.quoteStatuses.length;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _SectionTitle('Status'),
-              // Separate loops so the type of `s` is known (InvoiceStatus or QuoteStatus).
-              if (widget.isInvoice) ...[
-                Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
-                  children: InvoiceStatus.values
-                      .map(
-                        (s) => ChoiceChip(
-                          label: Text(s.label),
-                          selected: _filter.invoiceStatus == s,
-                          onSelected: (sel) {
-                            setLocal(() {
-                              _filter = _filter.copyWith(
-                                invoiceStatus: sel ? s : null,
-                                clearInvoiceStatus: !sel,
-                              );
-                            });
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-              ] else ...[
-                Wrap(
-                  spacing: AppSpacing.xs,
-                  runSpacing: AppSpacing.xs,
-                  children: QuoteStatus.values
-                      .map(
-                        (s) => ChoiceChip(
-                          label: Text(s.label),
-                          selected: _filter.quoteStatus == s,
-                          onSelected: (sel) {
-                            setLocal(() {
-                              _filter = _filter.copyWith(
-                                quoteStatus: sel ? s : null,
-                                clearQuoteStatus: !sel,
-                              );
-                            });
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-              const SizedBox(height: AppSpacing.md),
-              _SectionTitle('Client'),
-              Wrap(
-                spacing: AppSpacing.xs,
-                runSpacing: AppSpacing.xs,
+              Row(
                 children: [
-                  for (final c in widget.clients)
-                    ChoiceChip(
-                      label: Text(c.name),
-                      selected: _filter.clientId == c.id,
-                      onSelected: (sel) {
-                        setLocal(() {
-                          _filter = _filter.copyWith(
-                            clientId: sel ? c.id : null,
-                            clearClient: !sel,
-                          );
-                        });
-                      },
+                  const _SectionTitle('Status'),
+                  const Spacer(),
+                  if (selected > 0)
+                    Text(
+                      '$selected selected',
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: context.colors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                 ],
               ),
+              // Multi-select: tap to toggle each status independently.
+              // Separate loops so the type of `s` is known (InvoiceStatus or QuoteStatus).
+              if (widget.isInvoice)
+                _StatusWrap<InvoiceStatus>(
+                  statuses: InvoiceStatus.values,
+                  selected: _filter.invoiceStatuses,
+                  labelOf: (s) => s.label,
+                  onToggle: _toggleInvoiceStatus,
+                )
+              else
+                _StatusWrap<QuoteStatus>(
+                  statuses: QuoteStatus.values,
+                  selected: _filter.quoteStatuses,
+                  labelOf: (s) => s.label,
+                  onToggle: _toggleQuoteStatus,
+                ),
               const SizedBox(height: AppSpacing.md),
               _SectionTitle('Amount range'),
               Row(
@@ -409,7 +383,7 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
                     child: OutlinedButton(
                       onPressed: () {
                         widget.onApply(DocumentFilter.empty);
-                        Navigator.pop(ctx);
+                        Navigator.pop(ctx, DocumentFilter.empty);
                       },
                       child: const Text('Reset'),
                     ),
@@ -421,7 +395,7 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
                       icon: HugeIconsStroke.tick01,
                       onPressed: () {
                         widget.onApply(_filter);
-                        Navigator.pop(ctx);
+                        Navigator.pop(ctx, _filter);
                       },
                     ),
                   ),
@@ -436,6 +410,39 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
 
   static String _short(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+}
+
+/// Multi-select status row. Each chip toggles its own state independently
+/// so users can pick e.g. Paid + Overdue + Sent.
+class _StatusWrap<T> extends StatelessWidget {
+  const _StatusWrap({
+    required this.statuses,
+    required this.selected,
+    required this.labelOf,
+    required this.onToggle,
+  });
+
+  final List<T> statuses;
+  final Set<T> selected;
+  final String Function(T) labelOf;
+  final void Function(T status, {required bool selected}) onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: AppSpacing.xs,
+      runSpacing: AppSpacing.xs,
+      children: [
+        for (final s in statuses)
+          FilterChip(
+            label: Text(labelOf(s)),
+            selected: selected.contains(s),
+            showCheckmark: true,
+            onSelected: (sel) => onToggle(s, selected: sel),
+          ),
+      ],
+    );
+  }
 }
 
 class _SectionTitle extends StatelessWidget {

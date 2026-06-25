@@ -8,9 +8,8 @@ import 'package:invoice_kit/features/quotes/domain/entities/quote.dart';
 /// trivially when persisting between launches.
 class DocumentFilter {
   const DocumentFilter({
-    this.invoiceStatus,
-    this.quoteStatus,
-    this.clientId,
+    this.invoiceStatuses = const <InvoiceStatus>{},
+    this.quoteStatuses = const <QuoteStatus>{},
     this.minAmount,
     this.maxAmount,
     this.issueAfter,
@@ -18,9 +17,12 @@ class DocumentFilter {
     this.sort = DocumentSort.newest,
   });
 
-  final InvoiceStatus? invoiceStatus;
-  final QuoteStatus? quoteStatus;
-  final String? clientId;
+  /// Set of selected invoice statuses. Empty means "all statuses".
+  final Set<InvoiceStatus> invoiceStatuses;
+
+  /// Set of selected quote statuses. Empty means "all statuses".
+  final Set<QuoteStatus> quoteStatuses;
+
   final double? minAmount;
   final double? maxAmount;
   final DateTime? issueAfter;
@@ -30,9 +32,8 @@ class DocumentFilter {
   static const empty = DocumentFilter();
 
   bool get isEmpty =>
-      invoiceStatus == null &&
-      quoteStatus == null &&
-      clientId == null &&
+      invoiceStatuses.isEmpty &&
+      quoteStatuses.isEmpty &&
       minAmount == null &&
       maxAmount == null &&
       issueAfter == null &&
@@ -41,8 +42,7 @@ class DocumentFilter {
 
   int get activeCount {
     var n = 0;
-    if (invoiceStatus != null || quoteStatus != null) n++;
-    if (clientId != null) n++;
+    if (invoiceStatuses.isNotEmpty || quoteStatuses.isNotEmpty) n++;
     if (minAmount != null) n++;
     if (maxAmount != null) n++;
     if (issueAfter != null) n++;
@@ -52,28 +52,21 @@ class DocumentFilter {
   }
 
   DocumentFilter copyWith({
-    InvoiceStatus? invoiceStatus,
-    QuoteStatus? quoteStatus,
-    String? clientId,
+    Set<InvoiceStatus>? invoiceStatuses,
+    Set<QuoteStatus>? quoteStatuses,
     double? minAmount,
     double? maxAmount,
     DateTime? issueAfter,
     DateTime? issueBefore,
     DocumentSort? sort,
-    bool clearInvoiceStatus = false,
-    bool clearQuoteStatus = false,
-    bool clearClient = false,
     bool clearMin = false,
     bool clearMax = false,
     bool clearAfter = false,
     bool clearBefore = false,
   }) {
     return DocumentFilter(
-      invoiceStatus: clearInvoiceStatus
-          ? null
-          : (invoiceStatus ?? this.invoiceStatus),
-      quoteStatus: clearQuoteStatus ? null : (quoteStatus ?? this.quoteStatus),
-      clientId: clearClient ? null : (clientId ?? this.clientId),
+      invoiceStatuses: invoiceStatuses ?? this.invoiceStatuses,
+      quoteStatuses: quoteStatuses ?? this.quoteStatuses,
       minAmount: clearMin ? null : (minAmount ?? this.minAmount),
       maxAmount: clearMax ? null : (maxAmount ?? this.maxAmount),
       issueAfter: clearAfter ? null : (issueAfter ?? this.issueAfter),
@@ -95,10 +88,18 @@ extension DocumentSortX on DocumentSort {
   };
 }
 
+/// Whether [clientName] contains [q] (case-insensitive). Returns false
+/// when [clientName] is null.
+bool _matchesClientName(String? clientName, String q) {
+  if (clientName == null) return false;
+  return clientName.toLowerCase().contains(q);
+}
+
 List<Invoice> filterInvoices({
   required List<Invoice> invoices,
   required DocumentFilter filter,
   required String query,
+  String? Function(Invoice)? resolveClientName,
 }) {
   Iterable<Invoice> result = invoices;
   if (query.trim().isNotEmpty) {
@@ -106,14 +107,13 @@ List<Invoice> filterInvoices({
     result = result.where(
       (i) =>
           i.number.toLowerCase().contains(q) ||
-          (i.notes ?? '').toLowerCase().contains(q),
+          (i.notes ?? '').toLowerCase().contains(q) ||
+          _matchesClientName(resolveClientName?.call(i), q),
     );
   }
-  if (filter.invoiceStatus != null) {
-    result = result.where((i) => i.status == filter.invoiceStatus);
-  }
-  if (filter.clientId != null) {
-    result = result.where((i) => i.clientId == filter.clientId);
+  // Multi-select status: empty set => no constraint, otherwise OR-match.
+  if (filter.invoiceStatuses.isNotEmpty) {
+    result = result.where((i) => filter.invoiceStatuses.contains(i.status));
   }
   if (filter.minAmount != null) {
     result = result.where((i) => i.total >= filter.minAmount!);
@@ -149,10 +149,12 @@ List<Invoice> filterInvoices({
   return list;
 }
 
+
 List<Quote> filterQuotes({
   required List<Quote> quotes,
   required DocumentFilter filter,
   required String query,
+  String? Function(Quote)? resolveClientName,
 }) {
   Iterable<Quote> result = quotes;
   if (query.trim().isNotEmpty) {
@@ -160,14 +162,13 @@ List<Quote> filterQuotes({
     result = result.where(
       (q0) =>
           q0.number.toLowerCase().contains(q) ||
-          (q0.notes ?? '').toLowerCase().contains(q),
+          (q0.notes ?? '').toLowerCase().contains(q) ||
+          _matchesClientName(resolveClientName?.call(q0), q),
     );
   }
-  if (filter.quoteStatus != null) {
-    result = result.where((q0) => q0.status == filter.quoteStatus);
-  }
-  if (filter.clientId != null) {
-    result = result.where((q0) => q0.clientId == filter.clientId);
+  // Multi-select status: empty set => no constraint, otherwise OR-match.
+  if (filter.quoteStatuses.isNotEmpty) {
+    result = result.where((q0) => filter.quoteStatuses.contains(q0.status));
   }
   if (filter.minAmount != null) {
     result = result.where((q0) => q0.total >= filter.minAmount!);

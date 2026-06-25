@@ -67,7 +67,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
             ),
             child: SearchField(
               controller: _searchCtrl,
-              hint: 'Search by number, notes…',
+              hint: 'Search by number, client, notes…',
               onChanged: (v) => setState(() => _query = v),
               onClear: () {
                 _searchCtrl.clear();
@@ -88,15 +88,18 @@ class _QuotesScreenState extends State<QuotesScreen> {
                 }
                 return BlocBuilder<ClientsCubit, ClientsState>(
                   builder: (context, cstate) {
+                    // Lookup table for resolving client name per quote so
+                    // search-by-client-name and display both work.
+                    final clientsById = {
+                      for (final c in cstate.clients) c.id.trim(): c,
+                    };
                     final filtered = filterQuotes(
                       quotes: state.quotes,
                       filter: _filter,
                       query: _query,
+                      resolveClientName: (q) =>
+                          clientsById[q.clientId.trim()]?.name,
                     );
-                    final clientName = cstate.clients
-                        .where((c) => c.id == _filter.clientId)
-                        .map((c) => c.name)
-                        .firstOrNull;
                     return ListView(
                       padding: const EdgeInsets.fromLTRB(
                         AppSpacing.lg,
@@ -108,7 +111,6 @@ class _QuotesScreenState extends State<QuotesScreen> {
                         DocumentFilterChips(
                           filter: _filter,
                           isInvoice: false,
-                          clientName: clientName,
                           onChanged: (f) => setState(() => _filter = f),
                           onClear: () =>
                               setState(() => _filter = DocumentFilter.empty),
@@ -130,10 +132,6 @@ class _QuotesScreenState extends State<QuotesScreen> {
                                   context: context,
                                   initial: _filter,
                                   isInvoice: false,
-                                  clients: [
-                                    for (final c in cstate.clients)
-                                      (id: c.id, name: c.name),
-                                  ],
                                 );
                                 if (updated != null) {
                                   setState(() => _filter = updated);
@@ -181,9 +179,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                           )
                         else
                           ...filtered.map((q) {
-                            final client = cstate.clients
-                                .where((c) => c.id.trim() == q.clientId.trim())
-                                .firstOrNull;
+                            final client = clientsById[q.clientId.trim()];
                             return DocumentRow(
                               title: q.number,
                               subtitle: client?.name ?? 'Unknown client',
@@ -214,8 +210,4 @@ class _QuotesScreenState extends State<QuotesScreen> {
       ),
     );
   }
-}
-
-extension _FirstOrNull<E> on Iterable<E> {
-  E? get firstOrNull => isEmpty ? null : first;
 }

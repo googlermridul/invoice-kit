@@ -67,7 +67,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
             ),
             child: SearchField(
               controller: _searchCtrl,
-              hint: 'Search by number, notes…',
+              hint: 'Search by number, client, notes…',
               onChanged: (v) => setState(() => _query = v),
               onClear: () {
                 _searchCtrl.clear();
@@ -88,15 +88,18 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                 }
                 return BlocBuilder<ClientsCubit, ClientsState>(
                   builder: (context, cstate) {
+                    // Lookup table for resolving client name per invoice so
+                    // search-by-client-name and display both work.
+                    final clientsById = {
+                      for (final c in cstate.clients) c.id.trim(): c,
+                    };
                     final filtered = filterInvoices(
                       invoices: state.invoices,
                       filter: _filter,
                       query: _query,
+                      resolveClientName: (inv) =>
+                          clientsById[inv.clientId.trim()]?.name,
                     );
-                    final clientName = cstate.clients
-                        .where((c) => c.id == _filter.clientId)
-                        .map((c) => c.name)
-                        .firstOrNull;
                     return ListView(
                       padding: const EdgeInsets.fromLTRB(
                         AppSpacing.lg,
@@ -108,7 +111,6 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                         DocumentFilterChips(
                           filter: _filter,
                           isInvoice: true,
-                          clientName: clientName,
                           onChanged: (f) => setState(() => _filter = f),
                           onClear: () => setState(() => _filter = DocumentFilter.empty),
                         ),
@@ -128,9 +130,6 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                                   context: context,
                                   initial: _filter,
                                   isInvoice: true,
-                                  clients: [
-                                    for (final c in cstate.clients) (id: c.id, name: c.name),
-                                  ],
                                 );
                                 if (updated != null) {
                                   setState(() => _filter = updated);
@@ -169,7 +168,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                           )
                         else
                           ...filtered.map((inv) {
-                            final client = cstate.clients.where((c) => c.id.trim() == inv.clientId.trim()).firstOrNull;
+                            final client = clientsById[inv.clientId.trim()];
                             return DocumentRow(
                               title: inv.number,
                               subtitle: client?.name ?? 'Unknown client',
@@ -198,8 +197,4 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
       ),
     );
   }
-}
-
-extension _FirstOrNull<E> on Iterable<E> {
-  E? get firstOrNull => isEmpty ? null : first;
 }

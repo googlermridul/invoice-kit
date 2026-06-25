@@ -12,6 +12,7 @@ import 'package:invoice_kit/core/network/interceptors/logging_interceptor.dart';
 import 'package:invoice_kit/core/network/interceptors/refresh_token_interceptor.dart';
 import 'package:invoice_kit/core/permissions/permissions_service.dart';
 import 'package:invoice_kit/core/security/device_integrity_service.dart';
+import 'package:invoice_kit/core/services/document_share_service.dart';
 import 'package:invoice_kit/core/storage/hive_storage_service.dart';
 import 'package:invoice_kit/core/storage/local_storage_service.dart';
 import 'package:invoice_kit/core/storage/secure_storage_service.dart';
@@ -84,6 +85,7 @@ Future<void> configureDependencies({
     ..registerSingleton<EntitlementService>(const EntitlementService())
     ..registerSingleton<LogoStorage>(const LogoStorage())
     ..registerSingleton<ReportPdfService>(const ReportPdfService())
+    ..registerSingleton<DocumentShareService>(const DocumentShareService())
     ..registerSingleton<SharedPreferences>(
       await SharedPreferences.getInstance(),
     );

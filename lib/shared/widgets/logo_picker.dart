@@ -91,7 +91,7 @@ class _LogoPickerState extends State<LogoPicker> {
   Widget build(BuildContext context) {
     final hasLogo = widget.value != null && File(widget.value!).existsSync();
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 72,
@@ -111,7 +111,7 @@ class _LogoPickerState extends State<LogoPicker> {
                   height: 72,
                 )
               : Icon(
-                  Icons.image_outlined,
+                  HugeIconsStroke.image03,
                   size: 28,
                   color: context.colors.onSurfaceVariant,
                 ),

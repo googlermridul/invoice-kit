@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
+import 'package:invoice_kit/core/services/document_share_service.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/core/widgets/app_card.dart';
@@ -38,6 +40,13 @@ class QuoteDetailScreen extends StatefulWidget {
 }
 
 class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
+  /// Cached PDF bytes for the currently viewed quote. Reused by
+  /// Share / Save / Print so we don't re-render the PDF for every action.
+  Uint8List? _pdfBytes;
+
+  /// True while the PDF is being built (or a Share/Save/Print is in flight).
+  bool _pdfBusy = false;
+
   @override
   void initState() {
     super.initState();
@@ -76,8 +85,10 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
                 if (mounted) {
                   GoRouter.of(context).pushReplacement('/invoices/${inv.id}');
                 }
-              case 'pdf':
-                await _openPdf(context, q);
+              case 'share':
+                await _share(context, q);
+              case 'print':
+                await _print(context, q);
               case 'delete':
                 final confirmed = await AppDialog.confirm(
                   context: context,
@@ -95,7 +106,9 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
             }
           },
           itemBuilder: (_) => const [
-            PopupMenuItem(value: 'pdf', child: Text('Preview / share PDF')),
+            PopupMenuItem(value: 'share', child: Text('Share')),
+            PopupMenuItem(value: 'print', child: Text('Print')),
+            PopupMenuDivider(),
             PopupMenuItem(value: 'send', child: Text('Mark as sent')),
             PopupMenuItem(value: 'accept', child: Text('Mark as accepted')),
             PopupMenuItem(value: 'decline', child: Text('Mark as declined')),
@@ -137,27 +150,58 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
     return s.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
   }
 
-  Future<void> _openPdf(BuildContext context, Quote quote) async {
-    final generator = sl<PdfGenerator>();
-    final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
-    final client = context
-        .read<ClientsCubit>()
-        .state
-        .clients
-        .where((c) => c.id == quote.clientId)
-        .cast<Client?>()
-        .firstOrNull;
-    final bytes = await generator.quotePdf(
-      quote: quote,
-      business: profile,
-      client: client ?? _emptyClient(quote.clientId),
-      templateId: quote.pdfTemplateId,
-    );
+  Future<Uint8List?> _ensureBytes(BuildContext context, Quote quote) async {
+    final cached = _pdfBytes;
+    if (cached != null) return cached;
+    if (_pdfBusy) return null;
+    setState(() => _pdfBusy = true);
+    try {
+      final generator = sl<PdfGenerator>();
+      final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
+      final client = context
+          .read<ClientsCubit>()
+          .state
+          .clients
+          .where((c) => c.id == quote.clientId)
+          .cast<Client?>()
+          .firstOrNull;
+      final bytes = await generator.quotePdf(
+        quote: quote,
+        business: profile,
+        client: client ?? _emptyClient(quote.clientId),
+        templateId: quote.pdfTemplateId,
+      );
+      _pdfBytes = bytes;
+      return bytes;
+    } on Object catch (e) {
+      if (mounted) context.showErrorSnack('Could not build PDF: $e');
+      return null;
+    } finally {
+      if (mounted) setState(() => _pdfBusy = false);
+    }
+  }
+
+  Future<void> _share(BuildContext context, Quote quote) async {
+    final bytes = await _ensureBytes(context, quote);
+    if (bytes == null || !mounted) return;
+    try {
+      await sl<DocumentShareService>().share(
+        bytes,
+        filename: 'Quote_${quote.number}.pdf',
+        subject: 'InvoiceKit Quote ${quote.number}',
+      );
+    } on Object catch (e) {
+      if (mounted) context.showErrorSnack('Could not share: $e');
+    }
+  }
+
+  Future<void> _print(BuildContext context, Quote quote) async {
+    final bytes = await _ensureBytes(context, quote);
+    if (bytes == null || !mounted) return;
     await Printing.layoutPdf(onLayout: (_) async => bytes);
   }
 
-  Client _emptyClient(String id) =>
-      Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
+  Client _emptyClient(String id) => Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
 
   BusinessProfile _emptyProfile() => const BusinessProfile(businessName: '');
 }
