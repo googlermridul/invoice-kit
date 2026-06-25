@@ -169,7 +169,7 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                           )
                         else
                           ...filtered.map((inv) {
-                            final client = cstate.clients.where((c) => c.id == inv.clientId).firstOrNull;
+                            final client = cstate.clients.where((c) => c.id.trim() == inv.clientId.trim()).firstOrNull;
                             return DocumentRow(
                               title: inv.number,
                               subtitle: client?.name ?? 'Unknown client',

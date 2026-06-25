@@ -45,10 +45,10 @@ class AppShellDestinations {
     selectedIcon: HugeIconsSolid.userGroup,
   );
 
-  static const reports = AppShellDestination(
-    label: 'Reports',
-    icon: HugeIconsStroke.chart,
-    selectedIcon: HugeIconsSolid.chart,
+  static const quotes = AppShellDestination(
+    label: 'Quotes',
+    icon: HugeIconsStroke.note01,
+    selectedIcon: HugeIconsSolid.note01,
   );
 
   static const settings = AppShellDestination(
@@ -61,7 +61,7 @@ class AppShellDestinations {
     home,
     invoices,
     clients,
-    reports,
+    quotes,
     settings,
   ];
 }

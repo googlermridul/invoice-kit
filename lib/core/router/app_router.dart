@@ -107,7 +107,7 @@ class AppRouter {
           redirect: (_, _) => RoutePaths.dashboard,
         ),
 
-        // ── Bottom-nav shell: Dashboard / Invoices / Clients / Reports / Settings ──
+        // ── Bottom-nav shell: Dashboard / Invoices / Clients / Quotes / Settings ──
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) => AppShellScaffold(navigationShell: navigationShell),
           branches: [
@@ -253,16 +253,76 @@ class AppRouter {
               ],
             ),
 
-            // Branch 3 — Reports
+            // Branch 3 — Quotes
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: RoutePaths.reports,
-                  name: RouteNames.reports,
-                  builder: (_, _) => BlocProvider(
-                    create: (_) => sl<DashboardCubit>(),
-                    child: const ReportsScreen(),
+                  path: RoutePaths.quotes,
+                  name: RouteNames.quotes,
+                  builder: (_, _) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider<QuotesCubit>(
+                        create: (_) => sl<QuotesCubit>(),
+                      ),
+                      BlocProvider<ClientsCubit>(
+                        create: (_) => sl<ClientsCubit>(),
+                      ),
+                    ],
+                    child: const QuotesScreen(),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'new',
+                      name: RouteNames.quoteNew,
+                      builder: (_, _) => MultiBlocProvider(
+                        providers: [
+                          BlocProvider<QuotesCubit>(
+                            create: (_) => sl<QuotesCubit>(),
+                          ),
+                          BlocProvider<ClientsCubit>(
+                            create: (_) => sl<ClientsCubit>(),
+                          ),
+                        ],
+                        child: const QuoteEditScreen(),
+                      ),
+                    ),
+                    GoRoute(
+                      path: ':id',
+                      name: RouteNames.quoteDetail,
+                      builder: (_, state) => MultiBlocProvider(
+                        providers: [
+                          BlocProvider<QuotesCubit>(
+                            create: (_) => sl<QuotesCubit>(),
+                          ),
+                          BlocProvider<ClientsCubit>(
+                            create: (_) => sl<ClientsCubit>(),
+                          ),
+                        ],
+                        child: QuoteDetailScreen(
+                          quoteId: state.pathParameters['id']!,
+                        ),
+                      ),
+                      routes: [
+                        GoRoute(
+                          path: 'edit',
+                          name: RouteNames.quoteEdit,
+                          builder: (_, state) => MultiBlocProvider(
+                            providers: [
+                              BlocProvider<QuotesCubit>(
+                                create: (_) => sl<QuotesCubit>(),
+                              ),
+                              BlocProvider<ClientsCubit>(
+                                create: (_) => sl<ClientsCubit>(),
+                              ),
+                            ],
+                            child: QuoteEditScreen(
+                              quoteId: state.pathParameters['id'],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -297,57 +357,13 @@ class AppRouter {
           ),
         ),
         GoRoute(
-          path: RoutePaths.quotes,
-          name: RouteNames.quotes,
+          path: RoutePaths.reports,
+          name: RouteNames.reports,
           parentNavigatorKey: rootNavigatorKey,
           builder: (_, _) => BlocProvider(
-            create: (_) => sl<QuotesCubit>(),
-            child: const QuotesScreen(),
+            create: (_) => sl<DashboardCubit>(),
+            child: const ReportsScreen(),
           ),
-          routes: [
-            GoRoute(
-              path: 'new',
-              name: RouteNames.quoteNew,
-              parentNavigatorKey: rootNavigatorKey,
-              builder: (_, _) => MultiBlocProvider(
-                providers: [
-                  BlocProvider<QuotesCubit>(create: (_) => sl<QuotesCubit>()),
-                  BlocProvider<ClientsCubit>(create: (_) => sl<ClientsCubit>()),
-                ],
-                child: const QuoteEditScreen(),
-              ),
-            ),
-            GoRoute(
-              path: ':id',
-              name: RouteNames.quoteDetail,
-              parentNavigatorKey: rootNavigatorKey,
-              builder: (_, state) => MultiBlocProvider(
-                providers: [
-                  BlocProvider<QuotesCubit>(create: (_) => sl<QuotesCubit>()),
-                  BlocProvider<ClientsCubit>(create: (_) => sl<ClientsCubit>()),
-                ],
-                child: QuoteDetailScreen(quoteId: state.pathParameters['id']!),
-              ),
-              routes: [
-                GoRoute(
-                  path: 'edit',
-                  name: RouteNames.quoteEdit,
-                  parentNavigatorKey: rootNavigatorKey,
-                  builder: (_, state) => MultiBlocProvider(
-                    providers: [
-                      BlocProvider<QuotesCubit>(
-                        create: (_) => sl<QuotesCubit>(),
-                      ),
-                      BlocProvider<ClientsCubit>(
-                        create: (_) => sl<ClientsCubit>(),
-                      ),
-                    ],
-                    child: QuoteEditScreen(quoteId: state.pathParameters['id']),
-                  ),
-                ),
-              ],
-            ),
-          ],
         ),
         GoRoute(
           path: RoutePaths.recurring,

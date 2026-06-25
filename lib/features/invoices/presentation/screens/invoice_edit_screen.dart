@@ -160,6 +160,57 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
     }
   }
 
+  // Save the invoice and immediately mark it as sent.
+  Future<void> _saveAndMarkSent() async {
+    if (_saving || _invoice == null) return;
+    final inv = _invoice!;
+    if (inv.clientId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please pick a client.')),
+      );
+      return;
+    }
+    final issueDay = DateTime(
+      inv.issueDate.year,
+      inv.issueDate.month,
+      inv.issueDate.day,
+    );
+    if (inv.dueDate.isBefore(issueDay)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Due date cannot be before issue date.')),
+      );
+      return;
+    }
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _saving = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      final invoiceRepo = sl<InvoiceRepository>();
+      // Mark the invoice as sent before saving.
+      final toSave = inv.copyWith(
+        notes: _notesCtrl.text,
+        terms: _termsCtrl.text,
+        status: InvoiceStatus.sent,
+      );
+      await invoiceRepo.save(toSave);
+      // When marking as sent we do not increment the next invoice number.
+      if (!mounted) return;
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Invoice saved and marked as sent')),
+      );
+      // Navigate to the invoice detail view.
+      router.pushReplacement(RoutePaths.invoiceDetailPath(toSave.id));
+    } on Exception catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('Could not save invoice: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   void _updateItems(List<DocumentItem> items) {
     setState(() {
       _invoice = _invoice!.copyWith(items: items);
@@ -290,7 +341,6 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                           ),
                         RadioListTile<String>(
                           value: PdfTemplateIds.all[i],
-                          // ignore: deprecated_member_use
                           groupValue: inv.pdfTemplateId ?? _profile?.selectedPdfTemplate ?? PdfTemplateIds.classic,
                           onChanged: (v) => setState(() {
                             _invoice = _invoice!.copyWith(
@@ -425,6 +475,13 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                   icon: HugeIconsStroke.tick01,
                   loading: _saving,
                   onPressed: _saving ? null : _save,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                PrimaryButton(
+                  label: 'Save & Mark Sent',
+                  icon: HugeIconsStroke.tick01,
+                  loading: _saving,
+                  onPressed: _saving ? null : _saveAndMarkSent,
                 ),
               ],
             ),

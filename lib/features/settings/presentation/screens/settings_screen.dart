@@ -350,7 +350,6 @@ class _ThemeOption extends StatelessWidget {
     return RadioListTile<ThemeMode>(
       title: Text(label),
       value: value,
-      // ignore: deprecated_member_use
       groupValue: groupValue,
       onChanged: (m) {
         if (m != null) context.read<ThemeBloc>().add(ThemeChanged(m));

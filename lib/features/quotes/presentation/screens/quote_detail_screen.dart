@@ -14,15 +14,20 @@ import 'package:invoice_kit/core/widgets/app_scaffold.dart';
 import 'package:invoice_kit/core/widgets/kv_row.dart';
 import 'package:invoice_kit/core/widgets/meta_tile.dart';
 import 'package:invoice_kit/core/widgets/section_header.dart';
+import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
+import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/features/invoices/data/repositories/invoice_repository.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
+import 'package:invoice_kit/features/invoices/domain/services/pdf_generator.dart';
 import 'package:invoice_kit/features/quotes/domain/entities/quote.dart';
 import 'package:invoice_kit/features/quotes/presentation/bloc/quotes_cubit.dart';
 import 'package:invoice_kit/shared/dialogs/app_dialog.dart';
+import 'package:invoice_kit/shared/widgets/template_preview_header.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
+import 'package:printing/printing.dart';
 
 class QuoteDetailScreen extends StatefulWidget {
   const QuoteDetailScreen({required this.quoteId, super.key});
@@ -71,6 +76,8 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
                 if (mounted) {
                   GoRouter.of(context).pushReplacement('/invoices/${inv.id}');
                 }
+              case 'pdf':
+                await _openPdf(context, q);
               case 'delete':
                 final confirmed = await AppDialog.confirm(
                   context: context,
@@ -88,6 +95,7 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
             }
           },
           itemBuilder: (_) => const [
+            PopupMenuItem(value: 'pdf', child: Text('Preview / share PDF')),
             PopupMenuItem(value: 'send', child: Text('Mark as sent')),
             PopupMenuItem(value: 'accept', child: Text('Mark as accepted')),
             PopupMenuItem(value: 'decline', child: Text('Mark as declined')),
@@ -97,16 +105,26 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
           ],
         ),
       ],
-      body: BlocBuilder<QuotesCubit, QuotesState>(
-        builder: (context, state) {
-          final q = state.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
-          if (q == null) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return BlocBuilder<ClientsCubit, ClientsState>(
-            builder: (context, cstate) {
-              final client = cstate.clients.where((c) => c.id == q.clientId).cast<Client?>().firstOrNull;
-              return _Body(quote: q, client: client);
+      body: FutureBuilder<BusinessProfile?>(
+        future: sl<BusinessProfileRepository>().load(),
+        builder: (context, snap) {
+          final profile = snap.data;
+          return BlocBuilder<QuotesCubit, QuotesState>(
+            builder: (context, state) {
+              final q = state.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
+              if (q == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return BlocBuilder<ClientsCubit, ClientsState>(
+                builder: (context, cstate) {
+                  final client = cstate.clients.where((c) => c.id == q.clientId).cast<Client?>().firstOrNull;
+                  return _Body(
+                    quote: q,
+                    client: client,
+                    business: profile,
+                  );
+                },
+              );
             },
           );
         },
@@ -118,6 +136,30 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
     final s = context.read<QuotesCubit>().state;
     return s.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
   }
+
+  Future<void> _openPdf(BuildContext context, Quote quote) async {
+    final generator = sl<PdfGenerator>();
+    final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
+    final client = context
+        .read<ClientsCubit>()
+        .state
+        .clients
+        .where((c) => c.id == quote.clientId)
+        .cast<Client?>()
+        .firstOrNull;
+    final bytes = await generator.quotePdf(
+      quote: quote,
+      business: profile,
+      client: client ?? _emptyClient(quote.clientId),
+      templateId: quote.pdfTemplateId,
+    );
+    await Printing.layoutPdf(onLayout: (_) async => bytes);
+  }
+
+  Client _emptyClient(String id) =>
+      Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
+
+  BusinessProfile _emptyProfile() => const BusinessProfile(businessName: '');
 }
 
 extension _FirstOrNull<E> on Iterable<E> {
@@ -125,42 +167,49 @@ extension _FirstOrNull<E> on Iterable<E> {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.quote, this.client});
+  const _Body({required this.quote, this.client, this.business});
   final Quote quote;
   final Client? client;
+  final BusinessProfile? business;
 
   @override
   Widget build(BuildContext context) {
     final totals = InvoiceCalculator.forDocument(quote);
+    final style = TemplateStyle.forId(
+      quote.pdfTemplateId ?? business?.selectedPdfTemplate,
+    );
     return ListView(
       padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
         AppSpacing.sm,
-        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.sm,
         AppSpacing.xxxl,
       ),
       children: [
+        TemplatePreviewHeader(
+          style: style,
+          title: quote.number,
+          subtitle: 'Quoted for ${client?.name ?? "Unknown client"}',
+          rightLabel: 'TOTAL',
+          rightValue: Formatters.currency(
+            quote.total,
+            code: quote.currency,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Text(
-                quote.number,
-                style: context.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.4,
-                ),
+            QuoteStatusBadge(quote.status),
+            const Spacer(),
+            Text(
+              'Template · ${style.label}',
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4,
               ),
             ),
-            QuoteStatusBadge(quote.status),
           ],
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'Quoted for ${client?.name ?? "Unknown client"}',
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: context.colors.onSurfaceVariant,
-          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         Row(
@@ -259,7 +308,7 @@ class _Body extends StatelessWidget {
                         code: quote.currency,
                       ),
                       bold: true,
-                      valueColor: context.colors.primary,
+                      valueColor: style.accent,
                     ),
                   ],
                 ),
