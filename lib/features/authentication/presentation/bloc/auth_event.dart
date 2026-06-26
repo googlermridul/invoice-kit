@@ -11,6 +11,10 @@ class AuthStarted extends AuthEvent {
   const AuthStarted();
 }
 
+class AuthRestoreSessionRequested extends AuthEvent {
+  const AuthRestoreSessionRequested();
+}
+
 class AuthLoginRequested extends AuthEvent {
   const AuthLoginRequested({required this.email, required this.password});
   final String email;
@@ -32,6 +36,10 @@ class AuthRegisterRequested extends AuthEvent {
   List<Object?> get props => [email, password, name];
 }
 
+class AuthGoogleSignInRequested extends AuthEvent {
+  const AuthGoogleSignInRequested();
+}
+
 class AuthForgotPasswordRequested extends AuthEvent {
   const AuthForgotPasswordRequested({required this.email});
   final String email;
@@ -41,4 +49,8 @@ class AuthForgotPasswordRequested extends AuthEvent {
 
 class AuthLogoutRequested extends AuthEvent {
   const AuthLogoutRequested();
+}
+
+class AuthDeleteAccountRequested extends AuthEvent {
+  const AuthDeleteAccountRequested();
 }

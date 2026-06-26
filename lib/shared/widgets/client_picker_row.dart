@@ -90,7 +90,9 @@ class ClientPickerRow extends StatelessWidget {
                   selectedName ?? emptyLabel,
                   style: context.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: selectedName == null ? context.colors.onSurfaceVariant : context.colors.onSurface,
+                    color: selectedName == null
+                        ? context.colors.onSurfaceVariant
+                        : context.colors.onSurface,
                   ),
                 ),
               ],

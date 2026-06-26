@@ -127,8 +127,7 @@ class _QuotesScreenState extends State<QuotesScreen> {
                             ),
                             TextButton.icon(
                               onPressed: () async {
-                                final updated =
-                                    await DocumentFilterSheet.show(
+                                final updated = await DocumentFilterSheet.show(
                                   context: context,
                                   initial: _filter,
                                   isInvoice: false,
@@ -173,8 +172,9 @@ class _QuotesScreenState extends State<QuotesScreen> {
                                 ? 'Create quote'
                                 : null,
                             onAction: _query.isEmpty && _filter.isEmpty
-                                ? () => GoRouter.of(context)
-                                    .push(RoutePaths.quoteNew)
+                                ? () => GoRouter.of(
+                                    context,
+                                  ).push(RoutePaths.quoteNew)
                                 : null,
                           )
                         else
@@ -190,9 +190,11 @@ class _QuotesScreenState extends State<QuotesScreen> {
                                   ? null
                                   : Text(
                                       'Valid until ${Formatters.date(q.validUntil!)}',
-                                      style: context.textTheme.bodySmall?.copyWith(
-                                        color: context.colors.onSurfaceVariant,
-                                      ),
+                                      style: context.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color:
+                                                context.colors.onSurfaceVariant,
+                                          ),
                                     ),
                               onTap: () => GoRouter.of(context).push(
                                 RoutePaths.quoteDetailPath(q.id),

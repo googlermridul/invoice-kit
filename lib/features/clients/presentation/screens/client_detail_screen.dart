@@ -51,7 +51,10 @@ class _ClientDetailScreenState extends State<ClientDetailScreen> {
       ],
       body: BlocBuilder<ClientsCubit, ClientsState>(
         builder: (context, state) {
-          final client = state.clients.where((c) => c.id == widget.clientId).cast<Client?>().firstOrNull;
+          final client = state.clients
+              .where((c) => c.id == widget.clientId)
+              .cast<Client?>()
+              .firstOrNull;
           if (client == null) {
             return const Center(child: CircularProgressIndicator());
           }

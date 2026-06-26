@@ -74,7 +74,9 @@ class AppTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               errorText: error,
-              prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
+              prefixIcon: prefixIcon != null
+                  ? Icon(prefixIcon, size: 20)
+                  : null,
               suffixIcon: suffixIcon,
               isDense: dense,
               contentPadding: dense
@@ -100,7 +102,9 @@ class AppTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               errorText: error,
-              prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
+              prefixIcon: prefixIcon != null
+                  ? Icon(prefixIcon, size: 20)
+                  : null,
               suffixIcon: suffixIcon,
               isDense: dense,
               contentPadding: dense

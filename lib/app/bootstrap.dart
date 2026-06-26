@@ -30,6 +30,12 @@ Future<void> bootstrap(Widget Function() builder) async {
       final config = AppConfig.fromEnv();
       runtimeConfig.config = config;
 
+      // 5. Supabase
+      await Supabase.initialize(
+        url: config.supabaseUrl,
+        publishableKey: config.supabasePublishableKey,
+      );
+
       // 2. Storage
       await Hive.initFlutter();
       final prefs = await SharedPreferences.getInstance();
@@ -41,12 +47,6 @@ Future<void> bootstrap(Widget Function() builder) async {
 
       // 4. DI
       await configureDependencies(config: config, localStorage: localStorage);
-
-      // 5. Supabase
-      await Supabase.initialize(
-        url: config.supabaseUrl,
-        publishableKey: config.supabasePublishableKey,
-      );
 
       // 6. System UI
       await SystemChrome.setPreferredOrientations([

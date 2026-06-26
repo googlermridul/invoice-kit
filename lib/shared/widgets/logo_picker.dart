@@ -129,7 +129,9 @@ class _LogoPickerState extends State<LogoPicker> {
               ),
               const SizedBox(height: 2),
               Text(
-                hasLogo ? 'Shown on invoices and PDF exports.' : 'Add a logo to brand your invoices and PDFs.',
+                hasLogo
+                    ? 'Shown on invoices and PDF exports.'
+                    : 'Add a logo to brand your invoices and PDFs.',
                 style: context.textTheme.bodySmall?.copyWith(
                   color: context.colors.onSurfaceVariant,
                 ),

@@ -30,7 +30,8 @@ class Formatters {
 
   static String compact(num value) => NumberFormat.compact().format(value);
 
-  static String date(DateTime date, {String pattern = 'dd MMM yyyy'}) => DateFormat(pattern).format(date);
+  static String date(DateTime date, {String pattern = 'dd MMM yyyy'}) =>
+      DateFormat(pattern).format(date);
 
   static String time(DateTime time) => DateFormat.jm().format(time);
 

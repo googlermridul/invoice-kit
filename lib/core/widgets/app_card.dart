@@ -76,7 +76,9 @@ class AppCard extends StatelessWidget {
     final shape = BoxDecoration(
       color: bg,
       borderRadius: BorderRadius.circular(radius),
-      border: border == AppColors.transparent ? null : Border.all(color: border, width: 1),
+      border: border == AppColors.transparent
+          ? null
+          : Border.all(color: border, width: 1),
       boxShadow: elevation ? tokens.shadowSm : null,
     );
 

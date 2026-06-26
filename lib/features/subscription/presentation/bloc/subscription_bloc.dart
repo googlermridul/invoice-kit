@@ -7,17 +7,21 @@ import 'package:invoice_kit/features/subscription/domain/services/entitlement_se
 part 'subscription_event.dart';
 part 'subscription_state.dart';
 
-class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
+class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionBlocState> {
   SubscriptionBloc({
     required this.repository,
     required this.entitlements,
-  }) : super(SubscriptionState.initial()) {
+  }) : super(SubscriptionBlocState.initial()) {
     on<SubscriptionStarted>(_onStarted);
     on<SubscriptionRefreshed>(_onRefresh);
     on<SubscriptionPlanPurchased>(_onPurchased);
     on<SubscriptionRestored>(_onRestored);
     on<SubscriptionExpired>(_onExpired);
     on<SubscriptionTrialStarted>(_onTrialStarted);
+    on<SubscriptionPurchasePending>(_onPurchasePending);
+    on<SubscriptionGracePeriodEntered>(_onGracePeriod);
+    on<SubscriptionCancelled>(_onCancelled);
+    on<SubscriptionSyncedFromBackend>(_onSynced);
   }
 
   final SubscriptionRepository repository;
@@ -25,7 +29,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   Future<void> _onStarted(
     SubscriptionStarted event,
-    Emitter<SubscriptionState> emit,
+    Emitter<SubscriptionBlocState> emit,
   ) async {
     emit(state.copyWith(status: SubscriptionStatusX.loading));
     final current = await repository.current();
@@ -44,7 +48,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   Future<void> _onRefresh(
     SubscriptionRefreshed event,
-    Emitter<SubscriptionState> emit,
+    Emitter<SubscriptionBlocState> emit,
   ) async {
     emit(state.copyWith(status: SubscriptionStatusX.refreshing));
     try {
@@ -72,7 +76,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   Future<void> _onPurchased(
     SubscriptionPlanPurchased event,
-    Emitter<SubscriptionState> emit,
+    Emitter<SubscriptionBlocState> emit,
   ) async {
     emit(state.copyWith(status: SubscriptionStatusX.purchasing));
     final current = await repository.current();
@@ -94,7 +98,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   Future<void> _onRestored(
     SubscriptionRestored event,
-    Emitter<SubscriptionState> emit,
+    Emitter<SubscriptionBlocState> emit,
   ) async {
     emit(state.copyWith(status: SubscriptionStatusX.restoring));
     try {
@@ -122,7 +126,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   Future<void> _onExpired(
     SubscriptionExpired event,
-    Emitter<SubscriptionState> emit,
+    Emitter<SubscriptionBlocState> emit,
   ) async {
     final current = await repository.current();
     final updated = entitlements.expire(current);
@@ -138,7 +142,7 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
 
   Future<void> _onTrialStarted(
     SubscriptionTrialStarted event,
-    Emitter<SubscriptionState> emit,
+    Emitter<SubscriptionBlocState> emit,
   ) async {
     await repository.save(event.status);
     final now = DateTime.now();
@@ -149,6 +153,81 @@ class SubscriptionBloc extends Bloc<SubscriptionEvent, SubscriptionState> {
         hasAccess: entitlements.hasAccess(event.status, now),
         trialDaysRemaining: entitlements.trialDaysRemaining(event.status, now),
         message: 'Trial started',
+      ),
+    );
+  }
+
+  Future<void> _onPurchasePending(
+    SubscriptionPurchasePending event,
+    Emitter<SubscriptionBlocState> emit,
+  ) async {
+    final current = await repository.current();
+    final updated = current.copyWith(
+      state: SubscriptionState.pending,
+      productId: event.productId,
+    );
+    await repository.save(updated);
+    emit(
+      state.copyWith(
+        status: SubscriptionStatusX.pending,
+        subscriptionStatus: updated,
+        hasAccess: false,
+        message: 'Purchase pending — access will unlock once verified.',
+      ),
+    );
+  }
+
+  Future<void> _onGracePeriod(
+    SubscriptionGracePeriodEntered event,
+    Emitter<SubscriptionBlocState> emit,
+  ) async {
+    final current = await repository.current();
+    final updated = current.copyWith(
+      state: SubscriptionState.gracePeriod,
+      currentPeriodEnd: event.expiryDate ?? current.currentPeriodEnd,
+    );
+    await repository.save(updated);
+    emit(
+      state.copyWith(
+        status: SubscriptionStatusX.gracePeriod,
+        subscriptionStatus: updated,
+        hasAccess: true,
+        message: 'Grace period — update your payment method to keep access.',
+      ),
+    );
+  }
+
+  Future<void> _onCancelled(
+    SubscriptionCancelled event,
+    Emitter<SubscriptionBlocState> emit,
+  ) async {
+    final current = await repository.current();
+    final updated = current.copyWith(state: SubscriptionState.cancelled);
+    await repository.save(updated);
+    emit(
+      state.copyWith(
+        status: SubscriptionStatusX.ready,
+        subscriptionStatus: updated,
+        hasAccess: entitlements.hasAccess(updated, DateTime.now()),
+        message: 'Subscription cancelled. Access continues until period end.',
+      ),
+    );
+  }
+
+  Future<void> _onSynced(
+    SubscriptionSyncedFromBackend event,
+    Emitter<SubscriptionBlocState> emit,
+  ) async {
+    await repository.save(event.status);
+    emit(
+      state.copyWith(
+        status: SubscriptionStatusX.ready,
+        subscriptionStatus: event.status,
+        hasAccess: entitlements.hasAccess(event.status, DateTime.now()),
+        trialDaysRemaining: entitlements.trialDaysRemaining(
+          event.status,
+          DateTime.now(),
+        ),
       ),
     );
   }

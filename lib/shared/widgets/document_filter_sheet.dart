@@ -6,7 +6,8 @@ import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/theme/app_tokens.dart';
 import 'package:invoice_kit/core/widgets/app_bottom_sheet.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus, QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus, QuoteStatus;
 import 'package:invoice_kit/shared/widgets/buttons.dart';
 
 /// Summary chips that show currently active filters, and a button to open
@@ -314,7 +315,9 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
                     child: OutlinedButton.icon(
                       icon: const Icon(HugeIconsStroke.calendar01, size: 18),
                       label: Text(
-                        _filter.issueAfter == null ? 'From' : _short(_filter.issueAfter!),
+                        _filter.issueAfter == null
+                            ? 'From'
+                            : _short(_filter.issueAfter!),
                       ),
                       onPressed: () async {
                         final picked = await showDatePicker(
@@ -336,7 +339,9 @@ class _DocumentFilterSheetState extends State<DocumentFilterSheet> {
                     child: OutlinedButton.icon(
                       icon: const Icon(HugeIconsStroke.calendar01, size: 18),
                       label: Text(
-                        _filter.issueBefore == null ? 'To' : _short(_filter.issueBefore!),
+                        _filter.issueBefore == null
+                            ? 'To'
+                            : _short(_filter.issueBefore!),
                       ),
                       onPressed: () async {
                         final picked = await showDatePicker(

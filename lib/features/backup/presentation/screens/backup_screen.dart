@@ -110,9 +110,13 @@ class _BackupScreenState extends State<BackupScreen> {
                       onPressed: state.busy
                           ? null
                           : () async {
-                              final path = await context.read<BackupCubit>().export();
+                              final path = await context
+                                  .read<BackupCubit>()
+                                  .export();
                               if (!mounted) return;
-                              final bytes = await context.read<BackupCubit>().exportBytes();
+                              final bytes = await context
+                                  .read<BackupCubit>()
+                                  .exportBytes();
                               await SharePlus.instance.share(
                                 ShareParams(
                                   files: [
@@ -185,7 +189,9 @@ class _BackupScreenState extends State<BackupScreen> {
                               ? null
                               : () async {
                                   try {
-                                    final summary = await context.read<BackupCubit>().importFromString(_pasteCtrl.text);
+                                    final summary = await context
+                                        .read<BackupCubit>()
+                                        .importFromString(_pasteCtrl.text);
                                     if (mounted) {
                                       context.showSnackBar(
                                         'Imported ${summary.clients} clients, ${summary.invoices} invoices',
@@ -250,7 +256,9 @@ class _BackupScreenState extends State<BackupScreen> {
                             ),
                           ),
                           title: Text(
-                            state.history[i].path?.split('/').last ?? state.history[i].label ?? 'Backup',
+                            state.history[i].path?.split('/').last ??
+                                state.history[i].label ??
+                                'Backup',
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                             ),

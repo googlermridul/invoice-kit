@@ -97,6 +97,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _submit,
                   loading: state.isSubmitting,
                 ),
+                const SizedBox(height: AppSpacing.md),
+                _SocialDivider(label: 'or'),
+                const SizedBox(height: AppSpacing.md),
+                OutlinedButton.icon(
+                  onPressed: state.isSubmitting
+                      ? null
+                      : () => context.read<AuthBloc>().add(
+                          const AuthGoogleSignInRequested(),
+                        ),
+                  icon: const Icon(Icons.g_mobiledata, size: 24),
+                  label: const Text('Continue with Google'),
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -114,6 +126,24 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+class _SocialDivider extends StatelessWidget {
+  const _SocialDivider({required this.label});
+  final String label;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Expanded(child: Divider()),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(label),
+        ),
+        const Expanded(child: Divider()),
+      ],
     );
   }
 }

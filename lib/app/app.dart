@@ -9,7 +9,9 @@ import 'package:invoice_kit/core/localization/app_localizations.dart';
 import 'package:invoice_kit/core/router/app_router.dart';
 import 'package:invoice_kit/core/router/app_router_guard.dart';
 import 'package:invoice_kit/core/theme/theme.dart';
+import 'package:invoice_kit/features/premium/presentation/bloc/premium_cubit.dart';
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
+import 'package:invoice_kit/features/trial/presentation/cubit/trial_cubit.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -20,12 +22,17 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   late final SubscriptionBloc _subscriptionBloc;
+  late final PremiumCubit _premiumCubit;
+  late final TrialCubit _trialCubit;
   late final AppRouter _router;
 
   @override
   void initState() {
     super.initState();
-    _subscriptionBloc = sl<SubscriptionBloc>()..add(const SubscriptionStarted());
+    _subscriptionBloc = sl<SubscriptionBloc>()
+      ..add(const SubscriptionStarted());
+    _premiumCubit = sl<PremiumCubit>()..refresh();
+    _trialCubit = sl<TrialCubit>();
     _router = AppRouter(
       guard: AppRouterGuard(subscriptionBloc: _subscriptionBloc),
     );
@@ -34,6 +41,8 @@ class _AppState extends State<App> {
   @override
   void dispose() {
     unawaited(_subscriptionBloc.close());
+    unawaited(_premiumCubit.close());
+    unawaited(_trialCubit.close());
     super.dispose();
   }
 
@@ -43,6 +52,8 @@ class _AppState extends State<App> {
       providers: [
         BlocProvider<ThemeBloc>(create: (_) => sl<ThemeBloc>()),
         BlocProvider<SubscriptionBloc>.value(value: _subscriptionBloc),
+        BlocProvider<PremiumCubit>.value(value: _premiumCubit),
+        BlocProvider<TrialCubit>.value(value: _trialCubit),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, themeState) {

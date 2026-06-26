@@ -7,10 +7,13 @@ import 'package:invoice_kit/core/storage/secure_storage_service.dart';
 import 'package:invoice_kit/features/authentication/data/datasources/auth_local_datasource.dart';
 import 'package:invoice_kit/features/authentication/data/datasources/auth_remote_datasource.dart';
 import 'package:invoice_kit/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/forgot_password_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/google_signin_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/login_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/logout_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/register_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/restore_session_usecase.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLocalStorageService extends Mock implements LocalStorageService {}
@@ -38,3 +41,9 @@ class MockRegisterUseCase extends Mock implements RegisterUseCase {}
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
 
 class MockForgotPasswordUseCase extends Mock implements ForgotPasswordUseCase {}
+
+class MockGoogleSignInUseCase extends Mock implements GoogleSignInUseCase {}
+
+class MockRestoreSessionUseCase extends Mock implements RestoreSessionUseCase {}
+
+class MockDeleteAccountUseCase extends Mock implements DeleteAccountUseCase {}

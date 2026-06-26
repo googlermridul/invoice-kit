@@ -36,7 +36,9 @@ class RefreshTokenInterceptor extends Interceptor {
         data: {'refreshToken': refreshToken},
         options: Options(headers: {'_skipRefresh': 'true'}),
       );
-      final data = response.data is Map ? Map<String, dynamic>.from(response.data as Map) : <String, dynamic>{};
+      final data = response.data is Map
+          ? Map<String, dynamic>.from(response.data as Map)
+          : <String, dynamic>{};
       final api = ApiResponse<Map<String, dynamic>>.fromJson(
         data,
         (raw) => Map<String, dynamic>.from(raw as Map),

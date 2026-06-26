@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/app_routes.dart';
+import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/features/splash/presentation/bloc/splash_bloc.dart';
@@ -20,6 +21,10 @@ class SplashScreen extends StatelessWidget {
           context.go(AppRoutes.onboarding);
         } else if (state is SplashNavigateToSubscription) {
           context.go(AppRoutes.subscription);
+        } else if (state is SplashNavigateToAuth) {
+          context.go(RoutePaths.trialExpired);
+        } else if (state is SplashNavigateToDevices) {
+          context.go(RoutePaths.devices);
         } else if (state is SplashNavigateToHome) {
           context.go(AppRoutes.dashboard);
         } else if (state is SplashError) {

@@ -6,6 +6,7 @@ class RoutePaths {
 
   static const String splash = '/';
   static const String onboarding = '/onboarding';
+  static const String startTrial = '/start-trial';
   static const String subscription = '/subscription';
   static const String login = '/login';
   static const String register = '/register';
@@ -30,6 +31,8 @@ class RoutePaths {
   static const String backup = '/backup';
   static const String settings = '/settings';
   static const String home = '/home';
+  static const String devices = '/devices';
+  static const String trialExpired = '/trial-expired';
   static const String dashboardHomeAlias = 'home';
 
   static String clientDetailPath(String id) => '/clients/$id';

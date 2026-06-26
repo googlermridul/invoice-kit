@@ -18,7 +18,8 @@ import 'package:invoice_kit/features/business_profile/data/repositories/business
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/features/invoices/data/repositories/invoice_repository.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/invoice.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/pdf_template.dart';
@@ -229,7 +230,8 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
         body: const EmptyState(
           icon: Icons.error_outline,
           title: 'Could not open the editor',
-          subtitle: 'There was a problem creating a draft. Please go back and try again.',
+          subtitle:
+              'There was a problem creating a draft. Please go back and try again.',
         ),
       );
     }
@@ -250,12 +252,16 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
             return EmptyState(
               icon: Icons.people_outline,
               title: 'Add a client first',
-              subtitle: 'Invoices need a client. Add one and you can come back here.',
+              subtitle:
+                  'Invoices need a client. Add one and you can come back here.',
               actionLabel: 'Add client',
               onAction: () => GoRouter.of(context).push(RoutePaths.clientNew),
             );
           }
-          final selectedName = cstate.clients.where((c) => c.id == inv.clientId).map((c) => c.name).firstOrNull;
+          final selectedName = cstate.clients
+              .where((c) => c.id == inv.clientId)
+              .map((c) => c.name)
+              .firstOrNull;
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -341,7 +347,10 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                           ),
                         RadioListTile<String>(
                           value: PdfTemplateIds.all[i],
-                          groupValue: inv.pdfTemplateId ?? _profile?.selectedPdfTemplate ?? PdfTemplateIds.classic,
+                          groupValue:
+                              inv.pdfTemplateId ??
+                              _profile?.selectedPdfTemplate ??
+                              PdfTemplateIds.classic,
                           onChanged: (v) => setState(() {
                             _invoice = _invoice!.copyWith(
                               pdfTemplateId: v,
@@ -375,10 +384,16 @@ class _InvoiceEditScreenState extends State<InvoiceEditScreen> {
                     key: ValueKey(item.id),
                     item: item,
                     showTax: true,
-                    validatorDescription: (v) => Validators.required(v, fieldName: 'Description'),
-                    validatorQuantity: (v) => Validators.positiveNumber(v, fieldName: 'Quantity'),
-                    validatorUnitPrice: (v) => Validators.nonNegativeNumber(v, fieldName: 'Unit price'),
-                    validatorTaxRate: (v) => Validators.nonNegativeNumber(v, fieldName: 'Tax'),
+                    validatorDescription: (v) =>
+                        Validators.required(v, fieldName: 'Description'),
+                    validatorQuantity: (v) =>
+                        Validators.positiveNumber(v, fieldName: 'Quantity'),
+                    validatorUnitPrice: (v) => Validators.nonNegativeNumber(
+                      v,
+                      fieldName: 'Unit price',
+                    ),
+                    validatorTaxRate: (v) =>
+                        Validators.nonNegativeNumber(v, fieldName: 'Tax'),
                     onChanged: (updated) {
                       final list = [..._invoice!.items];
                       list[index] = updated;

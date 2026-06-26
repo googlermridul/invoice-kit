@@ -112,7 +112,8 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                           filter: _filter,
                           isInvoice: true,
                           onChanged: (f) => setState(() => _filter = f),
-                          onClear: () => setState(() => _filter = DocumentFilter.empty),
+                          onClear: () =>
+                              setState(() => _filter = DocumentFilter.empty),
                         ),
                         Row(
                           children: [
@@ -137,13 +138,21 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                               },
                               icon: Icon(
                                 Icons.tune,
-                                color: _filter.activeCount > 0 ? context.colors.primary : null,
+                                color: _filter.activeCount > 0
+                                    ? context.colors.primary
+                                    : null,
                               ),
                               label: Text(
-                                _filter.activeCount > 0 ? 'Filters · ${_filter.activeCount}' : 'Filters',
+                                _filter.activeCount > 0
+                                    ? 'Filters · ${_filter.activeCount}'
+                                    : 'Filters',
                                 style: TextStyle(
-                                  color: _filter.activeCount > 0 ? context.colors.primary : null,
-                                  fontWeight: _filter.activeCount > 0 ? FontWeight.w700 : null,
+                                  color: _filter.activeCount > 0
+                                      ? context.colors.primary
+                                      : null,
+                                  fontWeight: _filter.activeCount > 0
+                                      ? FontWeight.w700
+                                      : null,
                                 ),
                               ),
                             ),
@@ -159,7 +168,9 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                             subtitle: _query.isNotEmpty || !_filter.isEmpty
                                 ? 'Try clearing search or filters.'
                                 : 'Create your first invoice to bill a client.',
-                            actionLabel: _query.isEmpty && _filter.isEmpty ? 'Create invoice' : null,
+                            actionLabel: _query.isEmpty && _filter.isEmpty
+                                ? 'Create invoice'
+                                : null,
                             onAction: _query.isEmpty && _filter.isEmpty
                                 ? () => GoRouter.of(
                                     context,

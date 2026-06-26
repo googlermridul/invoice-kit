@@ -3,6 +3,16 @@ import 'package:invoice_kit/core/api/api_endpoints.dart';
 import 'package:invoice_kit/core/api/api_response.dart';
 import 'package:invoice_kit/features/authentication/data/models/auth_session_model.dart';
 
+/// Legacy Dio-backed auth datasource.
+///
+/// **Do not call this from `AuthRepositoryImpl`.** Auth (sign-up, sign-in,
+/// password reset, sign-out) must go through `SupabaseAuthDataSource`, which
+/// hits `https://<project>.supabase.co/auth/v1/...` via the Supabase Flutter
+/// client. The Dio instance is configured with `APP_BASE_URL` (a placeholder
+/// legacy backend) and would silently 404 on auth requests.
+///
+/// This class is preserved in DI for compile compatibility with any
+/// non-auth legacy callers. New code must not introduce a dependency on it.
 abstract class AuthRemoteDataSource {
   Future<AuthSessionModel> login({
     required String email,

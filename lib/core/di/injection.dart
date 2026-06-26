@@ -13,18 +13,24 @@ import 'package:invoice_kit/core/network/interceptors/refresh_token_interceptor.
 import 'package:invoice_kit/core/permissions/permissions_service.dart';
 import 'package:invoice_kit/core/security/device_integrity_service.dart';
 import 'package:invoice_kit/core/services/document_share_service.dart';
+import 'package:invoice_kit/core/services/startup_coordinator.dart';
+import 'package:invoice_kit/core/services/supabase_service.dart';
 import 'package:invoice_kit/core/storage/hive_storage_service.dart';
 import 'package:invoice_kit/core/storage/local_storage_service.dart';
 import 'package:invoice_kit/core/storage/secure_storage_service.dart';
 import 'package:invoice_kit/core/theme/theme_bloc/theme_bloc.dart';
 import 'package:invoice_kit/features/authentication/data/datasources/auth_local_datasource.dart';
 import 'package:invoice_kit/features/authentication/data/datasources/auth_remote_datasource.dart';
+import 'package:invoice_kit/features/authentication/data/datasources/supabase_auth_datasource.dart';
 import 'package:invoice_kit/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:invoice_kit/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/delete_account_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/forgot_password_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/google_signin_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/login_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/logout_usecase.dart';
 import 'package:invoice_kit/features/authentication/domain/usecases/register_usecase.dart';
+import 'package:invoice_kit/features/authentication/domain/usecases/restore_session_usecase.dart';
 import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:invoice_kit/features/backup/data/repositories/backup_repository.dart';
 import 'package:invoice_kit/features/backup/presentation/bloc/backup_cubit.dart';
@@ -34,6 +40,13 @@ import 'package:invoice_kit/features/business_profile/presentation/bloc/business
 import 'package:invoice_kit/features/clients/data/repositories/client_repository.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/features/dashboard/presentation/bloc/dashboard_cubit.dart';
+import 'package:invoice_kit/features/devices/data/repositories/device_repository_impl.dart';
+import 'package:invoice_kit/features/devices/domain/repositories/device_repository.dart';
+import 'package:invoice_kit/features/devices/domain/usecases/enforce_device_limit_usecase.dart';
+import 'package:invoice_kit/features/devices/domain/usecases/fetch_devices_usecase.dart';
+import 'package:invoice_kit/features/devices/domain/usecases/register_device_usecase.dart';
+import 'package:invoice_kit/features/devices/domain/usecases/remove_device_usecase.dart';
+import 'package:invoice_kit/features/devices/presentation/bloc/devices_cubit.dart';
 import 'package:invoice_kit/features/fx/data/datasources/fx_remote_datasource.dart';
 import 'package:invoice_kit/features/fx/data/repositories/fx_repository.dart';
 import 'package:invoice_kit/features/fx/presentation/bloc/fx_cubit.dart';
@@ -41,6 +54,12 @@ import 'package:invoice_kit/features/invoices/data/repositories/invoice_reposito
 import 'package:invoice_kit/features/invoices/domain/services/pdf_generator.dart';
 import 'package:invoice_kit/features/invoices/presentation/bloc/invoices_cubit.dart';
 import 'package:invoice_kit/features/onboarding/presentation/bloc/onboarding_bloc.dart';
+import 'package:invoice_kit/features/premium/data/repositories/premium_repository_impl.dart';
+import 'package:invoice_kit/features/premium/domain/repositories/premium_repository.dart';
+import 'package:invoice_kit/features/premium/domain/services/premium_access_manager.dart';
+import 'package:invoice_kit/features/premium/domain/services/premium_checker.dart';
+import 'package:invoice_kit/features/premium/domain/services/premium_route_guard.dart';
+import 'package:invoice_kit/features/premium/presentation/bloc/premium_cubit.dart';
 import 'package:invoice_kit/features/quotes/data/repositories/quote_repository.dart';
 import 'package:invoice_kit/features/quotes/presentation/bloc/quotes_cubit.dart';
 import 'package:invoice_kit/features/recurring/data/repositories/recurring_repository.dart';
@@ -50,11 +69,19 @@ import 'package:invoice_kit/features/settings/data/repositories/settings_reposit
 import 'package:invoice_kit/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:invoice_kit/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:invoice_kit/features/subscription/data/datasources/subscription_remote_datasource.dart';
+import 'package:invoice_kit/features/subscription/data/datasources/subscription_supabase_datasource.dart';
 import 'package:invoice_kit/features/subscription/data/repositories/subscription_repository.dart';
+import 'package:invoice_kit/features/subscription/data/services/play_billing_service.dart';
 import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart';
 import 'package:invoice_kit/features/subscription/domain/services/entitlement_service.dart';
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
+import 'package:invoice_kit/features/trial/data/repositories/trial_repository_impl.dart';
+import 'package:invoice_kit/features/trial/domain/repositories/trial_repository.dart';
+import 'package:invoice_kit/features/trial/domain/usecases/get_trial_state_usecase.dart';
+import 'package:invoice_kit/features/trial/domain/usecases/start_trial_usecase.dart';
+import 'package:invoice_kit/features/trial/presentation/cubit/trial_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Global service locator.
 final GetIt sl = GetIt.instance;
@@ -89,6 +116,11 @@ Future<void> configureDependencies({
     ..registerSingleton<SharedPreferences>(
       await SharedPreferences.getInstance(),
     );
+
+  // ── Supabase service (reads the SDK's already-initialised singleton) ──
+  sl.registerSingleton<SupabaseService>(
+    SupabaseService(Supabase.instance.client),
+  );
 
   // ── Dio stack ─────────────────────────────────────────────────────────
   final tokenProvider = SecureStorageTokenProvider(sl<SecureStorageService>());
@@ -128,10 +160,17 @@ Future<void> configureDependencies({
         sl<HiveStorageService>(),
       ),
     )
+    ..registerSingleton<SupabaseAuthDataSource>(
+      SupabaseAuthDataSourceImpl(
+        client: sl<SupabaseService>().client,
+        secure: sl<SecureStorageService>(),
+        config: config,
+      ),
+    )
     ..registerSingleton<AuthRepository>(
       AuthRepositoryImpl(
-        remote: sl<AuthRemoteDataSource>(),
         local: sl<AuthLocalDataSource>(),
+        supabase: sl<SupabaseAuthDataSource>(),
         errorHandler: sl<ErrorHandler>(),
         tokenProvider: tokenProvider,
       ),
@@ -141,6 +180,45 @@ Future<void> configureDependencies({
     ..registerSingleton<LogoutUseCase>(LogoutUseCase(sl<AuthRepository>()))
     ..registerSingleton<ForgotPasswordUseCase>(
       ForgotPasswordUseCase(sl<AuthRepository>()),
+    )
+    ..registerSingleton<GoogleSignInUseCase>(
+      GoogleSignInUseCase(sl<AuthRepository>()),
+    )
+    ..registerSingleton<RestoreSessionUseCase>(
+      RestoreSessionUseCase(sl<AuthRepository>()),
+    )
+    ..registerSingleton<DeleteAccountUseCase>(
+      DeleteAccountUseCase(sl<AuthRepository>()),
+    )
+    // ── Trial feature ─────────────────────────────────────────────────────
+    ..registerSingleton<TrialRepository>(
+      TrialRepositoryImpl(sl<HiveStorageService>()),
+    )
+    ..registerSingleton<StartTrialUseCase>(
+      StartTrialUseCase(sl<TrialRepository>()),
+    )
+    ..registerSingleton<GetTrialStateUseCase>(
+      GetTrialStateUseCase(sl<TrialRepository>()),
+    )
+    // ── Devices feature ───────────────────────────────────────────────────
+    ..registerSingleton<DeviceRepository>(
+      DeviceRepositoryImpl(
+        client: sl<SupabaseService>().client,
+        secure: sl<SecureStorageService>(),
+        errorHandler: sl<ErrorHandler>(),
+      ),
+    )
+    ..registerSingleton<FetchDevicesUseCase>(
+      FetchDevicesUseCase(sl<DeviceRepository>()),
+    )
+    ..registerSingleton<RegisterDeviceUseCase>(
+      RegisterDeviceUseCase(sl<DeviceRepository>()),
+    )
+    ..registerSingleton<RemoveDeviceUseCase>(
+      RemoveDeviceUseCase(sl<DeviceRepository>()),
+    )
+    ..registerSingleton<EnforceDeviceLimitUseCase>(
+      EnforceDeviceLimitUseCase(sl<DeviceRepository>()),
     )
     // ── InvoiceKit features ────────────────────────────────────────────────
     ..registerSingleton<BusinessProfileRepository>(
@@ -164,11 +242,24 @@ Future<void> configureDependencies({
     ..registerSingleton<SubscriptionRemoteDataSource>(
       SubscriptionRemoteDataSourceImpl(sl<Dio>()),
     )
+    ..registerSingleton<SubscriptionSupabaseDataSource>(
+      SubscriptionSupabaseDataSourceImpl(sl<SupabaseService>().client),
+    )
     ..registerSingleton<SubscriptionRepository>(
       SubscriptionRepositoryImpl(
         remote: sl<SubscriptionRemoteDataSource>(),
         storage: sl<HiveStorageService>(),
         localStorage: sl<LocalStorageService>(),
+      ),
+    )
+    ..registerSingleton<SubscriptionBillingService>(
+      PlayBillingSubscriptionService(
+        hive: sl<HiveStorageService>(),
+        localStorage: sl<LocalStorageService>(),
+        secure: sl<SecureStorageService>(),
+        supabase: sl<SubscriptionSupabaseDataSource>(),
+        monthlyProductId: config.playBillingMonthlyProductId,
+        yearlyProductId: config.playBillingYearlyProductId,
       ),
     )
     ..registerSingleton<FxRemoteDataSource>(FxRemoteDataSourceImpl(sl<Dio>()))
@@ -185,6 +276,33 @@ Future<void> configureDependencies({
         subscriptionStatus: SubscriptionStatus.initial(),
       ),
     )
+    // ── Premium centralised access control ──────────────────────────────
+    ..registerSingleton<PremiumChecker>(const PremiumChecker())
+    ..registerSingleton<PremiumAccessManager>(
+      PremiumAccessManager(sl<PremiumChecker>()),
+    )
+    ..registerSingleton<PremiumRepository>(
+      PremiumRepositoryImpl(
+        subscriptionRepository: sl<SubscriptionRepository>(),
+        authRepository: sl<AuthRepository>(),
+        checker: sl<PremiumChecker>(),
+      ),
+    )
+    ..registerSingleton<PremiumRouteGuard>(
+      PremiumRouteGuard(sl<PremiumAccessManager>()),
+    )
+    // ── Startup coordinator ──────────────────────────────────────────────
+    ..registerFactory<StartupCoordinator>(
+      () => StartupCoordinator(
+        trialRepository: sl<TrialRepository>(),
+        subscriptionRepository: sl<SubscriptionRepository>(),
+        authRepository: sl<AuthRepository>(),
+        deviceRepository: sl<DeviceRepository>(),
+        premiumManager: sl<PremiumAccessManager>(),
+        maxDevices: config.maxDevicesPerAccount,
+        onboardingCompleted: sl<LocalStorageService>().getBool('onboarding_completed') ?? false,
+      ),
+    )
     // ── Blocs / cubits ────────────────────────────────────────────────────
     ..registerFactory<AuthBloc>(
       () => AuthBloc(
@@ -192,6 +310,9 @@ Future<void> configureDependencies({
         logoutUseCase: sl<LogoutUseCase>(),
         forgotPasswordUseCase: sl<ForgotPasswordUseCase>(),
         registerUseCase: sl<RegisterUseCase>(),
+        googleSignInUseCase: sl<GoogleSignInUseCase>(),
+        restoreSessionUseCase: sl<RestoreSessionUseCase>(),
+        deleteAccountUseCase: sl<DeleteAccountUseCase>(),
         repository: sl<AuthRepository>(),
       ),
     )
@@ -209,6 +330,19 @@ Future<void> configureDependencies({
       () => SubscriptionBloc(
         repository: sl<SubscriptionRepository>(),
         entitlements: sl<EntitlementService>(),
+      ),
+    )
+    ..registerFactory<PremiumCubit>(
+      () => PremiumCubit(repository: sl<PremiumRepository>()),
+    )
+    ..registerFactory<TrialCubit>(
+      () => TrialCubit(repository: sl<TrialRepository>()),
+    )
+    ..registerFactory<DevicesCubit>(
+      () => DevicesCubit(
+        fetchDevices: sl<FetchDevicesUseCase>(),
+        removeDevice: sl<RemoveDeviceUseCase>(),
+        errorHandler: sl<ErrorHandler>(),
       ),
     )
     ..registerFactory<DashboardCubit>(
@@ -259,7 +393,7 @@ Future<void> configureDependencies({
     ..registerFactory<SplashBloc>(
       () => SplashBloc(
         localStorage: sl<LocalStorageService>(),
-        subscriptionRepository: sl<SubscriptionRepository>(),
+        startupCoordinator: sl<StartupCoordinator>(),
       ),
     )
     ..registerLazySingleton<ThemeBloc>(

@@ -82,7 +82,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       const SizedBox(height: 32),
                       EmptyState(
                         icon: Icons.people_outline,
-                        title: state.query.isEmpty ? 'No clients yet' : 'No clients match "${state.query}"',
+                        title: state.query.isEmpty
+                            ? 'No clients yet'
+                            : 'No clients match "${state.query}"',
                         subtitle: state.query.isEmpty
                             ? 'Add your first client to start invoicing.'
                             : 'Try a different name or company.',
@@ -111,7 +113,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     return ClientRow(
                       name: c.name,
                       subtitle: _clientSubtitle(c),
-                      trailing: (invoices > 0 || quotes > 0) ? _CountBadges(invoices: invoices, quotes: quotes) : null,
+                      trailing: (invoices > 0 || quotes > 0)
+                          ? _CountBadges(invoices: invoices, quotes: quotes)
+                          : null,
                       onTap: () => GoRouter.of(context).push(
                         RoutePaths.clientDetailPath(c.id),
                       ),
@@ -145,7 +149,8 @@ class _CountBadges extends StatelessWidget {
     return Wrap(
       spacing: 4,
       children: [
-        if (invoices > 0) _Badge(icon: Icons.receipt_long_outlined, n: invoices),
+        if (invoices > 0)
+          _Badge(icon: Icons.receipt_long_outlined, n: invoices),
         if (quotes > 0) _Badge(icon: Icons.description_outlined, n: quotes),
       ],
     );

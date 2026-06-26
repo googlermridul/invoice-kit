@@ -12,11 +12,24 @@ class ErrorHandler {
 
   final ErrorMapper _mapper;
 
+  /// Runs [body], mapping any thrown exception into a [Failure] and
+  /// re-throwing it. Use in repositories that prefer to let the caller
+  /// catch a single `Failure` type.
   Future<T> guard<T>(Future<T> Function() body) async {
     try {
       return await body();
     } catch (error, stackTrace) {
       throw _mapper.map(error, stackTrace);
+    }
+  }
+
+  /// Like [guard] but returns a [Result] instead of throwing — useful in
+  /// cubits / blocs that prefer to fold on a single union value.
+  Future<Result<T>> run<T>(Future<T> Function() body) async {
+    try {
+      return Success(await body());
+    } catch (error, stackTrace) {
+      return FailureResult(_mapper.map(error, stackTrace));
     }
   }
 

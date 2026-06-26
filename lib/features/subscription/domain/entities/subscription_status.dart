@@ -33,6 +33,12 @@ enum SubscriptionState {
 
   /// User cancelled (auto-renew off); still active until period ends.
   cancelled,
+
+  /// Purchase is still pending (e.g. awaiting payment confirmation).
+  pending,
+
+  /// Subscription is in the billing grace period after a failed renewal.
+  gracePeriod,
 }
 
 class SubscriptionStatus extends Equatable {
@@ -88,6 +94,8 @@ class SubscriptionStatus extends Equatable {
       state == SubscriptionState.active || state == SubscriptionState.cancelled;
   bool get isExpired =>
       state == SubscriptionState.expired || state == SubscriptionState.none;
+  bool get isPending => state == SubscriptionState.pending;
+  bool get isInGracePeriod => state == SubscriptionState.gracePeriod;
 
   /// Whether the user currently has access to premium features.
   ///
@@ -95,9 +103,11 @@ class SubscriptionStatus extends Equatable {
   ///
   ///   hasPremiumAccess = subscriptionActive || freeTrialActive
   ///
-  /// `subscriptionActive` covers both paid (`active`) and grace-period
-  /// (`cancelled` while still inside the paid window). `freeTrialActive`
-  /// covers the `trialing` state while the trial window is still open.
+  /// `subscriptionActive` covers both paid (`active`), grace-period
+  /// (`gracePeriod`), and cancelled-while-active (`cancelled` while
+  /// inside the paid window). `freeTrialActive` covers the `trialing`
+  /// state while the trial window is still open. Pending subscriptions
+  /// do *not* grant access until they resolve.
   /// Evaluated against [now] on every call so an expired trial takes
   /// effect on the very next read — the router guard relies on this
   /// rather than on any cached bloc state.
@@ -109,6 +119,10 @@ class SubscriptionStatus extends Equatable {
         return currentPeriodEnd == null || currentPeriodEnd!.isAfter(now);
       case SubscriptionState.cancelled:
         return currentPeriodEnd != null && currentPeriodEnd!.isAfter(now);
+      case SubscriptionState.gracePeriod:
+        // Grace period still grants access until expiry.
+        return currentPeriodEnd == null || currentPeriodEnd!.isAfter(now);
+      case SubscriptionState.pending:
       case SubscriptionState.none:
       case SubscriptionState.expired:
         return false;

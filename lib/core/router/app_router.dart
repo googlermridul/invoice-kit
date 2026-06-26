@@ -22,6 +22,7 @@ import 'package:invoice_kit/features/clients/presentation/screens/client_edit_sc
 import 'package:invoice_kit/features/clients/presentation/screens/clients_screen.dart';
 import 'package:invoice_kit/features/dashboard/presentation/bloc/dashboard_cubit.dart';
 import 'package:invoice_kit/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:invoice_kit/features/devices/presentation/screens/devices_screen.dart';
 import 'package:invoice_kit/features/fx/presentation/bloc/fx_cubit.dart';
 import 'package:invoice_kit/features/fx/presentation/screens/fx_screen.dart';
 import 'package:invoice_kit/features/invoices/presentation/bloc/invoices_cubit.dart';
@@ -42,6 +43,7 @@ import 'package:invoice_kit/features/settings/presentation/screens/settings_scre
 import 'package:invoice_kit/features/splash/presentation/bloc/splash_bloc.dart';
 import 'package:invoice_kit/features/splash/presentation/screens/splash_screen.dart';
 import 'package:invoice_kit/features/subscription/presentation/screens/subscription_screen.dart';
+import 'package:invoice_kit/features/trial/presentation/screens/trial_expired_screen.dart';
 
 class AppRouter {
   AppRouter({required this.guard}) {
@@ -74,6 +76,17 @@ class AppRouter {
           path: RoutePaths.subscription,
           name: RouteNames.subscription,
           builder: (_, _) => const SubscriptionScreen(),
+        ),
+        GoRoute(
+          path: RoutePaths.devices,
+          name: RouteNames.devices,
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (_, _) => const DevicesScreen(),
+        ),
+        GoRoute(
+          path: RoutePaths.trialExpired,
+          name: RouteNames.trialExpired,
+          builder: (_, _) => const TrialExpiredScreen(),
         ),
         GoRoute(
           path: RoutePaths.login,

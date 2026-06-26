@@ -4,6 +4,7 @@ class RouteNames {
 
   static const String splash = 'splash';
   static const String onboarding = 'onboarding';
+  static const String startTrial = 'start-trial';
   static const String subscription = 'subscription';
   static const String login = 'login';
   static const String register = 'register';
@@ -28,4 +29,6 @@ class RouteNames {
   static const String backup = 'backup';
   static const String settings = 'settings';
   static const String home = 'home';
+  static const String devices = 'devices';
+  static const String trialExpired = 'trial-expired';
 }

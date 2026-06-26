@@ -10,7 +10,9 @@ class AppColors {
 
   // Brand — navy primary with cyan accent
   static const Color primary = Color(0xFF1E3A8A); // navy
-  static const Color primaryDark = Color(0xFF172554); // darker navy for dark theme
+  static const Color primaryDark = Color(
+    0xFF172554,
+  ); // darker navy for dark theme
   static const Color primaryAccent = Color(0xFF60A5FA); // sky
   static const Color tertiary = Color(0xFF0EA5B7); // cyan accent
   static const Color tertiaryDark = Color(0xFF22D3EE);

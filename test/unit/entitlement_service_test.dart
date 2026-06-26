@@ -38,8 +38,8 @@ void main() {
           trialEnd: started.add(InvoiceConstants.trialDuration),
         );
         expect(svc.isInTrial(s, now), isTrue);
-        // 3 day trial, 1.5 days elapsed → 1 whole day remaining
-        expect(svc.trialDaysRemaining(s, now), 1);
+        // 7 day trial, 1.5 days elapsed → 5 whole days remaining
+        expect(svc.trialDaysRemaining(s, now), 5);
       });
 
       test('blocked once trial ends', () {

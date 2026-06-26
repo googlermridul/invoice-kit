@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invoice_kit/core/errors/failures.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Maps exceptions to domain-level [Failure]s. UI / blocs depend only on this.
 abstract class ErrorMapper {
@@ -36,6 +37,10 @@ class DefaultErrorMapper implements ErrorMapper {
       }
     }
 
+    if (error is AuthException) {
+      return _fromAuthException(error);
+    }
+
     if (error is FormatException) {
       return const ApiFailure(message: 'Bad response format.');
     }
@@ -57,6 +62,9 @@ class DefaultErrorMapper implements ErrorMapper {
       final fields = <String, String>{};
       return ValidationFailure(message: 'Validation failed.', fields: fields);
     }
+    if (status == 400) {
+      return const InvalidCredentialsFailure();
+    }
     if (status >= 500) {
       return ServerFailure(message: body?.toString() ?? '');
     }
@@ -67,5 +75,28 @@ class DefaultErrorMapper implements ErrorMapper {
       return const ApiFailure(message: 'Resource not found.');
     }
     return ApiFailure(message: body?.toString() ?? 'HTTP $status');
+  }
+
+  Failure _fromAuthException(AuthException error) {
+    final message = error.message.toLowerCase();
+    if (message.contains('invalid login') ||
+        message.contains('invalid credentials') ||
+        message.contains('invalid email or password')) {
+      return const InvalidCredentialsFailure();
+    }
+    if (message.contains('email not confirmed')) {
+      return const ApiFailure(
+        message: 'Please confirm your email before signing in.',
+      );
+    }
+    if (message.contains('user already registered')) {
+      return const ApiFailure(message: 'An account with this email exists.');
+    }
+    if (message.contains('rate limit')) {
+      return const ApiFailure(
+        message: 'Too many attempts. Please wait and retry.',
+      );
+    }
+    return ApiFailure(message: error.message);
   }
 }

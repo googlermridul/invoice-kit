@@ -7,10 +7,12 @@ enum SubscriptionStatusX {
   refreshing,
   purchasing,
   restoring,
+  pending,
+  gracePeriod,
 }
 
-class SubscriptionState extends Equatable {
-  const SubscriptionState({
+class SubscriptionBlocState extends Equatable {
+  const SubscriptionBlocState({
     this.status = SubscriptionStatusX.initial,
     SubscriptionStatus? subscriptionStatus,
     this.hasAccess = false,
@@ -18,7 +20,7 @@ class SubscriptionState extends Equatable {
     this.message,
   }) : _status = subscriptionStatus;
 
-  factory SubscriptionState.initial() => const SubscriptionState();
+  factory SubscriptionBlocState.initial() => const SubscriptionBlocState();
 
   final SubscriptionStatusX status;
   final SubscriptionStatus? _status;
@@ -32,8 +34,10 @@ class SubscriptionState extends Equatable {
   bool get isTrialing => currentStatus.isTrialing;
   bool get isActive => currentStatus.isActive;
   bool get isExpired => currentStatus.isExpired;
+  bool get isPending => status == SubscriptionStatusX.pending;
+  bool get isGracePeriod => status == SubscriptionStatusX.gracePeriod;
 
-  SubscriptionState copyWith({
+  SubscriptionBlocState copyWith({
     SubscriptionStatusX? status,
     SubscriptionStatus? subscriptionStatus,
     bool? hasAccess,
@@ -41,7 +45,7 @@ class SubscriptionState extends Equatable {
     String? message,
     bool clearMessage = false,
   }) {
-    return SubscriptionState(
+    return SubscriptionBlocState(
       status: status ?? this.status,
       subscriptionStatus: subscriptionStatus ?? _status,
       hasAccess: hasAccess ?? this.hasAccess,

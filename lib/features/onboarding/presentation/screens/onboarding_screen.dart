@@ -85,7 +85,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       _BusinessStep(
                         businessName: state.businessName,
                         currency: state.currency,
-                        onBusinessName: (v) => context.read<OnboardingBloc>().add(OnboardingBusinessNameChanged(v)),
+                        onBusinessName: (v) => context
+                            .read<OnboardingBloc>()
+                            .add(OnboardingBusinessNameChanged(v)),
                         onCurrency: (v) => context.read<OnboardingBloc>().add(
                           OnboardingCurrencyChanged(v),
                         ),
@@ -124,7 +126,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   child: state.step == 5
                       ? PrimaryButton(
-                          label: state.status == OnboardingStatus.saving ? 'Setting up…' : 'Start 3-day free trial',
+                          label: state.status == OnboardingStatus.saving
+                              ? 'Setting up…'
+                              : 'Start 3-day free trial',
                           onPressed: state.status == OnboardingStatus.saving
                               ? null
                               : () => context.read<OnboardingBloc>().add(
@@ -140,12 +144,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   onPressed: () => _setStep(state.step - 1),
                                 ),
                               ),
-                            if (state.step > 0) const SizedBox(width: AppSpacing.md),
+                            if (state.step > 0)
+                              const SizedBox(width: AppSpacing.md),
                             Expanded(
                               flex: 2,
                               child: PrimaryButton(
                                 label: 'Continue',
-                                onPressed: state.canProceed ? () => _setStep(state.step + 1) : null,
+                                onPressed: state.canProceed
+                                    ? () => _setStep(state.step + 1)
+                                    : null,
                               ),
                             ),
                           ],

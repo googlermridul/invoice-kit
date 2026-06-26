@@ -88,7 +88,8 @@ class _RecurringScreenState extends State<RecurringScreen> {
                 EmptyState(
                   icon: Icons.repeat_rounded,
                   title: 'No recurring schedules',
-                  subtitle: 'Set a schedule to auto-generate invoices on a daily, weekly, monthly, or yearly cadence.',
+                  subtitle:
+                      'Set a schedule to auto-generate invoices on a daily, weekly, monthly, or yearly cadence.',
                 ),
               ],
             );

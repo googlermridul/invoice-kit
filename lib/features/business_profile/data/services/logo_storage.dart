@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:get_it/get_it.dart' show GetIt;
 import 'package:invoice_kit/core/di/injection.dart';
-import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart' show BusinessProfile;
+import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart'
+    show BusinessProfile;
 import 'package:path_provider/path_provider.dart';
 
 /// Persists company logos to a stable local directory so the path stored in

@@ -6,7 +6,8 @@ import 'package:invoice_kit/core/services/document_share_service.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus;
 import 'package:invoice_kit/features/reports/domain/usecases/reports_calculator.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -28,7 +29,8 @@ class ReportPdfService {
     required List<({InvoiceStatus status, int count})> breakdown,
   }) async {
     final doc = pw.Document();
-    final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
+    final profile =
+        await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
     final logoBytes = await _loadLogoBytes(profile);
     final currency = 'USD';
     final generatedAt = DateTime.now();
@@ -100,7 +102,9 @@ class ReportPdfService {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text(
-                  profile.businessName.isEmpty ? 'InvoiceKit Report' : profile.businessName,
+                  profile.businessName.isEmpty
+                      ? 'InvoiceKit Report'
+                      : profile.businessName,
                   style: pw.TextStyle(
                     fontSize: 22,
                     fontWeight: pw.FontWeight.bold,

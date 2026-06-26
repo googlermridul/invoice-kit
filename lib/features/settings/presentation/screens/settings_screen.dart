@@ -39,7 +39,7 @@ class SettingsScreen extends StatelessWidget {
               color: Colors.transparent,
               child: Column(
                 children: [
-                  BlocBuilder<SubscriptionBloc, SubscriptionState>(
+                  BlocBuilder<SubscriptionBloc, SubscriptionBlocState>(
                     builder: (context, state) {
                       return ListTile(
                         leading: Container(
@@ -66,7 +66,8 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
-                        onTap: () => GoRouter.of(context).push(AppRoutes.subscription),
+                        onTap: () =>
+                            GoRouter.of(context).push(AppRoutes.subscription),
                       );
                     },
                   ),
@@ -90,7 +91,8 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     title: const Text('Business profile'),
                     trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
-                    onTap: () => GoRouter.of(context).push(AppRoutes.businessProfile),
+                    onTap: () =>
+                        GoRouter.of(context).push(AppRoutes.businessProfile),
                   ),
                 ],
               ),
@@ -193,7 +195,8 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
-                        onTap: () => _pickTemplate(context, s.selectedPdfTemplate),
+                        onTap: () =>
+                            _pickTemplate(context, s.selectedPdfTemplate),
                       ),
                       const Divider(
                         height: 1,
@@ -207,7 +210,9 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         title: const Text('Send payment reminders'),
                         value: s.sendReminders,
-                        onChanged: (v) => context.read<SettingsCubit>().setSendReminders(value: v),
+                        onChanged: (v) => context
+                            .read<SettingsCubit>()
+                            .setSendReminders(value: v),
                       ),
                       const Divider(
                         height: 1,
@@ -221,7 +226,9 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         title: const Text('Auto-mark overdue'),
                         value: s.markOverdueAuto,
-                        onChanged: (v) => context.read<SettingsCubit>().setMarkOverdueAuto(value: v),
+                        onChanged: (v) => context
+                            .read<SettingsCubit>()
+                            .setMarkOverdueAuto(value: v),
                       ),
                     ],
                   ),
@@ -304,7 +311,9 @@ class SettingsScreen extends StatelessWidget {
           for (final c in CurrencyCodes.common)
             ListTile(
               title: Text('${CurrencyCodes.symbolOf(c)}  $c'),
-              trailing: c == current ? Icon(HugeIconsStroke.tick01, size: 18) : null,
+              trailing: c == current
+                  ? Icon(HugeIconsStroke.tick01, size: 18)
+                  : null,
               onTap: () => Navigator.pop(context, c),
             ),
         ],
@@ -324,7 +333,9 @@ class SettingsScreen extends StatelessWidget {
             ListTile(
               title: Text(PdfTemplateIds.displayName(t)),
               subtitle: Text(PdfTemplateIds.description(t)),
-              trailing: t == current ? Icon(HugeIconsStroke.tick01, size: 18) : null,
+              trailing: t == current
+                  ? Icon(HugeIconsStroke.tick01, size: 18)
+                  : null,
               onTap: () => Navigator.pop(context, t),
             ),
         ],

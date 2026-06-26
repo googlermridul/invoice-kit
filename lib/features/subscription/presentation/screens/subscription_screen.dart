@@ -8,7 +8,8 @@ import 'package:invoice_kit/core/theme/app_radius.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/core/theme/app_tokens.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
-import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart' show SubscriptionPlan;
+import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart'
+    show SubscriptionPlan;
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
 import 'package:invoice_kit/shared/widgets/buttons.dart';
 
@@ -26,7 +27,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colors.surface,
-      body: BlocBuilder<SubscriptionBloc, SubscriptionState>(
+      body: BlocBuilder<SubscriptionBloc, SubscriptionBlocState>(
         builder: (context, state) {
           return SafeArea(
             child: Column(
@@ -51,13 +52,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       const SizedBox(height: AppSpacing.xl),
                       Center(
                         child: TextButton(
-                          onPressed: state.status == SubscriptionStatusX.restoring
+                          onPressed:
+                              state.status == SubscriptionStatusX.restoring
                               ? null
                               : () => context.read<SubscriptionBloc>().add(
                                   const SubscriptionRestored(),
                                 ),
                           child: Text(
-                            state.status == SubscriptionStatusX.restoring ? 'Restoring…' : 'Restore purchase',
+                            state.status == SubscriptionStatusX.restoring
+                                ? 'Restoring…'
+                                : 'Restore purchase',
                             style: context.textTheme.bodyMedium?.copyWith(
                               color: context.colors.onSurfaceVariant,
                               fontWeight: FontWeight.w600,
@@ -82,7 +86,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 /// Premium gradient hero with branding and optional trial badge.
 class _Header extends StatelessWidget {
   const _Header({required this.state});
-  final SubscriptionState state;
+  final SubscriptionBlocState state;
 
   @override
   Widget build(BuildContext context) {
@@ -352,7 +356,9 @@ class _ToggleOption extends StatelessWidget {
                     label,
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: selected ? context.colors.primary : context.colors.onSurface,
+                      color: selected
+                          ? context.colors.primary
+                          : context.colors.onSurface,
                     ),
                   ),
                 ),
@@ -362,13 +368,23 @@ class _ToggleOption extends StatelessWidget {
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: selected ? context.colors.primary : Colors.transparent,
+                    color: selected
+                        ? context.colors.primary
+                        : Colors.transparent,
                     border: Border.all(
-                      color: selected ? context.colors.primary : tokens.borderStrong,
+                      color: selected
+                          ? context.colors.primary
+                          : tokens.borderStrong,
                       width: 2,
                     ),
                   ),
-                  child: selected ? const Icon(HugeIconsStroke.tick02, size: 12, color: Colors.white) : null,
+                  child: selected
+                      ? const Icon(
+                          HugeIconsStroke.tick02,
+                          size: 12,
+                          color: Colors.white,
+                        )
+                      : null,
                 ),
               ],
             ),
@@ -517,7 +533,7 @@ class _BenefitsSection extends StatelessWidget {
 class _Footer extends StatelessWidget {
   const _Footer({required this.selected, required this.state});
   final SubscriptionPlan selected;
-  final SubscriptionState state;
+  final SubscriptionBlocState state;
 
   @override
   Widget build(BuildContext context) {
@@ -541,7 +557,9 @@ class _Footer extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             PrimaryButton(
-              label: isPurchasing ? 'Activating…' : 'Continue with ${isYearly ? 'Yearly' : 'Monthly'}',
+              label: isPurchasing
+                  ? 'Activating…'
+                  : 'Continue with ${isYearly ? 'Yearly' : 'Monthly'}',
               icon: isPurchasing ? null : Icons.arrow_forward_rounded,
               onPressed: isPurchasing
                   ? null

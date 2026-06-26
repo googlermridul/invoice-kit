@@ -29,7 +29,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SubscriptionBloc, SubscriptionState>(
+    return BlocBuilder<SubscriptionBloc, SubscriptionBlocState>(
       builder: (context, subState) {
         return Scaffold(
           body: RefreshIndicator(
@@ -56,7 +56,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           onPressed: () => GoRouter.of(context).go(AppRoutes.reports),
                         ),
                         IconButton(
-                          icon: const Icon(HugeIconsStroke.settings01, size: 18),
+                          icon: const Icon(
+                            HugeIconsStroke.settings01,
+                            size: 18,
+                          ),
                           tooltip: 'Settings',
                           onPressed: () => GoRouter.of(context).go(AppRoutes.settings),
                         ),
@@ -319,11 +322,11 @@ class _ActionCard extends StatelessWidget {
 class _PremiumBanner extends StatelessWidget {
   const _PremiumBanner({required this.subState});
 
-  final SubscriptionState subState;
+  final SubscriptionBlocState subState;
 
   @override
   Widget build(BuildContext context) {
-    final onTap = () => GoRouter.of(context).push(AppRoutes.subscription);
+    Future<Object?> onTap() => GoRouter.of(context).push(AppRoutes.subscription);
     final trialDays = subState.trialDaysRemaining;
 
     // Show the most relevant state for the user. The free trial takes

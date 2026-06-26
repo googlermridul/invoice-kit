@@ -74,3 +74,75 @@ class UnknownFailure extends Failure {
     super.code = 'UNKNOWN_FAILURE',
   });
 }
+
+/// Invalid auth credentials (400/401 from auth endpoint).
+class InvalidCredentialsFailure extends Failure {
+  const InvalidCredentialsFailure({
+    super.message = 'Invalid email or password.',
+    super.code = 'INVALID_CREDENTIALS',
+  });
+}
+
+/// Local storage read/write failure.
+class StorageFailure extends Failure {
+  const StorageFailure({
+    super.message = 'Local storage error.',
+    super.code = 'STORAGE_FAILURE',
+  });
+}
+
+/// Google Play Billing not available (store missing / unavailable).
+class BillingUnavailableFailure extends Failure {
+  const BillingUnavailableFailure({
+    super.message = 'Billing is currently unavailable on this device.',
+    super.code = 'BILLING_UNAVAILABLE',
+  });
+}
+
+/// User cancelled the in-app purchase.
+class PurchaseCancelledFailure extends Failure {
+  const PurchaseCancelledFailure({
+    super.message = 'Purchase cancelled.',
+    super.code = 'PURCHASE_CANCELLED',
+  });
+}
+
+/// Purchase pending (awaiting confirmation / payment method).
+class PurchasePendingFailure extends Failure {
+  const PurchasePendingFailure({
+    super.message = 'Purchase is pending.',
+    super.code = 'PURCHASE_PENDING',
+  });
+}
+
+/// Server-side purchase verification failed.
+class PurchaseVerificationFailure extends Failure {
+  const PurchaseVerificationFailure({
+    super.message = 'Purchase could not be verified.',
+    super.code = 'PURCHASE_VERIFICATION_FAILED',
+  });
+}
+
+/// Subscription has expired.
+class SubscriptionExpiredFailure extends Failure {
+  const SubscriptionExpiredFailure({
+    super.message = 'Subscription expired.',
+    super.code = 'SUBSCRIPTION_EXPIRED',
+  });
+}
+
+/// Device limit exceeded for the current account.
+class DeviceLimitFailure extends Failure {
+  const DeviceLimitFailure({
+    super.message = 'Maximum number of devices reached.',
+    super.code = 'DEVICE_LIMIT_EXCEEDED',
+  });
+}
+
+/// Auth session has expired or is missing.
+class SessionExpiredFailure extends Failure {
+  const SessionExpiredFailure({
+    super.message = 'Session expired.',
+    super.code = 'SESSION_EXPIRED',
+  });
+}

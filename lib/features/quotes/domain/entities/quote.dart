@@ -32,7 +32,9 @@ class Quote extends Document {
     terms: json['terms'] as String?,
     taxRateOverride: (json['taxRateOverride'] as num?)?.toDouble(),
     status: QuoteStatus.fromId((json['status'] as num?)?.toInt() ?? 0),
-    validUntil: json['validUntil'] == null ? null : DateTime.parse(json['validUntil'] as String),
+    validUntil: json['validUntil'] == null
+        ? null
+        : DateTime.parse(json['validUntil'] as String),
     pdfTemplateId: json['pdfTemplateId'] as String?,
   );
 
@@ -72,7 +74,9 @@ class Quote extends Document {
       taxRateOverride: taxRateOverride ?? this.taxRateOverride,
       status: status ?? this.status,
       validUntil: validUntil ?? this.validUntil,
-      pdfTemplateId: clearPdfTemplate ? null : (pdfTemplateId ?? this.pdfTemplateId),
+      pdfTemplateId: clearPdfTemplate
+          ? null
+          : (pdfTemplateId ?? this.pdfTemplateId),
     );
   }
 

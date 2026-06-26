@@ -42,13 +42,18 @@ class _LineItemEditorState extends State<LineItemEditor> {
     text: _formatQty(widget.item.quantity),
   );
   late final _priceCtrl = TextEditingController(
-    text: widget.item.unitPrice == 0 ? '' : widget.item.unitPrice.toStringAsFixed(2),
+    text: widget.item.unitPrice == 0
+        ? ''
+        : widget.item.unitPrice.toStringAsFixed(2),
   );
   late final _taxCtrl = TextEditingController(
-    text: widget.item.taxRate == 0 ? '' : widget.item.taxRate.toStringAsFixed(0),
+    text: widget.item.taxRate == 0
+        ? ''
+        : widget.item.taxRate.toStringAsFixed(0),
   );
 
-  String _formatQty(double q) => q == q.roundToDouble() ? q.toInt().toString() : q.toString();
+  String _formatQty(double q) =>
+      q == q.roundToDouble() ? q.toInt().toString() : q.toString();
 
   @override
   void dispose() {

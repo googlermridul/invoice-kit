@@ -15,7 +15,8 @@ import 'package:invoice_kit/core/widgets/kv_row.dart';
 import 'package:invoice_kit/core/widgets/section_header.dart';
 import 'package:invoice_kit/features/business_profile/data/repositories/business_profile_repository.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/entities/document_item.dart';
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/quotes/data/repositories/quote_repository.dart';
@@ -158,7 +159,8 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
         body: const EmptyState(
           icon: Icons.error_outline,
           title: 'Could not open the editor',
-          subtitle: 'There was a problem creating a draft. Please go back and try again.',
+          subtitle:
+              'There was a problem creating a draft. Please go back and try again.',
         ),
       );
     }
@@ -178,12 +180,16 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
             return EmptyState(
               icon: Icons.people_outline,
               title: 'Add a client first',
-              subtitle: 'Quotes need a client. Add one and you can come back here.',
+              subtitle:
+                  'Quotes need a client. Add one and you can come back here.',
               actionLabel: 'Add client',
               onAction: () => GoRouter.of(context).push(RoutePaths.clientNew),
             );
           }
-          final selectedName = cstate.clients.where((c) => c.id == q.clientId).map((c) => c.name).firstOrNull;
+          final selectedName = cstate.clients
+              .where((c) => c.id == q.clientId)
+              .map((c) => c.name)
+              .firstOrNull;
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -233,7 +239,9 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 DateRow(
                   label: 'Valid until',
-                  value: q.validUntil ?? DateTime.now().add(const Duration(days: 30)),
+                  value:
+                      q.validUntil ??
+                      DateTime.now().add(const Duration(days: 30)),
                   onPicked: (d) => setState(
                     () => _quote = _quote!.copyWith(validUntil: d),
                   ),
@@ -250,8 +258,10 @@ class _QuoteEditScreenState extends State<QuoteEditScreen> {
                   return LineItemEditor(
                     key: ValueKey(item.id),
                     item: item,
-                    validatorDescription: (v) => Validators.required(v, fieldName: 'Description'),
-                    validatorQuantity: (v) => Validators.positiveNumber(v, fieldName: 'Quantity'),
+                    validatorDescription: (v) =>
+                        Validators.required(v, fieldName: 'Description'),
+                    validatorQuantity: (v) =>
+                        Validators.positiveNumber(v, fieldName: 'Quantity'),
                     validatorUnitPrice: (v) => Validators.nonNegativeNumber(
                       v,
                       fieldName: 'Unit price',

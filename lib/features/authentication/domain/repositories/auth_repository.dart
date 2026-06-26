@@ -16,13 +16,21 @@ abstract class AuthRepository {
     String? name,
   });
 
+  Future<({Failure? failure, AuthSession? session})> signInWithGoogle();
+
   Future<({Failure? failure, User? user})> forgotPassword({
     required String email,
   });
 
   Future<({Failure? failure, bool success})> logout();
 
+  Future<({Failure? failure, bool success})> deleteAccount();
+
   Future<User?> currentUser();
 
   Future<bool> isAuthenticated();
+
+  /// Restore the persisted Supabase session — returns the active session
+  /// if one is available, otherwise null.
+  Future<AuthSession?> restoreSession();
 }

@@ -38,4 +38,30 @@ class HiveBoxes {
   static const String exports = 'exports_box';
   static const String fxRates = 'fx_rates_box';
   static const String settings = 'settings_box';
+  static const String trial = 'trial_box';
+  static const String devices = 'devices_box';
+  static const String subscriptionCache = 'subscription_cache_box';
+}
+
+/// Hive box names. Centralised so tests and bootstrap stay in sync.
+class SupabaseTables {
+  const SupabaseTables._();
+
+  static const String profiles = 'profiles';
+  static const String subscriptions = 'subscriptions';
+  static const String devices = 'devices';
+}
+
+/// Feature-local secure-storage keys.
+class SecureKeys {
+  const SecureKeys._();
+
+  static const String supabaseSession = 'supabase_session';
+  static const String supabaseAccessToken = 'supabase_access_token';
+  static const String supabaseRefreshToken = 'supabase_refresh_token';
+  static const String supabaseUserId = 'supabase_user_id';
+  static const String googleIdToken = 'google_id_token';
+  static const String deviceId = 'device_id';
+  static const String purchaseTokenMonthly = 'purchase_token_monthly';
+  static const String purchaseTokenYearly = 'purchase_token_yearly';
 }

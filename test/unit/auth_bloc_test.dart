@@ -27,6 +27,9 @@ void main() {
     registerUseCase: registerUseCase,
     logoutUseCase: logoutUseCase,
     forgotPasswordUseCase: forgotUseCase,
+    googleSignInUseCase: MockGoogleSignInUseCase(),
+    restoreSessionUseCase: MockRestoreSessionUseCase(),
+    deleteAccountUseCase: MockDeleteAccountUseCase(),
     repository: repository,
   );
 

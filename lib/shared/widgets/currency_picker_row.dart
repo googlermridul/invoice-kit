@@ -27,7 +27,9 @@ class CurrencyPickerRow extends StatelessWidget {
           .map(
             (c) => ListTile(
               title: Text(c),
-              trailing: c == selected ? Icon(HugeIconsStroke.at, size: 24) : null,
+              trailing: c == selected
+                  ? Icon(HugeIconsStroke.at, size: 24)
+                  : null,
               onTap: () => Navigator.pop(context, c),
             ),
           )

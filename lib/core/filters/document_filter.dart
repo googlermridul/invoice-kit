@@ -149,7 +149,6 @@ List<Invoice> filterInvoices({
   return list;
 }
 
-
 List<Quote> filterQuotes({
   required List<Quote> quotes,
   required DocumentFilter filter,

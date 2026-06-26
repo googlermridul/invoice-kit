@@ -7,7 +7,8 @@ import 'package:invoice_kit/core/theme/app_tokens.dart';
 import 'package:invoice_kit/core/widgets/app_bottom_sheet.dart';
 import 'package:invoice_kit/core/widgets/empty_state.dart';
 import 'package:invoice_kit/core/widgets/search_field.dart';
-import 'package:invoice_kit/shared/widgets/currency_picker_row.dart' show CurrencyPickerRow;
+import 'package:invoice_kit/shared/widgets/currency_picker_row.dart'
+    show CurrencyPickerRow;
 // import 'package:invoice_kit/shared/widgets/widgets.dart' show CurrencyPickerRow; // Unused import removed
 
 /// Searchable option item used by [SearchablePickerSheet].
@@ -102,7 +103,8 @@ class SearchablePickerSheet<T> extends StatefulWidget {
   }
 
   @override
-  _SearchablePickerSheetState<T> createState() => _SearchablePickerSheetState<T>();
+  _SearchablePickerSheetState<T> createState() =>
+      _SearchablePickerSheetState<T>();
 }
 
 class _SearchablePickerSheet<T> extends StatefulWidget {
@@ -127,7 +129,8 @@ class _SearchablePickerSheet<T> extends StatefulWidget {
   final Widget Function(SearchableOption<T> option)? leadingBuilder;
 
   @override
-  State<_SearchablePickerSheet<T>> createState() => _SearchablePickerSheetState<T>();
+  State<_SearchablePickerSheet<T>> createState() =>
+      _SearchablePickerSheetState<T>();
 }
 
 class _SearchablePickerSheetState<T> extends State<_SearchablePickerSheet<T>> {
@@ -142,7 +145,9 @@ class _SearchablePickerSheetState<T> extends State<_SearchablePickerSheet<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _query.isEmpty ? widget.options : widget.options.where((o) => o.matches(_query)).toList();
+    final filtered = _query.isEmpty
+        ? widget.options
+        : widget.options.where((o) => o.matches(_query)).toList();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -173,7 +178,10 @@ class _SearchablePickerSheetState<T> extends State<_SearchablePickerSheet<T>> {
                     return ListTile(
                       leading: widget.leadingBuilder?.call(option),
                       title: Text(option.label),
-                      subtitle: option.subtitle == null || option.subtitle!.isEmpty ? null : Text(option.subtitle!),
+                      subtitle:
+                          option.subtitle == null || option.subtitle!.isEmpty
+                          ? null
+                          : Text(option.subtitle!),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),

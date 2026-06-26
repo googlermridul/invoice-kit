@@ -70,6 +70,29 @@ class EntitlementService {
     return current.copyWith(state: SubscriptionState.expired);
   }
 
+  /// Mark the subscription as pending — used while a Google Play
+  /// purchase is still being verified.
+  SubscriptionStatus markPending(
+    SubscriptionStatus current, {
+    String? productId,
+  }) {
+    return current.copyWith(
+      state: SubscriptionState.pending,
+      productId: productId ?? current.productId,
+    );
+  }
+
+  /// Mark the subscription as in the billing grace period.
+  SubscriptionStatus markGracePeriod(
+    SubscriptionStatus current, {
+    DateTime? expiryDate,
+  }) {
+    return current.copyWith(
+      state: SubscriptionState.gracePeriod,
+      currentPeriodEnd: expiryDate ?? current.currentPeriodEnd,
+    );
+  }
+
   DateTime _defaultPeriodEnd(SubscriptionPlan plan, DateTime now) {
     switch (plan) {
       case SubscriptionPlan.monthly:

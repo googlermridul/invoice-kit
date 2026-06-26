@@ -9,7 +9,8 @@ import 'package:invoice_kit/core/theme/app_tokens.dart';
 import 'package:invoice_kit/core/utils/formatters.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
 import 'package:invoice_kit/features/dashboard/presentation/bloc/dashboard_cubit.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show InvoiceStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show InvoiceStatus;
 import 'package:invoice_kit/features/reports/data/services/report_pdf_service.dart';
 import 'package:invoice_kit/features/reports/domain/usecases/reports_calculator.dart';
 import 'package:invoice_kit/shared/widgets/buttons.dart';
@@ -44,7 +45,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
     if (picked != null) {
       setState(() {
-        _start = DateTime(picked.start.year, picked.start.month, picked.start.day);
+        _start = DateTime(
+          picked.start.year,
+          picked.start.month,
+          picked.start.day,
+        );
         _end = DateTime(picked.end.year, picked.end.month, picked.end.day);
       });
     }
@@ -131,7 +136,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
           );
           final tax = calc.totalTaxCollected(inRange);
           final breakdownMap = calc.statusBreakdown(inRange);
-          final breakdown = breakdownMap.entries.map((e) => (status: e.key, count: e.value.round())).toList();
+          final breakdown = breakdownMap.entries
+              .map((e) => (status: e.key, count: e.value.round()))
+              .toList();
           return ListView(
             children: [
               Padding(
@@ -255,7 +262,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           leading: CircleAvatar(
                             backgroundColor: context.tokens.brandSubtle,
                             child: Text(
-                              top[i].client.name.isEmpty ? '?' : top[i].client.name[0].toUpperCase(),
+                              top[i].client.name.isEmpty
+                                  ? '?'
+                                  : top[i].client.name[0].toUpperCase(),
                               style: TextStyle(
                                 color: context.colors.primary,
                                 fontWeight: FontWeight.w700,
@@ -372,7 +381,8 @@ class _TrendChart extends StatelessWidget {
               color: lineColor.withValues(alpha: 0.12),
             ),
             spots: [
-              for (var i = 0; i < points.length; i++) FlSpot(i.toDouble(), points[i].amount),
+              for (var i = 0; i < points.length; i++)
+                FlSpot(i.toDouble(), points[i].amount),
             ],
           ),
         ],

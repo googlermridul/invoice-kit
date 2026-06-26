@@ -70,6 +70,11 @@ dependencies:
    printing: ^5.13.3
    share_plus: ^13.0.0
 
+   # Auth / Billing / Devices (production-ready infrastructure)
+   google_sign_in: ^6.2.1
+   in_app_purchase: ^3.2.0
+   uuid: ^4.5.1
+
    # Charts (Reports)
    fl_chart: ^1.2.0
 

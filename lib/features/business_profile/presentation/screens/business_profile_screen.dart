@@ -105,10 +105,14 @@ class _BusinessProfileScreenState extends State<BusinessProfileScreen> {
       invoicePrefix: _invoicePrefix.text.trim().isEmpty
           ? InvoiceConstants.defaultInvoicePrefix
           : _invoicePrefix.text.trim(),
-      quotePrefix: _quotePrefix.text.trim().isEmpty ? InvoiceConstants.defaultQuotePrefix : _quotePrefix.text.trim(),
+      quotePrefix: _quotePrefix.text.trim().isEmpty
+          ? InvoiceConstants.defaultQuotePrefix
+          : _quotePrefix.text.trim(),
       nextInvoiceNumber: existing?.nextInvoiceNumber ?? 1,
       nextQuoteNumber: existing?.nextQuoteNumber ?? 1,
-      defaultPaymentTerms: _defaultTerms.text.trim().isEmpty ? 'Payment due within 3 days.' : _defaultTerms.text.trim(),
+      defaultPaymentTerms: _defaultTerms.text.trim().isEmpty
+          ? 'Payment due within 3 days.'
+          : _defaultTerms.text.trim(),
       bankDetails: _nullIfEmpty(_bankDetails.text),
       paymentInstructions: _nullIfEmpty(_paymentInstructions.text),
       selectedPdfTemplate: _pdfTemplate,

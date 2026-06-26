@@ -70,7 +70,10 @@ class _FxScreenState extends State<FxScreen> {
             from: _from,
             to: _to,
           );
-          final rateLine = state.rates.where((r) => r.base == _from && r.quote == _to).map((r) => r.rate).firstOrNull;
+          final rateLine = state.rates
+              .where((r) => r.base == _from && r.quote == _to)
+              .map((r) => r.rate)
+              .firstOrNull;
           return ListView(
             children: [
               const SectionHeader(
@@ -94,7 +97,8 @@ class _FxScreenState extends State<FxScreen> {
                           RegExp(r'^\d*\.?\d{0,2}'),
                         ),
                       ],
-                      onChanged: (v) => setState(() => _amount = double.tryParse(v) ?? 0),
+                      onChanged: (v) =>
+                          setState(() => _amount = double.tryParse(v) ?? 0),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     Row(
@@ -113,7 +117,10 @@ class _FxScreenState extends State<FxScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: AppSpacing.lg),
                           child: IconButton.filledTonal(
-                            icon: const Icon(HugeIconsStroke.exchange01, size: 18),
+                            icon: const Icon(
+                              HugeIconsStroke.exchange01,
+                              size: 18,
+                            ),
                             tooltip: 'Swap',
                             onPressed: _swap,
                           ),
@@ -200,11 +207,17 @@ class _FxScreenState extends State<FxScreen> {
                   padding: EdgeInsets.zero,
                   child: Column(
                     children: [
-                      for (var i = 0; i < state.rates.where((r) => r.base == _from).length; i++) ...[
+                      for (
+                        var i = 0;
+                        i < state.rates.where((r) => r.base == _from).length;
+                        i++
+                      ) ...[
                         if (i > 0) const Divider(height: 1),
                         Builder(
                           builder: (_) {
-                            final r = state.rates.where((r) => r.base == _from).elementAt(i);
+                            final r = state.rates
+                                .where((r) => r.base == _from)
+                                .elementAt(i);
                             return ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: context.tokens.brandSubtle,

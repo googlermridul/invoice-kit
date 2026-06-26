@@ -25,6 +25,20 @@ class SplashNavigateToSubscription extends SplashState {
   List<Object> get props => [];
 }
 
+class SplashNavigateToAuth extends SplashState {
+  const SplashNavigateToAuth();
+
+  @override
+  List<Object> get props => [];
+}
+
+class SplashNavigateToDevices extends SplashState {
+  const SplashNavigateToDevices();
+
+  @override
+  List<Object> get props => [];
+}
+
 class SplashNavigateToHome extends SplashState {
   const SplashNavigateToHome();
 
