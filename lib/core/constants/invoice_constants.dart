@@ -3,7 +3,7 @@ class InvoiceConstants {
   const InvoiceConstants._();
 
   // Trial & subscription
-  static const Duration trialDuration = Duration(minutes: 2);
+  static const Duration trialDuration = Duration(minutes: 10);
 
   // Recurring invoice generation safety
   static const int maxRecurringCatchup = 50;

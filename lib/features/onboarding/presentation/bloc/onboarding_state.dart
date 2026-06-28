@@ -12,6 +12,7 @@ class OnboardingState extends Equatable {
     this.taxId = '',
     this.paymentTerms = 'Payment due within 3 days.',
     this.themeModeName = 'system',
+    this.trialStartedAt,
     this.error,
   });
 
@@ -25,6 +26,12 @@ class OnboardingState extends Equatable {
   final String taxId;
   final String paymentTerms;
   final String themeModeName;
+
+  /// Mirror of [StorageKeys.trialStartedAt] so the setup wizard can show
+  /// a "Trial · N days left" badge. Set only — the trial is started
+  /// exclusively from the Welcome screen.
+  final DateTime? trialStartedAt;
+
   final String? error;
 
   bool get canProceed => switch (step) {
@@ -43,6 +50,7 @@ class OnboardingState extends Equatable {
     String? taxId,
     String? paymentTerms,
     String? themeModeName,
+    DateTime? trialStartedAt,
     String? error,
     bool clearError = false,
   }) {
@@ -55,6 +63,7 @@ class OnboardingState extends Equatable {
       taxId: taxId ?? this.taxId,
       paymentTerms: paymentTerms ?? this.paymentTerms,
       themeModeName: themeModeName ?? this.themeModeName,
+      trialStartedAt: trialStartedAt ?? this.trialStartedAt,
       error: clearError ? null : (error ?? this.error),
     );
   }
@@ -69,6 +78,7 @@ class OnboardingState extends Equatable {
     taxId,
     paymentTerms,
     themeModeName,
+    trialStartedAt,
     error,
   ];
 }

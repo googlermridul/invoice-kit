@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:invoice_kit/core/constants/storage_keys.dart';
@@ -6,8 +8,6 @@ import 'package:invoice_kit/features/business_profile/data/repositories/business
 import 'package:invoice_kit/features/business_profile/domain/entities/business_profile.dart';
 import 'package:invoice_kit/features/settings/data/repositories/settings_repository.dart';
 import 'package:invoice_kit/features/settings/domain/entities/app_settings.dart';
-import 'package:invoice_kit/features/subscription/data/repositories/subscription_repository.dart';
-import 'package:invoice_kit/features/subscription/domain/services/entitlement_service.dart';
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
 
 part 'onboarding_event.dart';
@@ -18,8 +18,6 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     required this.localStorage,
     required this.businessRepo,
     required this.settingsRepo,
-    required this.subscriptionRepo,
-    required this.entitlements,
     required this.subscriptionBloc,
   }) : super(OnboardingState.initial()) {
     on<OnboardingStarted>(_onStarted);
@@ -36,8 +34,6 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   final LocalStorageService localStorage;
   final BusinessProfileRepository businessRepo;
   final SettingsRepository settingsRepo;
-  final SubscriptionRepository subscriptionRepo;
-  final EntitlementService entitlements;
   final SubscriptionBloc subscriptionBloc;
 
   Future<void> _onStarted(
@@ -47,6 +43,17 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     emit(state.copyWith(status: OnboardingStatus.loading));
     final existingProfile = await businessRepo.load();
     final settings = await settingsRepo.load();
+
+    // Track trial_started_at so the setup wizard can show a "Trial · N
+    // days left" badge without having to round-trip through the trial
+    // repository. The trial itself is started by the Welcome screen, not
+    // here — onboarding completion MUST NOT auto-start a trial.
+    final trialStartedRaw = localStorage.getString(StorageKeys.trialStartedAt);
+    DateTime? trialStartedAt;
+    if (trialStartedRaw != null && trialStartedRaw.isNotEmpty) {
+      trialStartedAt = DateTime.tryParse(trialStartedRaw);
+    }
+
     emit(
       state.copyWith(
         status: OnboardingStatus.ready,
@@ -56,6 +63,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         taxId: existingProfile?.taxId ?? state.taxId,
         paymentTerms:
             existingProfile?.defaultPaymentTerms ?? state.paymentTerms,
+        trialStartedAt: trialStartedAt ?? state.trialStartedAt,
       ),
     );
   }
@@ -65,6 +73,9 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     Emitter<OnboardingState> emit,
   ) {
     emit(state.copyWith(step: event.step));
+    // Persist resume index best-effort so a relaunch lands the user on
+    // the same step.
+    unawaited(localStorage.setInt(StorageKeys.setupStepIndex, event.step));
   }
 
   void _onUserName(
@@ -129,21 +140,17 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     );
     await settingsRepo.save(settings);
 
-    // Start the trial automatically when onboarding completes.
-    final current = await subscriptionRepo.current();
-    if (entitlements.canStartTrial(current)) {
-      await subscriptionRepo.save(
-        entitlements.startTrial(current, DateTime.now()),
-      );
-    }
-
+    // Trial is started exclusively by the Welcome screen's "Start with
+    // free trial" CTA. We only persist the setup-completion flag here and
+    // refresh the SubscriptionBloc so the guard picks up `hasAccess = true`
+    // on the very next navigation.
+    await localStorage.setBool(StorageKeys.setupOnboardingCompleted, true);
+    // Back-compat: keep the legacy flag in sync so older guards (and any
+    // pre-existing user that completed onboarding under the old schema)
+    // continue to work.
     await localStorage.setBool(StorageKeys.onboardingCompleted, true);
+    await localStorage.remove(StorageKeys.setupStepIndex);
 
-    // Push the freshly persisted trial into the live SubscriptionBloc so
-    // the router guard observes `hasAccess = true` on the very next
-    // navigation. Without this, the guard reads the bloc's stale
-    // initial state and redirects every premium route back to the
-    // dashboard while the trial is active.
     subscriptionBloc.add(const SubscriptionStarted());
 
     emit(state.copyWith(status: OnboardingStatus.completed));

@@ -133,12 +133,17 @@ class SupabaseAuthDataSourceImpl implements SupabaseAuthDataSource {
     // platform so that Supabase can exchange the ID token server-side.
     final google = GoogleSignIn(
       clientId: defaultTargetPlatform == TargetPlatform.iOS
-          ? (_config.googleIosClientId.isEmpty ? null : _config.googleIosClientId)
+          ? (_config.googleIosClientId.isEmpty
+                ? null
+                : _config.googleIosClientId)
           : null,
-      serverClientId: _config.googleWebClientId.isEmpty ? null : _config.googleWebClientId,
+      serverClientId: _config.googleWebClientId.isEmpty
+          ? null
+          : _config.googleWebClientId,
     );
 
-    if (defaultTargetPlatform == TargetPlatform.android && _config.googleWebClientId.isEmpty) {
+    if (defaultTargetPlatform == TargetPlatform.android &&
+        _config.googleWebClientId.isEmpty) {
       throw sb.AuthException(
         'Google sign-in is not configured: GOOGLE_WEB_CLIENT_ID is empty '
         'in .env. See docs/google_signin_setup.md.',

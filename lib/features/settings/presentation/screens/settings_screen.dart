@@ -5,8 +5,11 @@ import 'package:hugeicons_pro/hugeicons.dart';
 import 'package:invoice_kit/core/constants/invoice_constants.dart';
 import 'package:invoice_kit/core/extensions/context_extensions.dart';
 import 'package:invoice_kit/core/router/app_routes.dart';
+import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/theme/theme.dart';
 import 'package:invoice_kit/core/widgets/widgets.dart';
+import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:invoice_kit/features/authentication/presentation/coordinators/logout_side_effects.dart';
 import 'package:invoice_kit/features/invoices/domain/entities/pdf_template.dart';
 import 'package:invoice_kit/features/settings/presentation/bloc/settings_cubit.dart';
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
@@ -94,7 +97,74 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () =>
                         GoRouter.of(context).push(AppRoutes.businessProfile),
                   ),
+                  const Divider(
+                    height: 1,
+                    indent: AppSpacing.md,
+                    endIndent: AppSpacing.md,
+                  ),
+                  ListTile(
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: context.tokens.brandSubtle,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.devices_other_outlined,
+                        color: context.colors.primary,
+                      ),
+                    ),
+                    title: const Text('Devices'),
+                    subtitle: Text(
+                      'Manage devices on this account',
+                      style: TextStyle(
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                    ),
+                    trailing: Icon(HugeIconsStroke.arrowRight01, size: 18),
+                    onTap: () => GoRouter.of(context).push(RoutePaths.devices),
+                  ),
                 ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionHeader(
+            title: 'Session',
+            uppercase: true,
+            tone: SectionHeaderTone.neutral,
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppCard(
+            padding: EdgeInsets.zero,
+            child: Material(
+              color: Colors.transparent,
+              child: ListTile(
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: context.tokens.errorSubtle,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.logout_rounded,
+                    color: context.colors.error,
+                  ),
+                ),
+                title: Text(
+                  'Sign out',
+                  style: TextStyle(color: context.colors.error),
+                ),
+                subtitle: Text(
+                  'Your invoices and quotes stay on this device.',
+                  style: TextStyle(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
+                onTap: () => _confirmSignOut(context),
               ),
             ),
           ),
@@ -342,6 +412,38 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
     if (id != null) await cubit.setPdfTemplate(id);
+  }
+
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final shouldSignOut = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Sign out of InvoiceKit?'),
+        content: const Text(
+          'Your invoices and quotes stay on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
+    );
+    if (shouldSignOut != true) return;
+    if (!context.mounted) return;
+
+    final authBloc = context.read<AuthBloc>();
+    final effects = LogoutSideEffects();
+    final router = GoRouter.of(context);
+
+    await effects.run();
+    authBloc.add(const AuthLogoutRequested());
+    router.go(RoutePaths.login);
   }
 }
 

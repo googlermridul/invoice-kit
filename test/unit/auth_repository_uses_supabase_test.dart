@@ -142,7 +142,9 @@ void main() {
   );
 
   test('signInWithGoogle uses Supabase', () async {
-    when(() => supabase.signInWithGoogle()).thenAnswer((_) async => makeSession());
+    when(
+      () => supabase.signInWithGoogle(),
+    ).thenAnswer((_) async => makeSession());
 
     final result = await repo.signInWithGoogle();
 

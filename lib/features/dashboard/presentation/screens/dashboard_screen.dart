@@ -53,7 +53,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         IconButton(
                           icon: const Icon(HugeIconsStroke.barChart, size: 18),
                           tooltip: 'Reports',
-                          onPressed: () => GoRouter.of(context).go(AppRoutes.reports),
+                          onPressed: () =>
+                              GoRouter.of(context).go(AppRoutes.reports),
                         ),
                         IconButton(
                           icon: const Icon(
@@ -61,7 +62,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             size: 18,
                           ),
                           tooltip: 'Settings',
-                          onPressed: () => GoRouter.of(context).go(AppRoutes.settings),
+                          onPressed: () =>
+                              GoRouter.of(context).go(AppRoutes.settings),
                         ),
                       ],
                     ),
@@ -81,11 +83,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               children: [
                                 Text(
                                   'Total revenue',
-                                  style: context.textTheme.labelMedium?.copyWith(
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.6,
-                                  ),
+                                  style: context.textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: Colors.white70,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.6,
+                                      ),
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
@@ -93,11 +96,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     s?.totalRevenue ?? 0,
                                     code: _currency(state),
                                   ),
-                                  style: context.textTheme.displaySmall?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: -0.6,
-                                  ),
+                                  style: context.textTheme.displaySmall
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -0.6,
+                                      ),
                                 ),
                                 const SizedBox(height: AppSpacing.xs),
                                 Row(
@@ -112,11 +116,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     const SizedBox(width: 4),
                                     Text(
                                       '${s?.paidCount ?? 0} paid · ${s?.sentCount ?? 0} sent',
-                                      style: context.textTheme.bodySmall?.copyWith(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.85,
-                                        ),
-                                      ),
+                                      style: context.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.85,
+                                            ),
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -141,7 +146,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 icon: Icons.hourglass_bottom_rounded,
                                 color: AppColors.warning,
-                                subtitle: '${s?.sentCount ?? 0} sent · ${s?.overdueCount ?? 0} overdue',
+                                subtitle:
+                                    '${s?.sentCount ?? 0} sent · ${s?.overdueCount ?? 0} overdue',
                               ),
                               MetricCard(
                                 label: 'Paid invoices',
@@ -208,16 +214,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: EmptyState(
                                 icon: Icons.people_outline,
                                 title: 'No clients yet',
-                                subtitle: 'Add your first client to start invoicing.',
+                                subtitle:
+                                    'Add your first client to start invoicing.',
                               ),
                             )
                           else
                             Column(
                               children: [
-                                for (var i = 0; i < state.recentClients.length; i++) ...[
+                                for (
+                                  var i = 0;
+                                  i < state.recentClients.length;
+                                  i++
+                                ) ...[
                                   ClientRow(
                                     name: state.recentClients[i].name,
-                                    subtitle: state.recentClients[i].email ?? state.recentClients[i].company ?? '',
+                                    subtitle:
+                                        state.recentClients[i].email ??
+                                        state.recentClients[i].company ??
+                                        '',
                                     onTap: () => GoRouter.of(context).push(
                                       RoutePaths.clientDetailPath(
                                         state.recentClients[i].id,
@@ -326,7 +340,8 @@ class _PremiumBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<Object?> onTap() => GoRouter.of(context).push(AppRoutes.subscription);
+    Future<Object?> onTap() =>
+        GoRouter.of(context).push(AppRoutes.subscription);
     final trialDays = subState.trialDaysRemaining;
 
     // Show the most relevant state for the user. The free trial takes

@@ -23,21 +23,36 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     Emitter<SplashState> emit,
   ) async {
     try {
-      final completed = _localStorage.getBool(StorageKeys.onboardingCompleted) ?? false;
+      final introCompleted =
+          _localStorage.getBool(StorageKeys.introOnboardingCompleted) ??
+          (_localStorage.getBool(StorageKeys.onboardingCompleted) ?? false);
 
-      final decision = await _coordinator.run();
+      if (!introCompleted) {
+        emit(const SplashNavigateToIntro());
+        return;
+      }
 
-      if (!completed) {
+      final setupCompleted =
+          _localStorage.getBool(StorageKeys.setupOnboardingCompleted) ??
+          (_localStorage.getBool(StorageKeys.onboardingCompleted) ?? false);
+
+      if (!setupCompleted) {
         emit(const SplashNavigateToOnboarding());
         return;
       }
 
+      final decision = await _coordinator.run();
+
       emit(
         switch (decision.destination) {
-          StartupDestination.home || StartupDestination.onboarding => const SplashNavigateToHome(),
-          StartupDestination.trialExpired || StartupDestination.auth => const SplashNavigateToAuth(),
-          StartupDestination.subscription => const SplashNavigateToSubscription(),
-          StartupDestination.deviceManagement => const SplashNavigateToDevices(),
+          StartupDestination.home => const SplashNavigateToHome(),
+          StartupDestination.onboarding => const SplashNavigateToOnboarding(),
+          StartupDestination.trialExpired ||
+          StartupDestination.auth => const SplashNavigateToAuth(),
+          StartupDestination.subscription =>
+            const SplashNavigateToSubscription(),
+          StartupDestination.deviceManagement =>
+            const SplashNavigateToDevices(),
         },
       );
     } on Exception catch (e) {

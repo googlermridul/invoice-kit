@@ -5,15 +5,16 @@ import 'package:invoice_kit/app/app_config.dart';
 import 'package:invoice_kit/core/constants/storage_keys.dart';
 import 'package:invoice_kit/core/di/injection.dart';
 import 'package:invoice_kit/core/logger/logger.dart';
+import 'package:invoice_kit/core/router/app_router.dart' show AppRouter;
 import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/storage/local_storage_service.dart';
 import 'package:invoice_kit/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:invoice_kit/features/devices/domain/repositories/device_repository.dart';
 import 'package:invoice_kit/features/premium/domain/services/premium_access_manager.dart';
 import 'package:invoice_kit/features/premium/domain/services/premium_context.dart';
 import 'package:invoice_kit/features/subscription/data/repositories/subscription_repository.dart';
-import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart'
-    show SubscriptionStatus;
+import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart' show SubscriptionStatus;
 import 'package:invoice_kit/features/subscription/presentation/bloc/subscription_bloc.dart';
 import 'package:invoice_kit/features/trial/domain/repositories/trial_repository.dart';
 
@@ -29,6 +30,7 @@ import 'package:invoice_kit/features/trial/domain/repositories/trial_repository.
 class AppRouterGuard {
   AppRouterGuard({
     required this.subscriptionBloc,
+    this._authBloc,
     SubscriptionRepository? subscriptionRepository,
     LocalStorageService? localStorage,
     AuthRepository? authRepository,
@@ -36,8 +38,7 @@ class AppRouterGuard {
     DeviceRepository? deviceRepository,
     PremiumAccessManager? premiumManager,
     CoreLogger? logger,
-  }) : subscriptionRepository =
-           subscriptionRepository ?? sl<SubscriptionRepository>(),
+  }) : subscriptionRepository = subscriptionRepository ?? sl<SubscriptionRepository>(),
        localStorage = localStorage ?? sl<LocalStorageService>(),
        _auth = authRepository ?? sl<AuthRepository>(),
        _trial = trialRepository ?? sl<TrialRepository>(),
@@ -46,7 +47,13 @@ class AppRouterGuard {
        _logger = logger ?? sl<CoreLogger>();
 
   final SubscriptionBloc subscriptionBloc;
+  final AuthBloc? _authBloc;
   final SubscriptionRepository subscriptionRepository;
+
+  /// Optional auth bloc — used by [AppRouter] to compose its
+  /// `refreshListenable` so login/logout transitions immediately
+  /// re-evaluate redirects.
+  AuthBloc? get authBloc => _authBloc;
   final LocalStorageService localStorage;
   final AuthRepository _auth;
   final TrialRepository _trial;
@@ -65,12 +72,22 @@ class AppRouterGuard {
   static const Set<String> publicRoutes = {
     RoutePaths.splash,
     RoutePaths.onboarding,
+    RoutePaths.onboardingIntro,
+    RoutePaths.onboardingWelcome,
     RoutePaths.login,
     RoutePaths.register,
     RoutePaths.forgotPassword,
     RoutePaths.subscription,
     RoutePaths.trialExpired,
     RoutePaths.devices,
+  };
+
+  /// Routes that are only meaningful during onboarding. Reached only when
+  /// `intro_onboarding_completed` is `false` for an unauthenticated user.
+  static const Set<String> welcomeRoutes = {
+    RoutePaths.splash,
+    RoutePaths.onboardingIntro,
+    RoutePaths.onboardingWelcome,
   };
 
   /// Routes that are only meaningful during onboarding and are gated
@@ -90,24 +107,62 @@ class AppRouterGuard {
   /// without constructing a `GoRouterState` (which requires private
   /// library types).
   Future<String?> resolveForLocation(String location) async {
-    // ── 1. Onboarding gate ──────────────────────────────────────────────
-    final completed =
-        localStorage.getBool(StorageKeys.onboardingCompleted) ?? false;
-    if (!completed) {
-      if (onboardingOnlyRoutes.contains(location)) {
-        _logRedirect('allow', location, 'onboarding-allowed');
+    // ── 0. Welcome gate ─────────────────────────────────────────────────
+    // If the user hasn't completed the intro phase yet (and isn't
+    // already authenticated), force them into `/onboarding/intro` first.
+    // `welcomeRoutes` is reachable only when this gate is active.
+    final introCompleted = _introCompleted();
+    final session = await _auth.restoreSession();
+    final isAuthenticated = session != null;
+
+    if (!introCompleted && !isAuthenticated) {
+      if (welcomeRoutes.contains(location)) {
+        _logRedirect('allow', location, 'welcome-allowed');
         return null;
       }
-      _logRedirect(RoutePaths.onboarding, location, 'onboarding-not-completed');
-      return RoutePaths.onboarding;
+      _logRedirect(
+        RoutePaths.onboardingIntro,
+        location,
+        'intro-onboarding-incomplete',
+      );
+      return _redirect(RoutePaths.onboardingIntro, location);
     }
 
-    // ── 2. Public-route gate ────────────────────────────────────────────
+    // ── 1. Public-route gate ────────────────────────────────────────────
     // Auth / help / reset / paywall flows must always render so users can
     // recover from a bad state (expired trial, locked out, etc).
+    //
+    // Special case: `/devices` is publicly reachable in the route table,
+    // but only when the user is authenticated. Otherwise an unauthenticated
+    // tap on a deep-link would expose the device-management UI.
     if (publicRoutes.contains(location)) {
+      if (location == RoutePaths.devices && !isAuthenticated) {
+        _logRedirect(RoutePaths.login, location, 'device-login-required');
+        return _redirect(RoutePaths.login, location);
+      }
       _logRedirect('allow', location, 'public-route');
       return null;
+    }
+
+    // ── 2. Onboarding gate (setup wizard) ───────────────────────────────
+    // After intro is done but before setup wizard is done, the only
+    // routes reachable are `/onboarding` (and `/splash` from public).
+    final setupCompleted =
+        localStorage.getBool(
+          StorageKeys.setupOnboardingCompleted,
+        ) ??
+        (localStorage.getBool(StorageKeys.onboardingCompleted) ?? false);
+    if (!setupCompleted) {
+      if (onboardingOnlyRoutes.contains(location)) {
+        _logRedirect('allow', location, 'setup-allowed');
+        return null;
+      }
+      _logRedirect(
+        RoutePaths.onboarding,
+        location,
+        'setup-onboarding-incomplete',
+      );
+      return RoutePaths.onboarding;
     }
 
     // ── 3. Evaluate access / device context ────────────────────────────
@@ -118,8 +173,6 @@ class AppRouterGuard {
     final trial = await _trial.currentTrial();
     final trialActive = trial != null && trial.isActive(now);
 
-    final session = await _auth.restoreSession();
-    final isAuthenticated = session != null;
     var deviceCount = 0;
     if (isAuthenticated) {
       try {
@@ -149,9 +202,7 @@ class AppRouterGuard {
 
     // ── 5. No-access gate (expired trial / no subscription) ─────────────
     if (!hasAccess && !trialActive) {
-      final target = isAuthenticated
-          ? RoutePaths.subscription
-          : RoutePaths.login;
+      final target = isAuthenticated ? RoutePaths.subscription : RoutePaths.login;
       _logRedirect(target, location, 'no-active-entitlement');
       return _redirect(target, location);
     }
@@ -165,6 +216,14 @@ class AppRouterGuard {
 
     _logRedirect('allow', location, 'granted');
     return null;
+  }
+
+  /// Reads `intro_onboarding_completed`, falling back to the legacy
+  /// `onboarding_completed` flag for installs that shipped with the
+  /// single-flag design.
+  bool _introCompleted() {
+    return localStorage.getBool(StorageKeys.introOnboardingCompleted) ??
+        (localStorage.getBool(StorageKeys.onboardingCompleted) ?? false);
   }
 
   String? _enforcePremium(String location, PremiumContext context) {

@@ -12,6 +12,19 @@ import 'package:invoice_kit/features/onboarding/presentation/bloc/onboarding_blo
 import 'package:invoice_kit/shared/widgets/app_text_field.dart';
 import 'package:invoice_kit/shared/widgets/buttons.dart';
 
+/// Setup-only onboarding wizard.
+///
+/// Reached **after** the user has chosen a path on the Welcome screen
+/// (`/onboarding/welcome`):
+///
+///  - **Start with free trial** flow lands here to collect business
+///    profile / theme preferences while the local trial window is
+///    running.
+///  - **Login** flow does **not** visit this screen.
+///
+/// The wizard itself MUST NOT start a trial. That responsibility belongs
+/// exclusively to the Welcome screen. When the user taps "Start" on the
+/// review step we mark setup complete and route to `/dashboard`.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -57,15 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           body: SafeArea(
             child: Column(
               children: [
-                _StepIndicator(
-                  step: state.step,
-                  total: 6,
-                  onSkip: () {
-                    context.read<OnboardingBloc>().add(
-                      const OnboardingCompleted(),
-                    );
-                  },
-                ),
+                _StepIndicator(step: state.step, total: 5),
                 Expanded(
                   child: PageView(
                     controller: _pageController,
@@ -74,13 +79,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       OnboardingStepChanged(i),
                     ),
                     children: [
-                      _IntroStep(onNext: () => _setStep(1)),
                       _UserNameStep(
                         value: state.userName,
                         onChanged: (v) => context.read<OnboardingBloc>().add(
                           OnboardingUserNameChanged(v),
                         ),
-                        onNext: () => _setStep(2),
+                        onNext: () => _setStep(1),
                       ),
                       _BusinessStep(
                         businessName: state.businessName,
@@ -91,7 +95,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onCurrency: (v) => context.read<OnboardingBloc>().add(
                           OnboardingCurrencyChanged(v),
                         ),
-                        onNext: () => _setStep(3),
+                        onNext: () => _setStep(2),
                       ),
                       _TaxStep(
                         taxId: state.taxId,
@@ -102,14 +106,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         onTerms: (v) => context.read<OnboardingBloc>().add(
                           OnboardingPaymentTermsChanged(v),
                         ),
-                        onNext: () => _setStep(4),
+                        onNext: () => _setStep(3),
                       ),
                       _ThemeStep(
                         value: state.themeModeName,
                         onChanged: (v) => context.read<OnboardingBloc>().add(
                           OnboardingThemeChanged(v),
                         ),
-                        onNext: () => _setStep(5),
+                        onNext: () => _setStep(4),
                       ),
                       _ReviewStep(
                         userName: state.userName,
@@ -117,18 +121,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         currency: state.currency,
                         paymentTerms: state.paymentTerms,
                         taxId: state.taxId,
-                        onBack: () => _setStep(4),
+                        onBack: () => _setStep(3),
                       ),
                     ],
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: state.step == 5
+                  child: state.step == 4
                       ? PrimaryButton(
                           label: state.status == OnboardingStatus.saving
                               ? 'Setting up…'
-                              : 'Start 3-day free trial',
+                              : 'Go to dashboard',
                           onPressed: state.status == OnboardingStatus.saving
                               ? null
                               : () => context.read<OnboardingBloc>().add(
@@ -168,14 +172,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class _StepIndicator extends StatelessWidget {
-  const _StepIndicator({
-    required this.step,
-    required this.total,
-    required this.onSkip,
-  });
+  const _StepIndicator({required this.step, required this.total});
   final int step;
   final int total;
-  final VoidCallback onSkip;
 
   @override
   Widget build(BuildContext context) {
@@ -186,67 +185,14 @@ class _StepIndicator extends StatelessWidget {
         AppSpacing.xl,
         AppSpacing.sm,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                value: (step + 1) / total,
-                minHeight: 6,
-                color: context.colors.primary,
-                backgroundColor: context.tokens.surfaceMuted,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          TextButton(
-            onPressed: step == 0 ? null : onSkip,
-            child: const Text('Skip'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IntroStep extends StatelessWidget {
-  const _IntroStep({required this.onNext});
-  final VoidCallback onNext;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GradientHero.brand(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            radius: 32,
-            child: const Icon(
-              Icons.receipt_long_rounded,
-              color: Colors.white,
-              size: 60,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xxl),
-          Text(
-            'Welcome to InvoiceKit',
-            style: context.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.4,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'Send invoices, quotes and recurring bills from one place. Local-first, polished, fast.',
-            textAlign: TextAlign.center,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.colors.onSurfaceVariant,
-            ),
-          ),
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(999),
+        child: LinearProgressIndicator(
+          value: (step + 1) / total,
+          minHeight: 6,
+          color: context.colors.primary,
+          backgroundColor: context.tokens.surfaceMuted,
+        ),
       ),
     );
   }
@@ -579,7 +525,7 @@ class _ReviewStep extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'A 3-day free trial unlocks every feature. No credit card required.',
+            'Review your details. You can update them later in Settings.',
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colors.onSurfaceVariant,
             ),

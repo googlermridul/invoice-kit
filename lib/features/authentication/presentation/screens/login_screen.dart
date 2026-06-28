@@ -6,6 +6,7 @@ import 'package:invoice_kit/core/localization/app_localizations.dart';
 import 'package:invoice_kit/core/router/app_routes.dart';
 import 'package:invoice_kit/core/theme/app_spacing.dart';
 import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:invoice_kit/features/authentication/presentation/coordinators/post_auth_runner.dart';
 import 'package:invoice_kit/features/authentication/presentation/widgets/auth_scaffold.dart';
 import 'package:invoice_kit/shared/widgets/widgets.dart';
 
@@ -48,9 +49,20 @@ class _LoginScreenState extends State<LoginScreen> {
       subtitle: l.authSignIn,
       child: BlocConsumer<AuthBloc, AuthState>(
         listenWhen: (a, b) => a.message != b.message || a.status != b.status,
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.message != null) {
             context.showSnackBar(state.message!);
+          }
+          if (state.status == AuthStatus.authenticated && state.user != null) {
+            // Run post-auth side effects (device registration, subscription
+            // refresh, premium re-evaluation) and route to the destination
+            // they imply.
+            final router = GoRouter.of(context);
+            await PostAuthRunner.run(
+              context: context,
+              router: router,
+              user: state.user!,
+            );
           }
         },
         builder: (context, state) {

@@ -2,7 +2,8 @@ import 'package:invoice_kit/features/premium/domain/entities/premium_access_deci
 import 'package:invoice_kit/features/premium/domain/services/premium_checker.dart';
 import 'package:invoice_kit/features/premium/domain/services/premium_context.dart';
 import 'package:invoice_kit/features/subscription/domain/entities/subscription_status.dart';
-import 'package:invoice_kit/features/subscription/domain/services/entitlement_service.dart' show EntitlementService;
+import 'package:invoice_kit/features/subscription/domain/services/entitlement_service.dart'
+    show EntitlementService;
 
 /// Outcomes the [PremiumAccessManager] can hand back to the UI layer.
 enum PremiumRedirect {
@@ -83,8 +84,11 @@ class PremiumAccessManager {
 
     final redirect = switch (decision.result) {
       PremiumAccessResult.deniedNotAuthenticated => PremiumRedirect.toAuth,
-      PremiumAccessResult.deniedNoTrial || PremiumAccessResult.deniedExpiredTrial =>
-        context.isAuthenticated ? PremiumRedirect.toSubscription : PremiumRedirect.toAuth,
+      PremiumAccessResult.deniedNoTrial ||
+      PremiumAccessResult.deniedExpiredTrial =>
+        context.isAuthenticated
+            ? PremiumRedirect.toSubscription
+            : PremiumRedirect.toAuth,
       PremiumAccessResult.granted ||
       PremiumAccessResult.gracePeriod ||
       PremiumAccessResult.cancelledButActive => PremiumRedirect.none,

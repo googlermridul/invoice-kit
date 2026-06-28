@@ -8,7 +8,6 @@ import 'package:invoice_kit/core/router/route_names.dart';
 import 'package:invoice_kit/core/router/route_paths.dart';
 import 'package:invoice_kit/core/widgets/app_shell.dart';
 import 'package:invoice_kit/core/widgets/error_screen.dart';
-import 'package:invoice_kit/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:invoice_kit/features/authentication/presentation/screens/forgot_password_screen.dart';
 import 'package:invoice_kit/features/authentication/presentation/screens/login_screen.dart';
 import 'package:invoice_kit/features/authentication/presentation/screens/register_screen.dart';
@@ -30,7 +29,9 @@ import 'package:invoice_kit/features/invoices/presentation/screens/invoice_detai
 import 'package:invoice_kit/features/invoices/presentation/screens/invoice_edit_screen.dart';
 import 'package:invoice_kit/features/invoices/presentation/screens/invoices_screen.dart';
 import 'package:invoice_kit/features/onboarding/presentation/bloc/onboarding_bloc.dart';
+import 'package:invoice_kit/features/onboarding/presentation/screens/intro_screen.dart';
 import 'package:invoice_kit/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:invoice_kit/features/onboarding/presentation/screens/welcome_screen.dart';
 import 'package:invoice_kit/features/quotes/presentation/bloc/quotes_cubit.dart';
 import 'package:invoice_kit/features/quotes/presentation/screens/quote_detail_screen.dart';
 import 'package:invoice_kit/features/quotes/presentation/screens/quote_edit_screen.dart';
@@ -47,11 +48,20 @@ import 'package:invoice_kit/features/trial/presentation/screens/trial_expired_sc
 
 class AppRouter {
   AppRouter({required this.guard}) {
+    final authBloc = guard.authBloc;
+    final subscriptionStream = guard.subscriptionBloc.stream;
+    final authStream = authBloc?.stream;
+    final refreshListenable = authStream == null
+        ? GoRouterRefreshStream(subscriptionStream)
+        : _MergedRefreshListenable([
+            GoRouterRefreshStream(subscriptionStream),
+            GoRouterRefreshStream(authStream),
+          ]);
     _router = GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: RoutePaths.splash,
       debugLogDiagnostics: kDebugMode,
-      refreshListenable: GoRouterRefreshStream(guard.subscriptionBloc.stream),
+      refreshListenable: refreshListenable,
       redirect: guard.redirect,
       routes: [
         // ── Public / onboarding / auth flows ──────────────────────────────
@@ -73,6 +83,16 @@ class AppRouter {
           ),
         ),
         GoRoute(
+          path: RoutePaths.onboardingIntro,
+          name: RouteNames.onboardingIntro,
+          builder: (_, _) => const IntroScreen(),
+        ),
+        GoRoute(
+          path: RoutePaths.onboardingWelcome,
+          name: RouteNames.onboardingWelcome,
+          builder: (_, _) => const WelcomeScreen(),
+        ),
+        GoRoute(
           path: RoutePaths.subscription,
           name: RouteNames.subscription,
           builder: (_, _) => const SubscriptionScreen(),
@@ -91,26 +111,17 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.login,
           name: RouteNames.login,
-          builder: (_, _) => BlocProvider(
-            create: (_) => sl<AuthBloc>(),
-            child: const LoginScreen(),
-          ),
+          builder: (_, _) => const LoginScreen(),
         ),
         GoRoute(
           path: RoutePaths.register,
           name: RouteNames.register,
-          builder: (_, _) => BlocProvider(
-            create: (_) => sl<AuthBloc>(),
-            child: const RegisterScreen(),
-          ),
+          builder: (_, _) => const RegisterScreen(),
         ),
         GoRoute(
           path: RoutePaths.forgotPassword,
           name: RouteNames.forgotPassword,
-          builder: (_, _) => BlocProvider(
-            create: (_) => sl<AuthBloc>(),
-            child: const ForgotPasswordScreen(),
-          ),
+          builder: (_, _) => const ForgotPasswordScreen(),
         ),
 
         // External `/home` deep links / stale callers — redirect into the
@@ -122,7 +133,8 @@ class AppRouter {
 
         // ── Bottom-nav shell: Dashboard / Invoices / Clients / Quotes / Settings ──
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) => AppShellScaffold(navigationShell: navigationShell),
+          builder: (context, state, navigationShell) =>
+              AppShellScaffold(navigationShell: navigationShell),
           branches: [
             // Branch 0 — Home / Dashboard
             StatefulShellBranch(
@@ -436,6 +448,29 @@ class GoRouterRefreshStream extends ChangeNotifier {
   @override
   void dispose() {
     (_subscription as dynamic).cancel();
+    super.dispose();
+  }
+}
+
+/// Composes multiple [ChangeNotifier]s into a single [Listenable] so
+/// GoRouter re-evaluates redirects when *any* of them notify.
+class _MergedRefreshListenable extends ChangeNotifier {
+  _MergedRefreshListenable(List<Listenable> children) {
+    for (final c in children) {
+      c.addListener(_onAnyChanged);
+    }
+    _children = children;
+  }
+
+  late final List<Listenable> _children;
+
+  void _onAnyChanged() => notifyListeners();
+
+  @override
+  void dispose() {
+    for (final c in _children) {
+      c.removeListener(_onAnyChanged);
+    }
     super.dispose();
   }
 }

@@ -12,6 +12,16 @@ class StorageKeys {
   static const String rememberMe = 'remember_me';
   static const String cachedProfile = 'cached_profile';
 
+  // ── Onboarding / trial flags ───────────────────────────────────────────
+  // The legacy `onboarding_completed` flag is preserved for back-compat.
+  // The router guard now reads `intro_onboarding_completed` (with a
+  // fallback to `onboarding_completed` for installs that already shipped
+  // with the single flag).
+  static const String introOnboardingCompleted = 'intro_onboarding_completed';
+  static const String setupOnboardingCompleted = 'setup_onboarding_completed';
+  static const String trialStartedAt = 'trial_started_at';
+  static const String setupStepIndex = 'setup_step_index';
+
   // ── InvoiceKit ────────────────────────────────────────────────────────
   static const String appSettings = 'app_settings_v1';
   static const String businessProfile = 'business_profile_v1';

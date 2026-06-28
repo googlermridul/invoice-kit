@@ -8,8 +8,7 @@ part 'trial_state.dart';
 /// Wraps [TrialRepository] for screens that just need to display the
 /// current trial status (banner, splash, dashboard countdown).
 class TrialCubit extends Cubit<TrialCubitState> {
-  TrialCubit({required this._repository})
-    : super(const TrialCubitState._()) {
+  TrialCubit({required this._repository}) : super(const TrialCubitState._()) {
     refresh();
   }
 

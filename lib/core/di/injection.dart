@@ -304,7 +304,7 @@ Future<void> configureDependencies({
       ),
     )
     // ── Blocs / cubits ────────────────────────────────────────────────────
-    ..registerFactory<AuthBloc>(
+    ..registerLazySingleton<AuthBloc>(
       () => AuthBloc(
         loginUseCase: sl<LoginUseCase>(),
         logoutUseCase: sl<LogoutUseCase>(),
@@ -321,8 +321,6 @@ Future<void> configureDependencies({
         localStorage: sl<LocalStorageService>(),
         businessRepo: sl<BusinessProfileRepository>(),
         settingsRepo: sl<SettingsRepository>(),
-        subscriptionRepo: sl<SubscriptionRepository>(),
-        entitlements: sl<EntitlementService>(),
         subscriptionBloc: sl<SubscriptionBloc>(),
       ),
     )

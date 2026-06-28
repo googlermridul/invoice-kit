@@ -4,6 +4,8 @@ class RouteNames {
 
   static const String splash = 'splash';
   static const String onboarding = 'onboarding';
+  static const String onboardingIntro = 'onboarding-intro';
+  static const String onboardingWelcome = 'onboarding-welcome';
   static const String startTrial = 'start-trial';
   static const String subscription = 'subscription';
   static const String login = 'login';

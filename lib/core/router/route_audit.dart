@@ -21,6 +21,8 @@ class RouteAudit {
   static const Set<String> declaredAbsolutePaths = {
     RoutePaths.splash,
     RoutePaths.onboarding,
+    RoutePaths.onboardingIntro,
+    RoutePaths.onboardingWelcome,
     RoutePaths.subscription,
     RoutePaths.login,
     RoutePaths.register,
@@ -36,6 +38,8 @@ class RouteAudit {
     RoutePaths.fx,
     RoutePaths.backup,
     RoutePaths.settings,
+    RoutePaths.devices,
+    RoutePaths.trialExpired,
   };
 
   /// Every named route that [AppRouter] declares.
@@ -45,6 +49,8 @@ class RouteAudit {
   static const Set<String> declaredRouteNames = {
     RouteNames.splash,
     RouteNames.onboarding,
+    RouteNames.onboardingIntro,
+    RouteNames.onboardingWelcome,
     RouteNames.subscription,
     RouteNames.login,
     RouteNames.register,
@@ -69,6 +75,8 @@ class RouteAudit {
     RouteNames.fx,
     RouteNames.backup,
     RouteNames.settings,
+    RouteNames.devices,
+    RouteNames.trialExpired,
   };
 
   /// Lookup a [RoutePaths] path from a [RouteNames] name. Returns `null`
@@ -79,6 +87,10 @@ class RouteAudit {
         return RoutePaths.splash;
       case RouteNames.onboarding:
         return RoutePaths.onboarding;
+      case RouteNames.onboardingIntro:
+        return RoutePaths.onboardingIntro;
+      case RouteNames.onboardingWelcome:
+        return RoutePaths.onboardingWelcome;
       case RouteNames.subscription:
         return RoutePaths.subscription;
       case RouteNames.login:
@@ -107,6 +119,10 @@ class RouteAudit {
         return RoutePaths.backup;
       case RouteNames.settings:
         return RoutePaths.settings;
+      case RouteNames.devices:
+        return RoutePaths.devices;
+      case RouteNames.trialExpired:
+        return RoutePaths.trialExpired;
       default:
         return null;
     }

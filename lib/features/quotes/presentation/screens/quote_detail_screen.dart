@@ -21,7 +21,8 @@ import 'package:invoice_kit/features/business_profile/domain/entities/business_p
 import 'package:invoice_kit/features/clients/domain/entities/client.dart';
 import 'package:invoice_kit/features/clients/presentation/bloc/clients_cubit.dart';
 import 'package:invoice_kit/features/invoices/data/repositories/invoice_repository.dart';
-import 'package:invoice_kit/features/invoices/domain/entities/document.dart' show QuoteStatus;
+import 'package:invoice_kit/features/invoices/domain/entities/document.dart'
+    show QuoteStatus;
 import 'package:invoice_kit/features/invoices/domain/services/pdf_generator.dart';
 import 'package:invoice_kit/features/invoices/domain/usecases/invoice_calculator.dart';
 import 'package:invoice_kit/features/quotes/domain/entities/quote.dart';
@@ -124,13 +125,19 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
           final profile = snap.data;
           return BlocBuilder<QuotesCubit, QuotesState>(
             builder: (context, state) {
-              final q = state.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
+              final q = state.quotes
+                  .where((x) => x.id == widget.quoteId)
+                  .cast<Quote?>()
+                  .firstOrNull;
               if (q == null) {
                 return const Center(child: CircularProgressIndicator());
               }
               return BlocBuilder<ClientsCubit, ClientsState>(
                 builder: (context, cstate) {
-                  final client = cstate.clients.where((c) => c.id == q.clientId).cast<Client?>().firstOrNull;
+                  final client = cstate.clients
+                      .where((c) => c.id == q.clientId)
+                      .cast<Client?>()
+                      .firstOrNull;
                   return _Body(
                     quote: q,
                     client: client,
@@ -147,7 +154,10 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
 
   Quote? _quote(BuildContext context) {
     final s = context.read<QuotesCubit>().state;
-    return s.quotes.where((x) => x.id == widget.quoteId).cast<Quote?>().firstOrNull;
+    return s.quotes
+        .where((x) => x.id == widget.quoteId)
+        .cast<Quote?>()
+        .firstOrNull;
   }
 
   Future<Uint8List?> _ensureBytes(BuildContext context, Quote quote) async {
@@ -157,7 +167,8 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
     setState(() => _pdfBusy = true);
     try {
       final generator = sl<PdfGenerator>();
-      final profile = await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
+      final profile =
+          await sl<BusinessProfileRepository>().load() ?? _emptyProfile();
       final client = context
           .read<ClientsCubit>()
           .state
@@ -201,7 +212,8 @@ class _QuoteDetailScreenState extends State<QuoteDetailScreen> {
     await Printing.layoutPdf(onLayout: (_) async => bytes);
   }
 
-  Client _emptyClient(String id) => Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
+  Client _emptyClient(String id) =>
+      Client(id: id, name: 'Unknown client', createdAt: DateTime.now());
 
   BusinessProfile _emptyProfile() => const BusinessProfile(businessName: '');
 }

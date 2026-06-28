@@ -19,8 +19,12 @@ class Device extends Equatable {
     deviceId: json['device_id']?.toString() ?? '',
     deviceName: json['device_name']?.toString() ?? '',
     platform: json['platform']?.toString() ?? 'unknown',
-    lastSeenAt: DateTime.tryParse(json['last_seen_at']?.toString() ?? '') ?? DateTime.now(),
-    createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+    lastSeenAt:
+        DateTime.tryParse(json['last_seen_at']?.toString() ?? '') ??
+        DateTime.now(),
+    createdAt:
+        DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+        DateTime.now(),
   );
 
   final String id;

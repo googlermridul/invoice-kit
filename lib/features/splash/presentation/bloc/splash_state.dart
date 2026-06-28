@@ -11,6 +11,13 @@ class SplashInitial extends SplashState {
   List<Object> get props => [];
 }
 
+class SplashNavigateToIntro extends SplashState {
+  const SplashNavigateToIntro();
+
+  @override
+  List<Object> get props => [];
+}
+
 class SplashNavigateToOnboarding extends SplashState {
   const SplashNavigateToOnboarding();
 

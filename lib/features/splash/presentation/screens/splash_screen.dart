@@ -17,7 +17,9 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<SplashBloc, SplashState>(
       listener: (context, state) {
-        if (state is SplashNavigateToOnboarding) {
+        if (state is SplashNavigateToIntro) {
+          context.go(RoutePaths.onboardingIntro);
+        } else if (state is SplashNavigateToOnboarding) {
           context.go(AppRoutes.onboarding);
         } else if (state is SplashNavigateToSubscription) {
           context.go(AppRoutes.subscription);

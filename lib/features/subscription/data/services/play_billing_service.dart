@@ -91,7 +91,10 @@ class PlayBillingSubscriptionService implements SubscriptionBillingService {
   PlayBillingSubscriptionService({
     required LocalStorageService localStorage,
     required this.monthlyProductId,
-    required this.yearlyProductId, required HiveStorageService hive, required SecureStorageService secure, required SubscriptionSupabaseDataSource supabase,
+    required this.yearlyProductId,
+    required HiveStorageService hive,
+    required SecureStorageService secure,
+    required SubscriptionSupabaseDataSource supabase,
   });
 
   // final HiveStorageService _hive;
@@ -101,7 +104,8 @@ class PlayBillingSubscriptionService implements SubscriptionBillingService {
   final String monthlyProductId;
   final String yearlyProductId;
 
-  final StreamController<BillingPurchaseUpdate> _controller = StreamController<BillingPurchaseUpdate>.broadcast();
+  final StreamController<BillingPurchaseUpdate> _controller =
+      StreamController<BillingPurchaseUpdate>.broadcast();
 
   InAppPurchase? _iap;
 
